@@ -577,11 +577,7 @@
 <section id="dashboard" class="view active">
     <div style="min-height: 100%; padding-bottom: 2rem;">
         
-        <!-- TODAY'S FOCUS -->
-        <h3 style="margin-bottom: 1rem;">Today's Focus</h3>
-        <div class="habit-list" id="today-list"></div>
-        
-        <!-- COMPACT STATS - ONE LINE -->
+        <!-- COMPACT STATS - ONE LINE AT THE TOP -->
         <div class="compact-stats-row">
             <div class="compact-stat">
                 <div class="compact-stat-value" id="dash-rate">0%</div>
@@ -603,12 +599,15 @@
             </div>
         </div>
         
+        <!-- TODAY'S FOCUS BELOW STATS -->
+        <h3 style="margin-bottom: 1rem; margin-top: 2rem;">Today's Focus</h3>
+        <div class="habit-list" id="today-list"></div>
+        
         <div id="empty-state" style="text-align: center; color: var(--text-muted); padding: 3rem; display: none;">
             <p>No active habits for today.</p>
         </div>
     </div>
 </section>
-            
 
                 <!-- History View -->
                 <section id="history" class="view">
