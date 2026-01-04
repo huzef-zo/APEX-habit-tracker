@@ -842,30 +842,44 @@
             },
 
             addHabit: () => {
-                const name = document.getElementById('habit-name-input').value.trim();
-                if (!name) return;
+    const name = document.getElementById('habit-name-input').value.trim();
+    console.log('Adding habit:', name); // DEBUG
+    
+    if (!name) {
+        console.log('No name provided'); // DEBUG
+        return;
+    }
 
-                const checkboxes = document.querySelectorAll('.day-selector input:checked');
-                const days = Array.from(checkboxes).map(cb => parseInt(cb.value));
-                const finalDays = days.length > 0 ? days : [0,1,2,3,4,5,6];
+    const checkboxes = document.querySelectorAll('.day-selector input:checked');
+    const days = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    const finalDays = days.length > 0 ? days : [0,1,2,3,4,5,6];
+    
+    console.log('Selected days:', finalDays); // DEBUG
 
-                const newHabit = {
-                    id: Date.now(),
-                    name: name,
-                    logs: [],
-                    days: finalDays,
-                    created: new Date().toISOString()
-                };
+    const newHabit = {
+        id: Date.now(),
+        name: name,
+        logs: [],
+        days: finalDays,
+        created: new Date().toISOString()
+    };
 
-                app.data.habits.push(newHabit);
-                app.save();
-                app.renderDashboard();
-                app.renderSidebarHabits();
-                app.closeModal();
-                app.showToast(`Habit "${name}" added!`);
-                document.getElementById('habit-name-input').value = '';
-                document.querySelectorAll('.day-selector input').forEach(cb => cb.checked = false);
-            },
+    console.log('New habit object:', newHabit); // DEBUG
+    
+    app.data.habits.push(newHabit);
+    console.log('Total habits now:', app.data.habits.length); // DEBUG
+    
+    app.save();
+    
+    console.log('Calling renderDashboard...'); // DEBUG
+    app.renderDashboard();
+    
+    app.renderSidebarHabits();
+    app.closeModal();
+    app.showToast(`Habit "${name}" added!`);
+    document.getElementById('habit-name-input').value = '';
+    document.querySelectorAll('.day-selector input').forEach(cb => cb.checked = false);
+          },
 
             deleteHabit: (id) => {
                 if(confirm('Delete this habit?')) {
