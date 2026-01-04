@@ -3,7 +3,7 @@
 A beautiful habit tracking app with Pomodoro timer and analytics.
 
 ## 🌐 Live Demo
-https://huzef-zo.github.io/apex-habit-tracker
+https://huzef-zo.github.io/APEX-habit-tracker
 
 ## ✨ Features
 - 📊 Daily habit tracking
