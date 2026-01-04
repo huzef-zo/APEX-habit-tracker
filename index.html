@@ -527,6 +527,28 @@
                 min-height: 150px;
             }
         }
+        /* FIX DASHBOARD ORDER - STATS AT TOP */
+#dashboard > div {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#dashboard .compact-stats-row {
+    order: 1 !important;
+}
+
+#dashboard h3 {
+    order: 2 !important;
+    margin-top: 2rem !important;
+}
+
+#dashboard .habit-list {
+    order: 3 !important;
+}
+
+#dashboard #empty-state {
+    order: 4 !important;
+}
     </style>
 </head>
 <body>
