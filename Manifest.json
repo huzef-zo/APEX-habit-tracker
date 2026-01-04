@@ -1,0 +1,24 @@
+{
+  "name": "APEX Habit Tracker",
+  "short_name": "APEX",
+  "description": "Track habits, build consistency daily",
+  "start_url": "/APEX-habit-tracker/?source=pwa",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#00d2ff",
+  "orientation": "portrait",
+  "scope": "/APEX-habit-tracker/",
+  "icons": [
+    {
+      "src": "https://huzef-zo.github.io/APEX-habit-tracker/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://huzef-zo.github.io/APEX-habit-tracker/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
