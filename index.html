@@ -252,7 +252,20 @@
         .stat-label { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
         .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--text-main); }
         .stat-sub { font-size: 0.9rem; color: var(--success); display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+        /* --- Fix Dashboard Scroll --- */
+        #dashboard.active {
+         overflow-y: auto !important;
+          height: 100%;
+            }
 
+       #dashboard .habit-list {
+    min-height: 200px; /* Ensures space for scrolling */
+         }
+
+        /* Ensure scroll area works correctly */
+        .scroll-area {
+         overflow-y: auto !important;
+         }
         /* --- Habit List --- */
         .habit-list { display: flex; flex-direction: column; gap: 0.75rem; }
         .habit-item { display: flex; align-items: center; justify-content: space-between; background-color: var(--bg-card); padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
