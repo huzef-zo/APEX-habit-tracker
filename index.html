@@ -574,31 +574,41 @@
 
             <div class="scroll-area">
             <!-- Dashboard View -->
-            <section id="dashboard" class="view active">
-              <div style="min-height: 100%; padding-bottom: 2rem;"> <!-- Added wrapper for scrolling -->
-                <!-- COMPACT SINGLE-LINE DASHBOARD STATS -->
-<div class="compact-stats-row">
-    <div class="compact-stat">
-        <div class="compact-stat-value" id="dash-rate">0%</div>
-        <div class="compact-stat-label">Completion</div>
+<section id="dashboard" class="view active">
+    <div style="min-height: 100%; padding-bottom: 2rem;">
+        
+        <!-- TODAY'S FOCUS -->
+        <h3 style="margin-bottom: 1rem;">Today's Focus</h3>
+        <div class="habit-list" id="today-list"></div>
+        
+        <!-- COMPACT STATS - ONE LINE -->
+        <div class="compact-stats-row">
+            <div class="compact-stat">
+                <div class="compact-stat-value" id="dash-rate">0%</div>
+                <div class="compact-stat-label">Completion</div>
+            </div>
+            
+            <div class="stat-divider"></div>
+            
+            <div class="compact-stat">
+                <div class="compact-stat-value" id="dash-streak">0 <span class="streak-icon">🔥</span></div>
+                <div class="compact-stat-label">Streak</div>
+            </div>
+            
+            <div class="stat-divider"></div>
+            
+            <div class="compact-stat">
+                <div class="compact-stat-value" id="dash-total">0</div>
+                <div class="compact-stat-label">Active</div>
+            </div>
+        </div>
+        
+        <div id="empty-state" style="text-align: center; color: var(--text-muted); padding: 3rem; display: none;">
+            <p>No active habits for today.</p>
+        </div>
     </div>
-    
-    <div class="stat-divider"></div>
-    
-    <div class="compact-stat">
-        <div class="compact-stat-value" id="dash-streak">0 <span class="streak-icon">🔥</span></div>
-        <div class="compact-stat-label">Streak</div>
-    </div>
-    
-    <div class="stat-divider"></div>
-    
-    <div class="compact-stat">
-        <div class="compact-stat-value" id="dash-total">0</div>
-        <div class="compact-stat-label">Active</div>
-    </div>
-</div>
-                </div>
-               </section>
+</section>
+            
 
                 <!-- History View -->
                 <section id="history" class="view">
