@@ -1440,5 +1440,21 @@ self.addEventListener('fetch', event => {
     );
 });
 </script>
+<script>
+// Force offline support
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
 
+function updateOnlineStatus() {
+    if (!navigator.onLine) {
+        document.body.innerHTML = document.body.innerHTML.replace(
+            'APEX | Ultimate Habit Tracker',
+            'APEX | Offline Mode'
+        );
+    }
+}
+
+// Check on load
+updateOnlineStatus();
+</script>
 </body></html>
