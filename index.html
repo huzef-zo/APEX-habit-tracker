@@ -252,6 +252,71 @@
         .stat-label { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
         .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--text-main); }
         .stat-sub { font-size: 0.9rem; color: var(--success); display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+        /* --- COMPACT DASHBOARD STATS --- */
+.compact-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.compact-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+}
+
+.compact-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.compact-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 40px;
+    background-color: var(--border);
+    margin: 0 1rem;
+}
+
+.streak-icon {
+    color: #ff9f43;
+    font-size: 1.5rem;
+    vertical-align: middle;
+    margin-left: 2px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .compact-stats-row {
+        padding: 0.75rem 1rem;
+    }
+    
+    .compact-stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .stat-divider {
+        margin: 0 0.5rem;
+    }
+    }
         /* --- Fix Dashboard Scroll --- */
         #dashboard.active {
          overflow-y: auto !important;
@@ -511,29 +576,27 @@
             <!-- Dashboard View -->
             <section id="dashboard" class="view active">
               <div style="min-height: 100%; padding-bottom: 2rem;"> <!-- Added wrapper for scrolling -->
-                <div class="dashboard-grid">
-                  <div class="card">
-                    <div class="stat-label">Completion Rate</div>
-                      <div class="stat-value" id="dash-rate">0%</div>
-                <div class="stat-sub">This Month</div>
-            </div>
-            <div class="card">
-                <div class="stat-label">Current Streak</div>
-                <div class="stat-value" id="dash-streak">0 <span style="font-size:1.5rem; color: #ff9f43;">🔥</span></div>
-                <div class="stat-sub">Keep it up!</div>
-            </div>
-            <div class="card">
-                <div class="stat-label">Active Habits</div>
-                <div class="stat-value" id="dash-total">0</div>
-                <div class="stat-sub">Tracked</div>
-            </div>
-                </div>
-                <h3 style="margin-bottom: 1rem;">Today's Focus</h3>
-                 <div class="habit-list" id="today-list"></div>
-        
-                 <div id="empty-state" style="text-align: center; color: var(--text-muted); padding: 3rem; display: none;">
-                   <p>No active habits for today.</p>
-                 </div>
+                <!-- COMPACT SINGLE-LINE DASHBOARD STATS -->
+<div class="compact-stats-row">
+    <div class="compact-stat">
+        <div class="compact-stat-value" id="dash-rate">0%</div>
+        <div class="compact-stat-label">Completion</div>
+    </div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="compact-stat">
+        <div class="compact-stat-value" id="dash-streak">0 <span class="streak-icon">🔥</span></div>
+        <div class="compact-stat-label">Streak</div>
+    </div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="compact-stat">
+        <div class="compact-stat-value" id="dash-total">0</div>
+        <div class="compact-stat-label">Active</div>
+    </div>
+</div>
                 </div>
                </section>
 
