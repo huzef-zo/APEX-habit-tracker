@@ -8,7 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-
+     <!-- PWA Configuration -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="APEX">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#050505">
+<meta name="msapplication-TileColor" content="#050505">
+<meta name="msapplication-TileImage" content="icon-144.png">
     <style>
         :root {
             /* Obsidian Dark Theme */
@@ -1391,6 +1399,46 @@
             }
         }, 5000);
     </script>
+<script>
+// OFFLINE SUPPORT - Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/APEX-habit-tracker/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registered:', registration.scope);
+            })
+            .catch(error => {
+                console.log('ServiceWorker registration failed:', error);
+            });
+    });
+}
 
+// Save current page for offline
+const cacheName = 'apex-v1';
+const filesToCache = [
+    '/APEX-habit-tracker/',
+    '/APEX-habit-tracker/index.html'
+];
+
+// Install event - cache files
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(cacheName)
+            .then(cache => {
+                return cache.addAll(filesToCache);
+            })
+    );
+});
+
+// Fetch event - serve from cache if offline
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                return response || fetch(event.request);
+            })
+    );
+});
+</script>
 
 </body></html>
