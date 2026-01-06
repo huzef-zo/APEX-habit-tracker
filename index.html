@@ -196,7 +196,7 @@
         .stamina-fill { background: linear-gradient(90deg, #00ff9d, #00cc7a); }
         .strength-fill { background: linear-gradient(90deg, #ffcc00, #ff9900); }
 
-        /* Shadow Army (now called "Recruits") */
+        /* Recruits Section */
         .recruits-section {
             margin-top: 1rem;
             padding: 1rem;
@@ -229,8 +229,15 @@
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
         }
         .recruit-btn:disabled {
-            opacity: 0.5;
+            background: #666;
             cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .recruit-btn:disabled:hover {
+            background: #666;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         /* --- MAIN CONTENT --- */
@@ -507,7 +514,7 @@
             letter-spacing: 1px; 
         }
 
-        /* --- TIMER (Improved Design) --- */
+        /* --- TIMER --- */
         .timer-wrapper {
             display: flex;
             flex-direction: column;
@@ -574,13 +581,6 @@
             margin-bottom: 1rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-        }
-
-        .timer-info {
-            color: var(--text-dim);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-            text-align: center;
         }
 
         .timer-cycle {
@@ -711,11 +711,6 @@
 
         .lap-diff {
             color: var(--danger);
-            font-size: 0.8rem;
-        }
-
-        .lap-best {
-            color: var(--success);
             font-size: 0.8rem;
         }
 
@@ -1572,7 +1567,7 @@
         };
 
         // --- STATE MANAGEMENT ---
-        const STORAGE_KEY = 'apex_v8_complete';
+        const STORAGE_KEY = 'apex_v9_fixed';
         const defaultState = {
             user: { 
                 level: 1, 
@@ -1593,10 +1588,6 @@
                 pomodoroCompleted: 0,
                 totalFocusTime: 0,
                 bestStreak: 0
-            },
-            heatmapView: {
-                currentYear: new Date().getFullYear(),
-                currentMonth: new Date().getMonth()
             }
         };
         
@@ -1607,21 +1598,58 @@
             App.render(); 
         }
 
+        // --- UTILITY FUNCTIONS ---
+        function getLocalDateString(date = new Date()) {
+            // Get date in YYYY-MM-DD format in local timezone (FIXED)
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getYesterdayDateString() {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            return getLocalDateString(yesterday);
+        }
+
+        function diffToXP(diff) {
+            const map = {'easy':10, 'medium':25, 'hard':50};
+            return map[diff] || 10;
+        }
+
+        function getDifficultyColor(diff) {
+            const colors = {
+                'easy': '#00ff9d',
+                'medium': '#ffcc00',
+                'hard': '#ff003c'
+            };
+            return colors[diff] || '#666';
+        }
+
         // --- APP LOGIC ---
         const App = {
             tempDays: [],
             staminaInterval: null,
 
             init() {
-                // Initialize date and time
+                // Start intro animation
+                setTimeout(() => {
+                    const intro = document.getElementById('intro-overlay');
+                    if (intro) {
+                        intro.style.opacity = '0';
+                        setTimeout(() => {
+                            intro.style.display = 'none';
+                            document.getElementById('app-container').classList.add('visible');
+                        }, 800);
+                    }
+                }, 2500);
+                
                 this.updateDate();
                 setInterval(() => this.updateDate(), 60000);
                 
                 // Initialize stamina regeneration
                 this.initStaminaSystem();
-                
-                // Initialize heatmap
-                this.initHeatmap();
                 
                 // Set up day selector
                 document.querySelectorAll('.day-btn').forEach(btn => {
@@ -1636,22 +1664,13 @@
                     });
                 });
                 
-                // Start intro animation
-                setTimeout(() => {
-                    const intro = document.getElementById('intro-overlay');
-                    if (intro) {
-                        intro.style.opacity = '0';
-                        setTimeout(() => {
-                            intro.style.display = 'none';
-                            document.getElementById('app-container').classList.add('visible');
-                        }, 800);
-                    }
-                }, 2500);
-                
                 this.render();
                 
                 // Initialize Timer
                 Timer.init();
+                
+                // Initialize Heatmap
+                Heatmap.render();
             },
 
             updateDate() {
@@ -1659,8 +1678,7 @@
                 const dateStr = now.toLocaleDateString('en-US', { 
                     weekday: 'long', 
                     month: 'short', 
-                    day: 'numeric',
-                    year: 'numeric'
+                    day: 'numeric'
                 });
                 const dateEl = document.getElementById('sidebar-date');
                 if (dateEl) dateEl.innerText = dateStr;
@@ -1688,20 +1706,6 @@
                     );
                     this.render();
                 }, 60000);
-            },
-
-            initHeatmap() {
-                // Initialize activity log for the past year if not exists
-                const today = new Date();
-                for(let i = 0; i < 365; i++) {
-                    const date = new Date(today);
-                    date.setDate(today.getDate() - i);
-                    const dateStr = date.toISOString().split('T')[0];
-                    if(!State.activityLog[dateStr]) {
-                        State.activityLog[dateStr] = 0;
-                    }
-                }
-                saveState();
             },
 
             openModal() {
@@ -1766,7 +1770,7 @@
                 
                 const today = new Date();
                 const todayIndex = today.getDay();
-                const todayStr = today.toISOString().split('T')[0];
+                const todayStr = getLocalDateString(); // FIXED: Use local date string
                 
                 // Check if habit is active today
                 if(!habit.days.includes(todayIndex)) {
@@ -1792,7 +1796,7 @@
                     State.user.totalXp = Math.max(0, State.user.totalXp - xp - bonusXP);
                     State.user.stamina += staminaCost; // Return stamina
                     
-                    // Update activity log
+                    // Update activity log (FIXED: Use local date string)
                     if (State.activityLog[todayStr]) {
                         State.activityLog[todayStr]--;
                         if (State.activityLog[todayStr] <= 0) {
@@ -1813,6 +1817,7 @@
                     AudioSys.play('click');
                     this.checkLevelUp();
                     
+                    // Update activity log (FIXED: Use local date string)
                     if (!State.activityLog[todayStr]) {
                         State.activityLog[todayStr] = 0;
                     }
@@ -1831,15 +1836,15 @@
 
             recalcStreak(habit) {
                 const dates = habit.completedDates.sort().reverse();
-                const today = new Date();
-                const todayStr = today.toISOString().split('T')[0];
+                const todayStr = getLocalDateString();
+                const yesterdayStr = getYesterdayDateString();
                 let streak = 0;
                 
-                if (dates.length > 0 && (dates[0] === todayStr || dates[0] === this.getYesterdayStr())) {
+                if (dates.length > 0 && (dates[0] === todayStr || dates[0] === yesterdayStr)) {
                     streak = 1;
                     for(let i = 0; i < dates.length - 1; i++) {
-                        const d1 = new Date(dates[i]);
-                        const d2 = new Date(dates[i + 1]);
+                        const d1 = new Date(dates[i] + 'T00:00:00');
+                        const d2 = new Date(dates[i + 1] + 'T00:00:00');
                         const diff = (d1 - d2) / (1000 * 60 * 60 * 24);
                         if (diff === 1) streak++;
                         else break;
@@ -1847,12 +1852,6 @@
                 }
                 habit.streak = streak;
                 if (streak > habit.bestStreak) habit.bestStreak = streak;
-            },
-
-            getYesterdayStr() {
-                const d = new Date();
-                d.setDate(d.getDate() - 1);
-                return d.toISOString().split('T')[0];
             },
 
             getHabitXP(diff) {
@@ -1915,8 +1914,11 @@
                     
                     AudioSys.play('recruit');
                     saveState();
+                    
+                    // Show success message
+                    alert(`Recruit trained successfully! You now have ${State.user.recruits} recruits.`);
                 } else {
-                    alert("Insufficient XP to train recruit!");
+                    alert("Insufficient XP to train recruit! You need 100 XP.");
                 }
             },
 
@@ -2017,7 +2019,7 @@
                 
                 // Render today's habits
                 const todayIndex = new Date().getDay();
-                const todayStr = new Date().toISOString().split('T')[0];
+                const todayStr = getLocalDateString(); // FIXED: Use local date string
                 const listContainer = document.getElementById('habit-list-container');
                 const sidebarList = document.getElementById('sidebar-habit-list');
                 
@@ -2356,7 +2358,7 @@
                 
                 container.innerHTML = '';
                 
-                // Generate data for last 30 days
+                // Generate data for last 30 days (FIXED: Use local dates)
                 const data = [];
                 const labels = [];
                 const today = new Date();
@@ -2364,7 +2366,7 @@
                 for(let i = 29; i >= 0; i--) {
                     const date = new Date(today);
                     date.setDate(today.getDate() - i);
-                    const dateStr = date.toISOString().split('T')[0];
+                    const dateStr = getLocalDateString(date);
                     const dayLabel = date.getDate().toString();
                     
                     data.push(State.activityLog[dateStr] || 0);
@@ -2413,13 +2415,15 @@
                 const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
                 const daysPassed = now.getDate();
                 
-                // Calculate completed habits this month
+                // Calculate completed habits this month (FIXED: Use local dates)
                 let completedThisMonth = 0;
-                const yearMonth = now.toISOString().slice(0, 7);
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth() + 1;
                 
                 State.habits.forEach(habit => {
-                    habit.completedDates.forEach(date => {
-                        if(date.startsWith(yearMonth)) {
+                    habit.completedDates.forEach(dateStr => {
+                        const date = new Date(dateStr + 'T00:00:00');
+                        if (date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth) {
                             completedThisMonth++;
                         }
                     });
@@ -2481,7 +2485,7 @@
                 // Add cells for each day of the month
                 for(let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(year, month, day);
-                    const dateStr = date.toISOString().split('T')[0];
+                    const dateStr = getLocalDateString(date); // FIXED: Use local date string
                     const count = State.activityLog[dateStr] || 0;
                     
                     // Determine heat level
@@ -2495,8 +2499,9 @@
                     cell.className = 'heat-cell';
                     if(level > 0) cell.setAttribute('data-lvl', level);
                     
-                    // Mark today
-                    if(date.toDateString() === today.toDateString()) {
+                    // Mark today (FIXED: Compare local dates)
+                    const todayStr = getLocalDateString(today);
+                    if(dateStr === todayStr) {
                         cell.classList.add('today');
                     }
                     
@@ -2508,7 +2513,7 @@
                     // Add tooltip
                     const tooltip = document.createElement('div');
                     tooltip.className = 'heat-tooltip';
-                    tooltip.innerText = `${dateStr}: ${count} quest${count !== 1 ? 's' : ''} completed`;
+                    tooltip.innerText = `${date.toLocaleDateString()}: ${count} quest${count !== 1 ? 's' : ''} completed`;
                     cell.appendChild(tooltip);
                     
                     grid.appendChild(cell);
@@ -2526,18 +2531,17 @@
             }
         };
 
-        // --- UTILITY FUNCTIONS ---
+        // --- INITIALIZE APP ---
+        document.addEventListener('DOMContentLoaded', function() {
+            App.init();
+        });
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             if (sidebar) {
                 sidebar.classList.toggle('open');
             }
         }
-
-        // --- INITIALIZE APP ---
-        document.addEventListener('DOMContentLoaded', function() {
-            App.init();
-        });
     </script>
 </body>
     </html>
