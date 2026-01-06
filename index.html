@@ -1,0 +1,4852 @@
+<!doctype html>
+<html lang="en"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, viewport-fit=cover"> 
+  <title>APEX | Shadow Monarch Habit System</title> <!-- Fonts --> 
+  <link rel="preconnect" href="https://fonts.googleapis.com"> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"> 
+  <!-- PWA Configuration --> 
+  <link rel="manifest" href="manifest.json"> 
+  <meta name="apple-mobile-web-app-capable" content="yes"> 
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
+  <meta name="apple-mobile-web-app-title" content="APEX"> 
+  <link rel="apple-touch-icon" href="icon-192.png"> 
+  <meta name="theme-color" content="#050505"> 
+  <meta name="msapplication-TileColor" content="#050505"> 
+  <meta name="msapplication-TileImage" content="icon-144.png"> 
+  <!-- Styles --> 
+  <link rel="stylesheet" href="style.css"> 
+ <style type="text/css" id="dcoder_stylesheet">:root {
+    /* Shadow Monarch Theme */
+    --bg-body: #0a0a0a;
+    --bg-card: #121212;
+    --bg-card-hover: #1a1a1a;
+    --bg-sidebar: #0a0a0a;
+    --border: #222222;
+    --primary: #00d2ff; /* Neon Cyan */
+    --primary-glow: rgba(0, 210, 255, 0.3);
+    --primary-dim: rgba(0, 210, 255, 0.1);
+    --text-main: #ffffff;
+    --text-muted: #888888;
+    --danger: #ff4757;
+    --danger-glow: rgba(255, 71, 87, 0.3);
+    --success: #2ed573;
+    --warning: #ff9f43;
+    --shadow: 0 10px 30px -10px rgba(0,0,0,0.7);
+    --font-family: 'Inter', sans-serif;
+    --nav-width: 280px;
+    --neon-glow: 0 0 15px var(--primary-glow);
+    --red-glow: 0 0 15px var(--danger-glow);
+    --rank-gold: #ffd700;
+    --rank-silver: #c0c0c0;
+    --rank-bronze: #cd7f32;
+    --stat-strength: #ff6b6b;
+    --stat-intelligence: #4ecdc4;
+    --stat-willpower: #45b7d1;
+    --stat-discipline: #96ceb4;
+    --stat-consistency: #feca57;
+}
+
+body.light-mode {
+    /* Ivory Light Theme */
+    --bg-body: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f5f9;
+    --bg-sidebar: #ffffff;
+    --border: #e2e8f0;
+    --primary: #2563eb;
+    --primary-glow: rgba(37, 99, 235, 0.2);
+    --primary-dim: rgba(37, 99, 235, 0.1);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    --neon-glow: 0 0 10px var(--primary-glow);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: var(--font-family);
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    transition: background 0.3s, color 0.3s;
+    position: relative;
+}
+
+/* --- Splash Screen Animation --- */
+#splash-screen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #050505;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease;
+}
+
+.splash-logo {
+    width: 80px; height: 80px;
+    background-color: #000;
+    border: 4px solid var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; color: var(--primary);
+    border-radius: 16px;
+    box-shadow: var(--neon-glow);
+    transform: scale(0);
+    animation: logoPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.splash-brand {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fff;
+    margin-top: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUpFade 0.6s ease 0.4s forwards;
+    letter-spacing: -1px;
+    text-shadow: 0 0 20px var(--primary-glow);
+}
+
+.splash-slogan {
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-top: 10px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: slideUpFade 0.6s ease 0.8s forwards;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+@keyframes logoPop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); box-shadow: 0 0 40px var(--primary); }
+    100% { transform: scale(1); box-shadow: var(--neon-glow); }
+}
+
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Glitch Text Effect for Titles --- */
+.glitch-text {
+    position: relative;
+    display: inline-block;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-text::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--danger);
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+    opacity: 0.8;
+}
+
+.glitch-text::after {
+    left: -2px;
+    text-shadow: 2px 0 var(--primary);
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+    opacity: 0.8;
+}
+
+@keyframes glitch-anim-1 {
+    0% { clip-path: inset(40% 0 61% 0); }
+    5% { clip-path: inset(92% 0 1% 0); }
+    10% { clip-path: inset(43% 0 1% 0); }
+    15% { clip-path: inset(25% 0 58% 0); }
+    20% { clip-path: inset(54% 0 7% 0); }
+    25% { clip-path: inset(58% 0 43% 0); }
+    30% { clip-path: inset(98% 0 1% 0); }
+    35% { clip-path: inset(3% 0 46% 0); }
+    40% { clip-path: inset(80% 0 1% 0); }
+    45% { clip-path: inset(75% 0 9% 0); }
+    50% { clip-path: inset(37% 0 3% 0); }
+    55% { clip-path: inset(59% 0 3% 0); }
+    60% { clip-path: inset(26% 0 67% 0); }
+    65% { clip-path: inset(75% 0 19% 0); }
+    70% { clip-path: inset(84% 0 2% 0); }
+    75% { clip-path: inset(92% 0 5% 0); }
+    80% { clip-path: inset(10% 0 58% 0); }
+    85% { clip-path: inset(58% 0 23% 0); }
+    90% { clip-path: inset(20% 0 59% 0); }
+    95% { clip-path: inset(50% 0 32% 0); }
+    100% { clip-path: inset(23% 0 76% 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: inset(25% 0 58% 0); }
+    5% { clip-path: inset(54% 0 7% 0); }
+    10% { clip-path: inset(58% 0 43% 0); }
+    15% { clip-path: inset(98% 0 1% 0); }
+    20% { clip-path: inset(3% 0 46% 0); }
+    25% { clip-path: inset(80% 0 1% 0); }
+    30% { clip-path: inset(75% 0 9% 0); }
+    35% { clip-path: inset(37% 0 3% 0); }
+    40% { clip-path: inset(59% 0 3% 0); }
+    45% { clip-path: inset(26% 0 67% 0); }
+    50% { clip-path: inset(75% 0 19% 0); }
+    55% { clip-path: inset(84% 0 2% 0); }
+    60% { clip-path: inset(92% 0 5% 0); }
+    65% { clip-path: inset(10% 0 58% 0); }
+    70% { clip-path: inset(58% 0 23% 0); }
+    75% { clip-path: inset(20% 0 59% 0); }
+    80% { clip-path: inset(50% 0 32% 0); }
+    85% { clip-path: inset(23% 0 76% 0); }
+    90% { clip-path: inset(40% 0 61% 0); }
+    95% { clip-path: inset(92% 0 1% 0); }
+    100% { clip-path: inset(43% 0 1% 0); }
+}
+
+/* --- App Container --- */
+#app-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+.app-content-reveal {
+    animation: appSlideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 1 !important;
+}
+
+@keyframes appSlideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    width: var(--nav-width);
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    z-index: 20;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.brand { 
+    font-size: 1.5rem; 
+    font-weight: 900; 
+    letter-spacing: -0.5px; 
+    margin-bottom: 2rem; 
+    color: var(--text-main); 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    text-shadow: var(--neon-glow);
+}
+.brand span { 
+    color: var(--primary); 
+    text-shadow: 0 0 10px var(--primary);
+}
+
+.nav-section-title { 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+    font-weight: 800; 
+    margin-bottom: 0.75rem; 
+    margin-top: 1.5rem; 
+    letter-spacing: 1.5px; 
+    position: relative;
+    padding-left: 10px;
+}
+
+.nav-section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.nav-links { list-style: none; }
+.nav-item { margin-bottom: 0.25rem; }
+
+.nav-btn {
+    width: 100%; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    padding: 10px 12px; 
+    border-radius: 8px; 
+    border: none;
+    background: transparent; 
+    color: var(--text-muted); 
+    font-weight: 600;
+    font-size: 0.9rem; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+.nav-btn:hover { 
+    background-color: var(--bg-card-hover); 
+    color: var(--text-main); 
+    transform: translateX(5px);
+}
+.nav-btn.active { 
+    background-color: var(--primary-dim); 
+    color: var(--primary); 
+    font-weight: 700;
+    border-left: 3px solid var(--primary);
+}
+.nav-btn.active::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* Habit List in Sidebar */
+.habit-sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 1rem;
+    padding-right: 5px;
+}
+.habit-sidebar-list::-webkit-scrollbar { width: 4px; }
+.habit-sidebar-list::-webkit-scrollbar-thumb { 
+    background: var(--primary); 
+    border-radius: 4px; 
+}
+
+.sidebar-habit-item {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    padding: 8px 12px; 
+    border-radius: 6px; 
+    font-size: 0.85rem; 
+    color: var(--text-main);
+    margin-bottom: 4px; 
+    cursor: pointer; 
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+}
+.sidebar-habit-item:hover { 
+    background-color: var(--bg-card-hover); 
+    border-left-color: var(--primary);
+}
+.sidebar-habit-delete { 
+    color: var(--text-muted); 
+    opacity: 0; 
+    transition: opacity 0.2s; 
+    font-weight: bold;
+    font-size: 1.2rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+.sidebar-habit-item:hover .sidebar-habit-delete { opacity: 1; }
+.sidebar-habit-delete:hover { 
+    color: var(--danger); 
+    background: rgba(255, 71, 87, 0.1);
+}
+
+/* --- Main Content --- */
+.main-content { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+    position: relative; 
+    height: 100vh;
+    min-width: 0;
+    background-color: var(--bg-body);
+}
+
+.top-bar { 
+    height: 70px; 
+    border-bottom: 1px solid var(--border); 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 2rem; 
+    background-color: var(--bg-body); 
+    flex-shrink: 0; 
+    position: relative;
+}
+.top-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.3;
+}
+.page-title { 
+    font-size: 1.25rem; 
+    font-weight: 700; 
+    letter-spacing: -0.5px;
+}
+.mobile-toggle { 
+    display: none; 
+    background: none; 
+    border: none; 
+    font-size: 1.5rem; 
+    color: var(--text-main); 
+    cursor: pointer; 
+}
+
+.scroll-area { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 2rem; 
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 70px);
+    background-color: var(--bg-body);
+}
+
+/* --- Views --- */
+.view { 
+    display: none; 
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+}
+.view.active { 
+    display: block; 
+    opacity: 1;
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+@keyframes fadeUp { 
+    from { opacity: 0; transform: translateY(20px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* --- NEW: Shadow Army Display --- */
+.shadow-army-container {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(10,10,30,0.7));
+    border-radius: 16px;
+    border: 1px solid var(--primary);
+    box-shadow: var(--neon-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+.shadow-army-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.shadow-army-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.shadow-army-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.shadow-soldier {
+    width: 80px;
+    height: 80px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.shadow-soldier:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 210, 255, 0.3);
+}
+
+.shadow-rank {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary);
+}
+
+.shadow-name {
+    font-size: 0.7rem;
+    margin-top: 5px;
+    text-align: center;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70px;
+}
+
+.shadow-level {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(0,0,0,0.8);
+    color: var(--warning);
+    font-size: 0.6rem;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+/* --- NEW: Daily Dungeon --- */
+.daily-dungeon {
+    background: linear-gradient(135deg, rgba(30,0,30,0.8), rgba(10,0,20,0.9));
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--danger);
+    box-shadow: var(--red-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+.dungeon-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.dungeon-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dungeon-timer {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    background: rgba(255, 71, 87, 0.1);
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.dungeon-challenge {
+    background: rgba(0,0,0,0.5);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--danger);
+}
+
+.dungeon-reward {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.reward-xp {
+    color: var(--warning);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.complete-dungeon-btn {
+    background: linear-gradient(135deg, var(--danger), #ff6b6b);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.complete-dungeon-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+}
+
+/* --- NEW: Monster Hunting (Bad Habits) --- */
+.monster-hunt {
+    background: linear-gradient(135deg, rgba(20,0,0,0.8), rgba(40,0,0,0.9));
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #ff4757;
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
+}
+
+.monster-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.monster-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ff4757;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.monster-stats {
+    background: rgba(0,0,0,0.5);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.monster-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.monster-hp-bar {
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.monster-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff4757, #ff6b6b);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.monster-hp-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+}
+
+.attack-monster-btn {
+    background: linear-gradient(135deg, #ff4757, #ff3838);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 1rem;
+    transition: all 0.3s;
+    width: 100%;
+    justify-content: center;
+}
+
+.attack-monster-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
+}
+
+/* --- NEW: Skill Tree --- */
+.skill-tree-container {
+    background: rgba(0,0,0,0.5);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--primary);
+}
+
+.skill-tree {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 1rem;
+}
+
+.skill-node {
+    background: rgba(20,20,20,0.8);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.skill-node.unlocked {
+    border-color: var(--primary);
+    box-shadow: var(--neon-glow);
+}
+
+.skill-node.locked {
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+.skill-node.active {
+    border-color: var(--warning);
+    box-shadow: 0 0 20px rgba(255, 159, 67, 0.4);
+}
+
+.skill-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.skill-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.25rem;
+}
+
+.skill-cost {
+    font-size: 0.7rem;
+    color: var(--warning);
+    font-weight: 700;
+}
+
+/* --- NEW: Stats Screen --- */
+.stats-screen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+}
+
+.stat-value-large {
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+/* --- Dashboard Grid --- */
+.dashboard-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 1.5rem; 
+    margin-bottom: 2rem; 
+}
+.card { 
+    background-color: var(--bg-card); 
+    border: 1px solid var(--border); 
+    border-radius: 16px; 
+    padding: 1.5rem; 
+    box-shadow: var(--shadow); 
+    position: relative;
+    overflow: hidden;
+}
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.5;
+}
+.stat-value { font-size: 2.5rem; font-weight: 900; color: var(--text-main); }
+.stat-sub { font-size: 0.9rem; color: var(--success); display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+
+/* --- COMPACT DASHBOARD STATS --- */
+.compact-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(20,20,40,0.5));
+    border: 1px solid var(--primary);
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--neon-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+.compact-stats-row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.compact-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.compact-stat-value {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text-main);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 0 10px currentColor;
+}
+
+.compact-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--primary), transparent);
+    margin: 0 1rem;
+}
+
+.streak-icon {
+    color: #ff9f43;
+    font-size: 1.5rem;
+    vertical-align: middle;
+    margin-left: 2px;
+    filter: drop-shadow(0 0 5px #ff9f43);
+}
+
+/* Mobile adjustments for compact stats */
+@media (max-width: 768px) {
+    .compact-stats-row {
+        padding: 0.75rem 1rem;
+    }
+    
+    .compact-stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .stat-divider {
+        margin: 0 0.5rem;
+    }
+}
+
+/* --- Fix Dashboard Scroll --- */
+#dashboard.active {
+    overflow-y: auto !important;
+    height: 100%;
+}
+
+#dashboard .habit-list {
+    min-height: 200px;
+}
+
+/* Ensure scroll area works correctly */
+.scroll-area {
+    overflow-y: auto !important;
+}
+
+/* --- Habit List --- */
+.habit-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.75rem; 
+}
+.habit-item { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    background-color: var(--bg-card); 
+    padding: 1rem 1.5rem; 
+    border-radius: 12px; 
+    border: 1px solid var(--border); 
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+.habit-item:hover { 
+    border-color: var(--primary); 
+    transform: translateX(5px);
+    box-shadow: var(--neon-glow);
+}
+.habit-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--primary);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.habit-item:hover::before {
+    opacity: 1;
+}
+
+.habit-left { display: flex; align-items: center; gap: 1rem; }
+
+.check-circle { 
+    width: 24px; 
+    height: 24px; 
+    border: 2px solid var(--text-muted); 
+    border-radius: 50%; 
+    cursor: pointer; 
+    position: relative; 
+    transition: all 0.2s; 
+    background: rgba(0,0,0,0.3);
+}
+.check-circle.checked { 
+    background-color: var(--primary); 
+    border-color: var(--primary); 
+    box-shadow: 0 0 10px var(--primary);
+}
+.check-circle.checked::after { 
+    content: '✓'; 
+    color: #000; 
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    font-size: 14px; 
+    font-weight: 900; 
+}
+.habit-name { font-weight: 600; font-size: 1rem; }
+.habit-name.done { text-decoration: line-through; color: var(--text-muted); }
+.habit-streak { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    font-size: 0.85rem; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    background: var(--bg-body); 
+    padding: 4px 10px; 
+    border-radius: 20px; 
+    border: 1px solid var(--border);
+}
+.streak-fire { 
+    color: #ff9f43; 
+    filter: drop-shadow(0 0 3px #ff9f43);
+}
+.badge-day { 
+    font-size: 0.7rem; 
+    background: var(--bg-card-hover); 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    color: var(--text-muted); 
+    margin-left: 8px; 
+    border: 1px solid var(--border);
+}
+
+/* --- Timer View --- */
+.timer-wrapper { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-start;
+    width: 100%;
+    position: relative;
+    min-height: calc(100vh - 140px);
+    padding-bottom: 3rem;
+}
+.timer-controls { display: flex; gap: 1rem; margin-top: 2rem; z-index: 10; }
+
+.mode-switch {
+    background: var(--bg-card); 
+    border: 1px solid var(--border);
+    padding: 4px; 
+    border-radius: 12px; 
+    display: flex; 
+    margin-bottom: 2rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+.mode-opt {
+    padding: 8px 24px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 700; 
+    font-size: 0.9rem; 
+    color: var(--text-muted); 
+    transition: all 0.2s;
+}
+.mode-opt.active { 
+    background: linear-gradient(135deg, var(--primary), #00a8ff); 
+    color: #000; 
+    font-weight: 800;
+}
+
+.btn { 
+    padding: 12px 24px; 
+    border-radius: 8px; 
+    border: none; 
+    font-weight: 700; 
+    cursor: pointer; 
+    font-size: 1rem; 
+    transition: all 0.2s; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+.btn-primary { 
+    background: linear-gradient(135deg, var(--primary), #00a8ff); 
+    color: #000; 
+}
+.btn-primary:hover { 
+    opacity: 0.9; 
+    transform: scale(1.05); 
+    box-shadow: 0 0 20px var(--primary-glow);
+}
+.btn-outline { 
+    background: transparent; 
+    border: 1px solid var(--border); 
+    color: var(--text-main); 
+}
+.btn-outline:hover { 
+    border-color: var(--primary); 
+    color: var(--primary); 
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* Timer Ring */
+.progress-ring { 
+    position: relative; 
+    width: 320px; 
+    height: 320px; 
+    z-index: 5; 
+    flex-shrink: 0; 
+    margin-top: 1rem; 
+}
+.progress-ring circle { 
+    fill: transparent; 
+    stroke-width: 8; 
+    transform: rotate(-90deg); 
+    transform-origin: 50% 50%; 
+    transition: stroke-dashoffset 1s linear; 
+}
+.ring-bg { stroke: var(--bg-card-hover); }
+.ring-fill { 
+    stroke: var(--primary); 
+    stroke-linecap: round; 
+    filter: drop-shadow(0 0 10px var(--primary));
+}
+.timer-display-wrapper { 
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    text-align: center; 
+}
+.timer-display { 
+    font-size: 3.5rem; 
+    font-weight: 900; 
+    color: var(--text-main); 
+    font-variant-numeric: tabular-nums; 
+    display: block; 
+    text-shadow: 0 0 10px currentColor;
+}
+.timer-status { 
+    font-size: 1rem; 
+    color: var(--text-muted); 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    font-weight: 700; 
+    margin-top: 5px; 
+}
+.cycle-indicator { 
+    margin-top: 1.5rem; 
+    color: var(--text-muted); 
+    font-size: 0.9rem; 
+    background: var(--bg-card); 
+    padding: 5px 15px; 
+    border-radius: 20px; 
+    border: 1px solid var(--border); 
+    font-weight: 600;
+}
+
+/* Stopwatch Specific */
+.stopwatch-laps {
+    margin-top: 0; 
+    width: 250px; 
+    max-height: 200px;
+    overflow-y: auto; 
+    background: var(--bg-card); 
+    border-radius: 12px;
+    border: 1px solid var(--border); 
+    padding: 10px;
+    position: absolute; 
+    top: 20px;
+    left: 20px;
+    display: none;
+    box-shadow: var(--shadow);
+    z-index: 10;
+}
+.lap-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.lap-item:last-child { border-bottom: none; }
+
+/* --- History View --- */
+.history-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 2rem; 
+    margin-bottom: 2rem; 
+    min-height: 300px;
+}
+.chart-container { 
+    height: 250px; 
+    position: relative; 
+    width: 100%; 
+    min-height: 250px;
+}
+.ring-container-large { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    height: 250px; 
+    position: relative; 
+    min-height: 250px;
+}
+.ring-large-svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+.ring-large-bg { stroke: var(--bg-card-hover); }
+.ring-large-fill { 
+    stroke: var(--primary); 
+    stroke-linecap: round; 
+    transition: stroke-dashoffset 1s ease;
+    filter: drop-shadow(0 0 8px var(--primary));
+}
+.ring-text-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.ring-percent { font-size: 2.5rem; font-weight: 900; color: var(--text-main); }
+.ring-label { color: var(--text-muted); font-size: 0.9rem; }
+
+.calendar-container { 
+    background: var(--bg-card); 
+    padding: 1.5rem; 
+    border-radius: 16px; 
+    border: 1px solid var(--border); 
+    min-height: 300px;
+    margin-bottom: 2rem;
+}
+.calendar-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); 
+    gap: 6px; 
+    margin-top: 1rem; 
+    min-height: 200px;
+}
+.cal-day { 
+    aspect-ratio: 1; 
+    border-radius: 4px; 
+    background: var(--bg-body); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 0.8rem; 
+    color: var(--text-muted); 
+    position: relative; 
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+.cal-day.today { 
+    border: 1px solid var(--primary); 
+    color: var(--primary); 
+    font-weight: 700;
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+.cal-day.completed { 
+    background: linear-gradient(135deg, var(--primary), #00a8ff); 
+    color: #000; 
+    font-weight: 700;
+}
+
+/* Activity Map Container for better scrolling */
+.activity-map-container {
+    min-height: 400px;
+}
+
+/* --- FAB & Modal --- */
+.fab { 
+    position: fixed; 
+    bottom: 2rem; 
+    right: 2rem; 
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%; 
+    background: linear-gradient(135deg, var(--primary), #00a8ff); 
+    color: #000; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 2rem; 
+    border: none; 
+    cursor: pointer; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px var(--primary-glow); 
+    transition: all 0.3s; 
+    z-index: 100; 
+    font-weight: 900;
+}
+.fab:hover { 
+    transform: scale(1.1) rotate(90deg); 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7), 0 0 30px var(--primary);
+}
+
+.modal-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    background: rgba(0,0,0,0.8); 
+    backdrop-filter: blur(10px); 
+    z-index: 200; 
+    display: none; 
+    align-items: center; 
+    justify-content: center; 
+}
+.modal-overlay.open { display: flex; }
+.modal { 
+    background: linear-gradient(135deg, var(--bg-card), rgba(20,20,30,0.9)); 
+    width: 90%; 
+    max-width: 400px; 
+    padding: 2rem; 
+    border-radius: 16px; 
+    border: 1px solid var(--primary); 
+    box-shadow: var(--neon-glow); 
+    animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+    position: relative;
+    overflow: hidden;
+}
+.modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+@keyframes popIn { 
+    from { transform: scale(0.9); opacity: 0; } 
+    to { transform: scale(1); opacity: 1; } 
+}
+
+.form-group { margin-bottom: 1.5rem; }
+.form-label { 
+    display: block; 
+    margin-bottom: 0.5rem; 
+    font-size: 0.9rem; 
+    color: var(--text-muted); 
+    font-weight: 600;
+}
+.form-input { 
+    width: 100%; 
+    padding: 12px; 
+    border-radius: 8px; 
+    border: 1px solid var(--border); 
+    background: var(--bg-body); 
+    color: var(--text-main); 
+    font-size: 1rem; 
+    transition: all 0.2s;
+}
+.form-input:focus { 
+    border-color: var(--primary); 
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Day Selectors */
+.day-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.everyday-btn { 
+    font-size: 0.8rem; 
+    color: var(--primary); 
+    cursor: pointer; 
+    text-decoration: underline; 
+    border: none; 
+    background: none; 
+    font-weight: 600;
+}
+.day-selector { display: flex; justify-content: space-between; gap: 5px; }
+.day-check { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
+.day-check input { display: none; }
+.day-box { 
+    width: 32px; 
+    height: 32px; 
+    border-radius: 6px; 
+    border: 1px solid var(--border); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 0.8rem; 
+    transition: all 0.2s; 
+    color: var(--text-muted); 
+    font-weight: 600;
+}
+.day-check input:checked + .day-box { 
+    background: linear-gradient(135deg, var(--primary), #00a8ff); 
+    color: #000; 
+    border-color: var(--primary); 
+    font-weight: 800;
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+.day-label { font-size: 0.7rem; color: var(--text-muted); }
+
+/* --- Toast --- */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 300; }
+.toast { 
+    background: linear-gradient(135deg, var(--bg-card), rgba(20,20,30,0.9)); 
+    color: var(--text-main); 
+    padding: 1rem 1.5rem; 
+    margin-bottom: 10px; 
+    border-radius: 8px; 
+    border-left: 4px solid var(--primary); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5), 0 0 15px var(--primary-glow); 
+    animation: slideIn 0.3s ease; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 1rem; 
+    min-width: 250px; 
+    font-weight: 600;
+    backdrop-filter: blur(5px);
+}
+@keyframes slideIn { 
+    from { transform: translateX(100%); } 
+    to { transform: translateX(0); } 
+}
+
+/* --- SYSTEM: RPG UI STYLES --- */
+.player-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(20,20,40,0.7));
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--neon-glow);
+}
+
+.player-status-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+/* The Hexagon/Square Rank Badge */
+.rank-badge {
+    width: 50px;
+    height: 50px;
+    border: 2px solid var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--text-main);
+    clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+    margin-right: 15px;
+    text-shadow: 0 0 10px currentColor;
+    flex-shrink: 0;
+    background: rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.rank-badge::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, var(--primary), transparent, var(--primary));
+    z-index: -1;
+    border-radius: inherit;
+    padding: 2px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* XP Bar Container */
+.xp-section {
+    flex-grow: 1;
+    margin-right: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.xp-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.rank-text {
+    font-weight: 900;
+    color: var(--text-main);
+    text-shadow: 0 0 5px currentColor;
+}
+
+.xp-track {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.xp-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), #ff9f43, var(--primary));
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 0 15px var(--primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.xp-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Level Number */
+.level-display {
+    text-align: center;
+    min-width: 60px;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    padding-left: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#level-number {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--text-main);
+    letter-spacing: 1px;
+    line-height: 1;
+    text-shadow: 0 0 5px currentColor;
+}
+
+/* --- NEW: Title Badge --- */
+.title-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), #00a8ff);
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    margin-left: 10px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* --- NEW: Hunter Rank Display --- */
+.hunter-rank {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.rank-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+.rank-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.rank-info p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .sidebar { 
+        position: fixed; 
+        transform: translateX(-100%); 
+        height: 100vh; 
+        width: 85%; 
+        z-index: 1000;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .mobile-toggle { display: block; }
+    .top-bar { padding: 0 1rem; }
+    .scroll-area { 
+        padding: 1rem; 
+        height: calc(100vh - 70px);
+    }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .history-grid { 
+        grid-template-columns: 1fr; 
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .progress-ring { width: 280px; height: 280px; }
+    .timer-display { font-size: 3rem; }
+    
+    .timer-wrapper {
+        min-height: calc(100vh - 140px);
+        padding-bottom: 2rem;
+    }
+    
+    .stopwatch-laps { 
+        position: static; 
+        width: 100%; 
+        margin-top: 1rem; 
+        max-height: 150px;
+        margin-bottom: 1rem;
+    }
+    
+    .calendar-grid {
+        min-height: 150px;
+    }
+    
+    .stats-screen {
+        grid-template-columns: 1fr;
+    }
+    
+    .shadow-army-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+    
+    .player-status-bar {
+        padding: 10px;
+        margin-bottom: 1rem;
+    }
+    .rank-badge {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+        margin-right: 10px;
+    }
+    .level-display {
+        min-width: 50px;
+        padding-left: 10px;
+    }
+    #level-number {
+        font-size: 0.75rem;
+    }
+}
+
+/* FIX DASHBOARD ORDER - STATS AT TOP */
+#dashboard > div {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#dashboard .compact-stats-row {
+    order: 1 !important;
+}
+
+#dashboard h3 {
+    order: 2 !important;
+    margin-top: 2rem !important;
+}
+
+#dashboard .habit-list {
+    order: 3 !important;
+}
+
+#dashboard #empty-state {
+    order: 4 !important;
+}
+
+/* --- NEW: Achievement Popup --- */
+.achievement-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, #000, #1a1a2e);
+    border: 2px solid var(--warning);
+    border-radius: 20px;
+    padding: 2rem;
+    z-index: 1000;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(255, 159, 67, 0.5);
+    animation: achievementPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    max-width: 400px;
+    width: 90%;
+}
+
+@keyframes achievementPop {
+    0% { transform: translate(-50%, -50%) scale(0); }
+    70% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.achievement-icon {
+    font-size: 4rem;
+    color: var(--warning);
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 15px var(--warning));
+}
+
+.achievement-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.achievement-desc {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* --- NEW: Progress Bars for Stats --- */
+.stat-progress {
+    margin-top: 1rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.stat-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 100px;
+}
+
+.stat-bar-container {
+    flex-grow: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 10px;
+}
+
+.stat-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.stat-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* --- NEW: Power Level Display --- */
+.power-level {
+    text-align: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(30,0,30,0.7));
+    border-radius: 16px;
+    border: 1px solid var(--primary);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.power-level::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(0, 210, 255, 0.1), transparent);
+    animation: pulse 4s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.power-value {
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--primary), #ff9f43, var(--danger));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.power-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}</style></head> 
+ <body> <!-- Splash Screen --> 
+  <div id="splash-screen"> 
+   <div class="splash-content"> 
+    <div class="splash-logo">
+      ▲ 
+    </div> 
+    <h1 class="splash-brand">SHADOW MONARCH</h1> 
+    <p class="splash-slogan">Your habits are your army</p> 
+   </div> 
+  </div> 
+  <!-- Main App Container --> 
+  <div id="app-container"> 
+   <aside class="sidebar" id="sidebar"> 
+    <div class="brand"> <span>▲</span> APEX <span class="title-badge" id="user-title">ROOKIE</span>
+    </div> 
+    <div class="nav-section-title">
+      GATE 
+    </div>
+    <ul class="nav-links"> 
+     <li class="nav-item"><button class="nav-btn active" onclick="app.navigate('dashboard')"><span>🏰</span> Stronghold</button></li> 
+     <li class="nav-item"><button class="nav-btn" onclick="app.navigate('history')"><span>📜</span> Chronicles</button></li> 
+     <li class="nav-item"><button class="nav-btn" onclick="app.navigate('timer')"><span>⏳</span> Time Chamber</button></li> 
+     <li class="nav-item"><button class="nav-btn" onclick="app.navigate('growth')"><span>⚔️</span> Growth</button></li> 
+    </ul> 
+    <div class="nav-section-title">
+      Shadow Army 
+    </div> 
+    <div class="habit-sidebar-list" id="sidebar-habit-list"> <!-- Habits injected here --> 
+     <div style="font-size: 0.8rem; color: var(--text-muted); padding: 10px;">
+       No soldiers recruited yet. 
+     </div> 
+    </div> 
+    <div class="nav-section-title">
+      System 
+    </div>
+    <div class="theme-toggle-wrap"> 
+      <button class="nav-btn" onclick="app.toggleTheme()"> 
+        <span id="theme-icon">☀</span> Realm Shift 
+      </button> 
+      <button class="nav-btn" onclick="app.showStats()"> 
+        <span>📊</span> Status 
+      </button>
+    </div> 
+   </aside> 
+   <main class="main-content"> 
+    <div class="top-bar"> 
+      <button class="mobile-toggle" onclick="app.toggleSidebar()">☰</button> 
+      <div class="page-title" id="page-title">
+        Stronghold 
+      </div> 
+      <div style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;" id="current-date"></div> 
+    </div> 
+    <div class="scroll-area"> 
+      <!-- Dashboard View --> 
+     <section id="dashboard" class="view active"> 
+      <div style="min-height: 100%; padding-bottom: 2rem;"> 
+        <!-- POWER LEVEL DISPLAY -->
+        <div class="power-level">
+          <div class="power-value" id="power-level">0</div>
+          <div class="power-label">POWER LEVEL</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Shadow Monarch System Active</div>
+        </div>
+        
+        <!-- PLAYER STATUS / SYSTEM UI --> 
+       <div class="player-status-bar"> 
+        <div class="rank-badge" id="rank-badge">
+          R 
+        </div> 
+        <div class="xp-section"> 
+         <div class="xp-labels"> 
+           <span class="rank-text" id="rank-name">Rookie</span> 
+           <span class="xp-text">SHADOW ENERGY</span> 
+         </div> 
+         <div class="xp-track"> 
+          <div class="xp-fill" id="xp-bar-fill"></div> 
+         </div> 
+        </div> 
+        <div class="level-display"> 
+          <span id="level-number">LVL 1</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted);" id="skill-points">0 SP</span>
+        </div> 
+       </div> 
+       
+       <!-- DAILY DUNGEON -->
+       <div class="daily-dungeon" id="daily-dungeon">
+         <div class="dungeon-header">
+           <div class="dungeon-title"><span>⚔️</span> Daily Dungeon</div>
+           <div class="dungeon-timer" id="dungeon-timer">24:00:00</div>
+         </div>
+         <div class="dungeon-challenge">
+           <div style="font-weight: 700; margin-bottom: 0.5rem;" id="dungeon-name">Complete 3 Focus Sessions</div>
+           <div style="font-size: 0.9rem; color: var(--text-muted);" id="dungeon-desc">Use the Time Chamber 3 times today</div>
+         </div>
+         <div class="dungeon-reward">
+           <div>
+             <div style="font-size: 0.8rem; color: var(--text-muted);">Reward</div>
+             <div class="reward-xp">+500 XP</div>
+           </div>
+           <button class="complete-dungeon-btn" onclick="app.completeDungeon()" id="dungeon-btn">Enter Dungeon</button>
+         </div>
+       </div>
+       
+       <!-- MONSTER HUNT -->
+       <div class="monster-hunt" id="monster-hunt">
+         <div class="monster-header">
+           <div class="monster-title"><span>👹</span> Monster Hunt</div>
+           <div style="font-size: 0.8rem; color: #ff9f43; font-weight: 700;" id="monsters-defeated">0 Defeated</div>
+         </div>
+         <div class="monster-stats">
+           <div class="monster-name" id="monster-name">Procrastination</div>
+           <div class="monster-hp-bar">
+             <div class="monster-hp-fill" id="monster-hp-fill" style="width: 100%"></div>
+           </div>
+           <div class="monster-hp-text">
+             <span>HP: <span id="monster-current-hp">100</span>/<span id="monster-max-hp">100</span></span>
+             <span>Reward: <span id="monster-reward" style="color: #ff9f43;">150 XP</span></span>
+           </div>
+         </div>
+         <button class="attack-monster-btn" onclick="app.attackMonster()" id="attack-btn">
+           <span>⚔️</span> Attack Monster
+         </button>
+       </div>
+       
+       <!-- SHADOW ARMY -->
+       <div class="shadow-army-container">
+         <div class="shadow-army-title"><span>👥</span> Shadow Army</div>
+         <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Your habits become soldiers in your army</div>
+         <div class="shadow-army-grid" id="shadow-army">
+           <div class="shadow-soldier">
+             <div class="shadow-rank">?</div>
+             <div class="shadow-name">Recruit</div>
+             <div class="shadow-level">Lvl 0</div>
+           </div>
+         </div>
+       </div>
+
+       <!-- SEPARATOR --> 
+       <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 1rem 0;"></div> 
+       
+       <!-- OLD STATS (Compact) --> 
+       <div class="compact-stats-row"> 
+        <div class="compact-stat"> 
+         <div class="compact-stat-value" id="dash-rate">
+           0% 
+         </div> 
+         <div class="compact-stat-label">
+           Completion 
+         </div> 
+        </div> 
+        <div class="stat-divider"></div> 
+        <div class="compact-stat"> 
+         <div class="compact-stat-value" id="dash-streak">
+           0 <span class="streak-icon">🔥</span> 
+         </div> 
+         <div class="compact-stat-label">
+           Streak 
+         </div> 
+        </div> 
+        <div class="stat-divider"></div> 
+        <div class="compact-stat"> 
+         <div class="compact-stat-value" id="dash-total">
+           0 
+         </div> 
+         <div class="compact-stat-label">
+           Active 
+         </div> 
+        </div> 
+       </div> 
+       
+       <h3 style="margin-bottom: 1rem; margin-top: 2rem;">Today's Missions</h3> 
+       <div class="habit-list" id="today-list"></div> 
+          <div id="empty-state" style="text-align: center; color: var(--text-muted); padding: 3rem; display: none;">
+           <p>No missions for today. Create your first soldier!</p>
+         </div>
+      </div> 
+     </section> 
+     
+     <!-- History View --> 
+     <section id="history" class="view"> 
+      <div class="history-grid"> 
+       <div class="card"> 
+        <div class="stat-label">
+          Activity Trend (30 Days) 
+        </div> 
+        <div class="chart-container"> 
+         <canvas id="historyChart"></canvas> 
+        </div> 
+       </div> 
+       <div class="card"> 
+        <div class="stat-label">
+          Monthly Consistency 
+        </div> 
+        <div class="ring-container-large"> 
+         <svg class="ring-large-svg" viewbox="0 0 200 200"> <circle class="ring-large-bg" cx="100" cy="100" r="80" stroke-width="12" fill="none"></circle> <circle class="ring-large-fill" id="history-ring" cx="100" cy="100" r="80" stroke-width="12" fill="none" stroke-dasharray="502.65" stroke-dashoffset="502.65"></circle> 
+         </svg> 
+         <div class="ring-text-center"> 
+          <div class="ring-percent" id="history-percent">
+            0% 
+          </div> 
+          <div class="ring-label">
+            Completed 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="activity-map-container"> 
+       <div class="calendar-container"> 
+        <h3>Activity Map</h3> 
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Month to date view.</p> 
+        <div class="calendar-grid" id="calendar-grid"></div> 
+       </div> 
+      </div> 
+     </section> 
+     
+     <!-- Timer View --> 
+     <section id="timer" class="view"> 
+      <div class="timer-wrapper"> 
+       <div class="stopwatch-laps" id="stopwatch-laps"></div> 
+       <div class="mode-switch"> 
+        <div class="mode-opt active" id="mode-pomodoro" onclick="timer.switchMode('pomodoro')">
+          Auto Pomodoro 
+        </div> 
+        <div class="mode-opt" id="mode-stopwatch" onclick="timer.switchMode('stopwatch')">
+          Stopwatch 
+        </div> 
+       </div> 
+       <div class="progress-ring"> 
+        <svg width="320" height="320"> <circle class="ring-bg" cx="160" cy="160" r="150"></circle> <circle class="ring-fill" id="timer-ring" cx="160" cy="160" r="150" stroke-dasharray="942.48" stroke-dashoffset="0"></circle> 
+        </svg> 
+        <div class="timer-display-wrapper"> 
+         <div class="timer-display" id="timer-display">
+           25:00 
+         </div> 
+         <div class="timer-status" id="timer-status">
+           Focus Time 
+         </div> 
+        </div> 
+       </div> 
+       <div class="cycle-indicator" id="cycle-info">
+         Cycle 1 of 4 
+       </div> 
+       <div class="timer-controls"> <button class="btn btn-primary" id="timer-toggle" onclick="timer.toggle()">Start</button> <button class="btn btn-outline" onclick="timer.reset()">Reset</button> <button class="btn btn-outline" id="lap-btn" onclick="timer.lap()" style="display:none;">Lap</button> 
+       </div> 
+       <div style="height: 50px;"></div> 
+      </div> 
+     </section>
+     
+     <!-- NEW: Growth View -->
+     <section id="growth" class="view">
+       <div style="min-height: 100%; padding-bottom: 2rem;">
+         <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><span>🌱</span> Growth System</h2>
+         
+         <!-- Stats Overview -->
+         <div class="stats-screen">
+           <div class="stat-card">
+             <div class="stat-value-large" id="stat-strength">0</div>
+             <div class="stat-label">Strength</div>
+             <div class="stat-bar">
+               <div class="stat-bar-fill" id="strength-bar" style="width: 0%; background: var(--stat-strength);"></div>
+             </div>
+           </div>
+           <div class="stat-card">
+             <div class="stat-value-large" id="stat-intelligence">0</div>
+             <div class="stat-label">Intelligence</div>
+             <div class="stat-bar">
+               <div class="stat-bar-fill" id="intelligence-bar" style="width: 0%; background: var(--stat-intelligence);"></div>
+             </div>
+           </div>
+           <div class="stat-card">
+             <div class="stat-value-large" id="stat-willpower">0</div>
+             <div class="stat-label">Willpower</div>
+             <div class="stat-bar">
+               <div class="stat-bar-fill" id="willpower-bar" style="width: 0%; background: var(--stat-willpower);"></div>
+             </div>
+           </div>
+           <div class="stat-card">
+             <div class="stat-value-large" id="stat-discipline">0</div>
+             <div class="stat-label">Discipline</div>
+             <div class="stat-bar">
+               <div class="stat-bar-fill" id="discipline-bar" style="width: 0%; background: var(--stat-discipline);"></div>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Skill Tree -->
+         <div class="skill-tree-container">
+           <h3 style="margin-bottom: 1rem;">Skill Tree <span style="font-size: 0.9rem; color: var(--warning);">(<span id="available-sp">0</span> Skill Points Available)</span></h3>
+           <div class="skill-tree" id="skill-tree">
+             <!-- Skills will be injected here -->
+           </div>
+         </div>
+         
+         <!-- Detailed Stats -->
+         <div class="card">
+           <h3 style="margin-bottom: 1rem;">Detailed Statistics</h3>
+           <div class="stat-progress">
+             <div class="stat-row">
+               <span class="stat-name">Total Habits</span>
+               <div class="stat-bar-container">
+                 <div class="stat-progress-fill" id="total-habits-bar" style="width: 0%; background: var(--primary);"></div>
+               </div>
+               <span class="stat-value" id="total-habits">0</span>
+             </div>
+             <div class="stat-row">
+               <span class="stat-name">Longest Streak</span>
+               <div class="stat-bar-container">
+                 <div class="stat-progress-fill" id="longest-streak-bar" style="width: 0%; background: var(--success);"></div>
+               </div>
+               <span class="stat-value" id="longest-streak">0 days</span>
+             </div>
+             <div class="stat-row">
+               <span class="stat-name">Total Completions</span>
+               <div class="stat-bar-container">
+                 <div class="stat-progress-fill" id="total-completions-bar" style="width: 0%; background: var(--warning);"></div>
+               </div>
+               <span class="stat-value" id="total-completions">0</span>
+             </div>
+             <div class="stat-row">
+               <span class="stat-name">Consistency Rate</span>
+               <div class="stat-bar-container">
+                 <div class="stat-progress-fill" id="consistency-bar" style="width: 0%; background: var(--stat-consistency);"></div>
+               </div>
+               <span class="stat-value" id="consistency-rate">0%</span>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Hunter Rank Progression -->
+         <div class="card">
+           <h3 style="margin-bottom: 1rem;">Hunter Rank Progression</h3>
+           <div class="hunter-rank">
+             <div class="rank-icon" style="color: var(--rank-bronze);">🥉</div>
+             <div class="rank-info">
+               <h3>E-Rank Hunter</h3>
+               <p>Complete 10 habits to reach D-Rank</p>
+             </div>
+           </div>
+           <div class="stat-bar">
+             <div class="stat-bar-fill" id="rank-progress" style="width: 0%; background: linear-gradient(90deg, var(--rank-bronze), var(--rank-silver));"></div>
+           </div>
+         </div>
+       </div>
+     </section>
+     
+    </div> 
+   </main> 
+  </div> 
+  
+  <button class="fab" onclick="app.openModal()">+</button> 
+  
+  <!-- Add Habit Modal --> 
+  <div class="modal-overlay" id="habit-modal"> 
+   <div class="modal"> 
+    <h2 style="margin-bottom: 1.5rem;">Recruit New Soldier</h2> 
+    <div class="form-group"> 
+     <label class="form-label">Soldier Name</label> 
+     <input type="text" id="habit-name-input" class="form-input" placeholder="e.g. Read 10 pages"> 
+    </div> 
+    <div class="form-group"> 
+     <div class="day-wrapper"> 
+       <label class="form-label" style="margin-bottom:0;">Training Schedule</label> 
+       <button class="everyday-btn" onclick="app.selectAllDays()">Everyday</button> 
+     </div> 
+     <div class="day-selector"> 
+       <label class="day-check"><input type="checkbox" value="0"> 
+       <div class="day-box">S</div></label> 
+       <label class="day-check"><input type="checkbox" value="1"> 
+       <div class="day-box">M</div></label> 
+       <label class="day-check"><input type="checkbox" value="2"> 
+       <div class="day-box">T</div></label> 
+       <label class="day-check"><input type="checkbox" value="3"> 
+       <div class="day-box">W</div></label> 
+       <label class="day-check"><input type="checkbox" value="4"> 
+       <div class="day-box">T</div></label> 
+       <label class="day-check"><input type="checkbox" value="5"> 
+       <div class="day-box">F</div></label> 
+       <label class="day-check"><input type="checkbox" value="6"> 
+       <div class="day-box">S</div></label> 
+     </div> 
+    </div> 
+    <div style="display: flex; gap: 1rem; justify-content: flex-end;"> 
+      <button class="btn btn-outline" onclick="app.closeModal()">Cancel</button> 
+      <button class="btn btn-primary" onclick="app.addHabit()">Recruit Soldier</button> 
+    </div> 
+   </div> 
+  </div> 
+  
+  <!-- Achievement Popup -->
+  <div class="achievement-popup" id="achievement-popup" style="display: none;">
+    <div class="achievement-icon">🏆</div>
+    <div class="achievement-title" id="achievement-title">Achievement Unlocked!</div>
+    <div class="achievement-desc" id="achievement-desc">Complete description here</div>
+    <button class="btn btn-primary" onclick="app.closeAchievement()">Continue</button>
+  </div>
+  
+  <div class="toast-container" id="toast-container"></div> 
+  
+  <!-- JavaScript --> 
+  <script src="script.js" defer></script> 
+ 
+<script type="text/javascript" id="dcoder_script">// Debug logging
+console.log('SHADOW MONARCH System Initializing...');
+
+// --- Helper for Local Dates ---
+const getLocalDateString = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+// --- SYSTEM: RANKS CONFIG ---
+const RANKS = [
+    { name: "Rookie", color: "#ffffff", threshold: 1, title: "Initiate" },
+    { name: "Bronze", color: "#cd7f32", threshold: 5, title: "Apprentice" },
+    { name: "Silver", color: "#c0c0c0", threshold: 15, title: "Adept" },
+    { name: "Gold", color: "#ffd700", threshold: 30, title: "Expert" },
+    { name: "Platinum", color: "#e5e4e2", threshold: 50, title: "Master" },
+    { name: "Diamond", color: "#b9f2ff", threshold: 70, title: "Grandmaster" },
+    { name: "Master", color: "#d63384", threshold: 90, title: "Shadow" },
+    { name: "Predator", color: "#ff0000", threshold: 100, title: "Monarch" }
+];
+
+// --- HUNTER RANKS (Solo Leveling style) ---
+const HUNTER_RANKS = [
+    { name: "E-Rank", threshold: 10, icon: "🥉", color: "#cd7f32" },
+    { name: "D-Rank", threshold: 25, icon: "🥈", color: "#c0c0c0" },
+    { name: "C-Rank", threshold: 50, icon: "📜", color: "#45b7d1" },
+    { name: "B-Rank", threshold: 100, icon: "⚔️", color: "#96ceb4" },
+    { name: "A-Rank", threshold: 200, icon: "🛡️", color: "#ff9f43" },
+    { name: "S-Rank", threshold: 500, icon: "👑", color: "#ffd700" },
+    { name: "National", threshold: 1000, icon: "🏆", color: "#ff0000" }
+];
+
+// --- SKILLS ---
+const SKILLS = [
+    { id: 1, name: "Double XP", description: "Earn 2x XP on weekends", cost: 3, unlocked: false, type: "passive" },
+    { id: 2, name: "Focus Burst", description: "Timer sessions give 50% more XP", cost: 5, unlocked: false, type: "active" },
+    { id: 3, name: "Army March", description: "All soldiers gain +1 to streak", cost: 7, unlocked: false, type: "passive" },
+    { id: 4, name: "Shadow Extraction", description: "Defeat monsters 50% faster", cost: 10, unlocked: false, type: "active" },
+    { id: 5, name: "Monarch's Will", description: "Never break streaks on weekends", cost: 15, unlocked: false, type: "passive" }
+];
+
+// --- MONSTERS (Bad Habits) ---
+const MONSTERS = [
+    { name: "Procrastination", maxHp: 100, reward: 150, color: "#ff4757" },
+    { name: "Distraction", maxHp: 80, reward: 120, color: "#ff9f43" },
+    { name: "Laziness", maxHp: 120, reward: 180, color: "#747d8c" },
+    { name: "Negativity", maxHp: 90, reward: 135, color: "#a4b0be" },
+    { name: "Impatience", maxHp: 70, reward: 105, color: "#ffa502" }
+];
+
+// --- DAILY DUNGEONS ---
+const DUNGEONS = [
+    { name: "Focus Gauntlet", description: "Complete 3 timer sessions", target: 3, reward: 500 },
+    { name: "Consistency Trial", description: "Maintain all streaks for 3 days", target: 3, reward: 750 },
+    { name: "Army Training", description: "Complete 5 different habits", target: 5, reward: 600 },
+    { name: "Shadow Summoning", description: "Create 2 new habits", target: 2, reward: 400 }
+];
+
+// Helper to get Rank info based on current level
+const getCurrentRank = (level) => {
+    if (level < 1) return RANKS[0];
+    
+    let currentRank = RANKS[0];
+    for (let i = 0; i < RANKS.length; i++) {
+        if (level >= RANKS[i].threshold) {
+            currentRank = RANKS[i];
+        } else {
+            break;
+        }
+    }
+    return currentRank;
+};
+
+// Get current Hunter Rank
+const getHunterRank = (totalCompletions) => {
+    let currentRank = HUNTER_RANKS[0];
+    for (let i = 0; i < HUNTER_RANKS.length; i++) {
+        if (totalCompletions >= HUNTER_RANKS[i].threshold) {
+            currentRank = HUNTER_RANKS[i];
+        } else {
+            break;
+        }
+    }
+    return currentRank;
+};
+
+// Calculate XP needed for the NEXT level
+const getXPForNextLevel = (level) => {
+    return 100 + (level * 25);
+};
+
+const Store = {
+    get: () => {
+        const saved = JSON.parse(localStorage.getItem('apex_shadow_v1'));
+        return {
+            habits: saved?.habits || [],
+            theme: saved?.theme || 'dark',
+            lastVisit: saved?.lastVisit || new Date().toISOString(),
+            
+            // RPG Stats
+            xp: saved?.xp || 0,
+            level: saved?.level || 1,
+            skillPoints: saved?.skillPoints || 0,
+            
+            // New Stats
+            stats: saved?.stats || {
+                strength: 0,
+                intelligence: 0,
+                willpower: 0,
+                discipline: 0
+            },
+            
+            // Monster System
+            currentMonster: saved?.currentMonster || 0,
+            monsterHp: saved?.monsterHp || MONSTERS[0].maxHp,
+            monstersDefeated: saved?.monstersDefeated || 0,
+            
+            // Dungeon System
+            dailyDungeon: saved?.dailyDungeon || 0,
+            dungeonProgress: saved?.dungeonProgress || 0,
+            lastDungeonDate: saved?.lastDungeonDate || getLocalDateString(),
+            
+            // Skills
+            skills: saved?.skills || SKILLS.map(s => ({...s, unlocked: false})),
+            
+            // Achievements
+            totalCompletions: saved?.totalCompletions || 0,
+            longestStreak: saved?.longestStreak || 0,
+            powerLevel: saved?.powerLevel || 0
+        };
+    },
+    set: (data) => localStorage.setItem('apex_shadow_v1', JSON.stringify(data))
+};
+
+const app = {
+    data: Store.get(),
+
+    init: () => {
+        console.log('Shadow Monarch System Initializing...');
+        app.applyTheme();
+        app.updateDate();
+        app.renderDashboard();
+        app.renderHistory();
+        app.renderSidebarHabits();
+        app.renderRankUI();
+        app.initDailyDungeon();
+        app.renderMonster();
+        app.renderShadowArmy();
+        app.renderGrowthView();
+        app.calculatePowerLevel();
+        
+        // Ensure main content is visible
+        document.querySelector('.main-content').style.display = 'flex';
+        document.querySelector('.scroll-area').style.display = 'block';
+        
+        setInterval(() => app.updateDate(), 60000);
+        setInterval(() => app.updateDungeonTimer(), 1000);
+        window.addEventListener('resize', app.renderHistory);
+        
+        // Check for achievements
+        app.checkAchievements();
+    },
+
+    toggleTheme: () => {
+        app.data.theme = app.data.theme === 'dark' ? 'light' : 'dark';
+        app.applyTheme();
+        Store.set(app.data);
+        app.renderHistory();
+        app.showToast(`Realm shifted to ${app.data.theme} mode`);
+    },
+
+    applyTheme: () => {
+        if (app.data.theme === 'light') {
+            document.body.classList.add('light-mode');
+        } else {
+            document.body.classList.remove('light-mode');
+        }
+        document.getElementById('theme-icon').textContent = app.data.theme === 'dark' ? '☀' : '☾';
+    },
+
+    toggleSidebar: () => {
+        document.getElementById('sidebar').classList.toggle('open');
+    },
+
+    navigate: (viewId) => {
+        console.log('Navigating to:', viewId);
+        document.querySelectorAll('.view').forEach(el => {
+            el.classList.remove('active');
+            el.style.display = 'none';
+        });
+        
+        const targetView = document.getElementById(viewId);
+        if (targetView) {
+            targetView.classList.add('active');
+            targetView.style.display = 'block';
+        }
+        
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        
+        // Update page title
+        const titles = {
+            'dashboard': 'Stronghold',
+            'history': 'Chronicles',
+            'timer': 'Time Chamber',
+            'growth': 'Growth'
+        };
+        document.getElementById('page-title').textContent = titles[viewId] || viewId;
+        
+        if(window.innerWidth < 768) app.toggleSidebar();
+        if(viewId === 'history') app.renderHistory();
+        if(viewId === 'growth') app.renderGrowthView();
+    },
+
+    updateDate: () => {
+        const options = { weekday: 'long', month: 'short', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+    },
+
+    /* --- Habit Logic --- */
+    openModal: () => document.getElementById('habit-modal').classList.add('open'),
+    closeModal: () => document.getElementById('habit-modal').classList.remove('open'),
+
+    selectAllDays: () => {
+        document.querySelectorAll('.day-selector input').forEach(cb => cb.checked = true);
+    },
+
+    addHabit: () => {
+        const name = document.getElementById('habit-name-input').value.trim();
+        if (!name) {
+            app.showToast("Soldier needs a name!");
+            return;
+        }
+
+        const checkboxes = document.querySelectorAll('.day-selector input:checked');
+        const days = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        const finalDays = days.length > 0 ? days : [0,1,2,3,4,5,6];
+
+        const newHabit = {
+            id: Date.now(),
+            name: name,
+            logs: [],
+            days: finalDays,
+            created: new Date().toISOString(),
+            soldierLevel: 1,
+            soldierType: this.getSoldierType(name)
+        };
+
+        app.data.habits.push(newHabit);
+        app.save();
+        app.renderDashboard();
+        app.renderSidebarHabits();
+        app.renderShadowArmy();
+        app.closeModal();
+        app.showToast(`Soldier "${name}" recruited!`);
+        
+        // Update dungeon progress if applicable
+        if (app.data.dailyDungeon === 3) { // "Shadow Summoning" dungeon
+            app.data.dungeonProgress++;
+            app.save();
+            app.updateDungeonProgress();
+        }
+        
+        document.getElementById('habit-name-input').value = '';
+        document.querySelectorAll('.day-selector input').forEach(cb => cb.checked = false);
+        
+        // Add XP for creating habit
+        app.addXP(50, "Created new soldier");
+        
+        // Update stats
+        app.updateStat('discipline', 5);
+    },
+    
+    getSoldierType: (name) => {
+        const lowerName = name.toLowerCase();
+        if (lowerName.includes('read') || lowerName.includes('study') || lowerName.includes('learn')) {
+            return 'intelligence';
+        } else if (lowerName.includes('exercise') || lowerName.includes('workout') || lowerName.includes('run')) {
+            return 'strength';
+        } else if (lowerName.includes('meditate') || lowerName.includes('focus') || lowerName.includes('breathe')) {
+            return 'willpower';
+        } else {
+            return 'discipline';
+        }
+    },
+    
+    deleteHabit: (id) => {
+        if(confirm('Dismiss this soldier from your army?')) {
+            app.data.habits = app.data.habits.filter(h => h.id !== id);
+            app.save();
+            app.renderDashboard();
+            app.renderSidebarHabits();
+            app.renderHistory();
+            app.renderShadowArmy();
+            app.showToast("Soldier dismissed from army");
+            
+            // Lose some XP for dismissing
+            app.addXP(-30, "Dismissed soldier");
+        }
+    },
+
+    toggleCheck: (id) => {
+        const habit = app.data.habits.find(h => h.id === id);
+        const today = getLocalDateString();
+        
+        if (habit.logs.includes(today)) {
+            // Unchecking habit
+            habit.logs = habit.logs.filter(d => d !== today);
+            app.addXP(-15, "Habit unchecked");
+            app.updateStat(this.getStatForHabitType(habit.soldierType), -2);
+        } else {
+            // Checking habit
+            habit.logs.push(today);
+            
+            // Increase soldier level based on streak
+            const streak = app.calculateStreak(habit);
+            if (streak % 7 === 0 && streak > 0) {
+                habit.soldierLevel++;
+                app.showToast(`${habit.name} leveled up to ${habit.soldierLevel}!`);
+            }
+            
+            // Add XP and update stats
+            const xpGained = 20 + (habit.soldierLevel * 5);
+            app.addXP(xpGained, `Completed ${habit.name}`);
+            app.updateStat(this.getStatForHabitType(habit.soldierType), 5);
+            
+            // Increment total completions
+            app.data.totalCompletions++;
+            
+            // Attack monster if exists
+            if (app.data.monsterHp > 0) {
+                app.attackMonster();
+            }
+            
+            // Update dungeon progress
+            if (app.data.dailyDungeon === 0) { // "Focus Gauntlet"
+                // Check if this habit involves timer
+                if (habit.name.toLowerCase().includes('focus') || habit.name.toLowerCase().includes('timer')) {
+                    app.data.dungeonProgress++;
+                    app.updateDungeonProgress();
+                }
+            } else if (app.data.dailyDungeon === 2) { // "Army Training"
+                app.data.dungeonProgress++;
+                app.updateDungeonProgress();
+            }
+            
+            app.playSuccessSound();
+        }
+        app.save();
+        app.renderDashboard();
+        app.renderHistory();
+        app.renderRankUI();
+        app.renderShadowArmy();
+        app.renderGrowthView();
+        app.calculatePowerLevel();
+        
+        // Check for achievements
+        app.checkAchievements();
+    },
+    
+    getStatForHabitType: (type) => {
+        switch(type) {
+            case 'strength': return 'strength';
+            case 'intelligence': return 'intelligence';
+            case 'willpower': return 'willpower';
+            default: return 'discipline';
+        }
+    },
+
+    calculateStreak: (habit) => {
+        const logs = habit.logs.sort().reverse();
+        if (logs.length === 0) return 0;
+        const today = getLocalDateString();
+        
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        const yesterday = getLocalDateString(d);
+
+        if (logs[0] !== today && logs[0] !== yesterday) return 0;
+        let streak = 1;
+        for (let i = 0; i < logs.length - 1; i++) {
+            const current = new Date(logs[i]);
+            const next = new Date(logs[i+1]);
+            const diffTime = Math.abs(current - next);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            if (diffDays === 1) streak++;
+            else break;
+        }
+        
+        // Update longest streak if needed
+        if (streak > app.data.longestStreak) {
+            app.data.longestStreak = streak;
+        }
+        
+        return streak;
+    },
+
+    renderSidebarHabits: () => {
+        const container = document.getElementById('sidebar-habit-list');
+        container.innerHTML = '';
+        if(app.data.habits.length === 0) {
+            container.innerHTML = '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 10px;">No soldiers recruited yet.</div>';
+            return;
+        }
+        app.data.habits.forEach(habit => {
+            const streak = app.calculateStreak(habit);
+            const div = document.createElement('div');
+            div.className = 'sidebar-habit-item';
+            div.innerHTML = `
+                <span>${habit.name} <span style="font-size: 0.7rem; color: var(--warning);">Lv.${habit.soldierLevel}</span></span>
+                <span class="sidebar-habit-delete" onclick="app.deleteHabit(${habit.id})">×</span>
+            `;
+            container.appendChild(div);
+        });
+    },
+
+    renderDashboard: () => {
+        const list = document.getElementById('today-list');
+        const today = getLocalDateString();
+        const currentDayIndex = new Date().getDay();
+        list.innerHTML = '';
+
+        const todaysHabits = app.data.habits.filter(h => h.days.includes(currentDayIndex));
+        let completedToday = 0;
+        let totalStreakSum = 0;
+
+        if (todaysHabits.length === 0) {
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('dash-total').textContent = 0;
+            document.getElementById('dash-rate').textContent = "0%";
+            document.getElementById('dash-streak').innerHTML = "0 <span style='font-size:1.5rem; color: #ff9f43;'>🔥</span>";
+            return;
+        }
+
+        document.getElementById('empty-state').style.display = 'none';
+
+        todaysHabits.forEach(habit => {
+            const isDone = habit.logs.includes(today);
+            if (isDone) completedToday++;
+            const streak = app.calculateStreak(habit);
+            totalStreakSum += streak;
+            const dayLabel = habit.days.map(d => ['S','M','T','W','T','F','S'][d]).join(' ');
+
+            const div = document.createElement('div');
+            div.className = 'habit-item';
+            div.innerHTML = `
+                <div class="habit-left">
+                    <div class="check-circle ${isDone ? 'checked' : ''}" onclick="app.toggleCheck(${habit.id})"></div>
+                    <div>
+                        <span class="habit-name ${isDone ? 'done' : ''}">${habit.name} <span style="font-size: 0.8rem; color: var(--warning);">Lv.${habit.soldierLevel}</span></span>
+                        <span class="badge-day">${dayLabel}</span>
+                    </div>
+                </div>
+                <div class="habit-streak">
+                    <span class="streak-fire">🔥</span> ${streak}
+                </div>
+            `;
+            list.appendChild(div);
+        });
+
+        document.getElementById('dash-total').textContent = todaysHabits.length;
+        document.getElementById('dash-streak').innerHTML = `${totalStreakSum} <span style='font-size:1.5rem; color: #ff9f43;'>🔥</span>`;
+        const rate = todaysHabits.length > 0 ? Math.round((completedToday / todaysHabits.length) * 100) : 0;
+        document.getElementById('dash-rate').textContent = `${rate}%`;
+    },
+
+    renderHistory: () => {
+        // Activity Map
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+        
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const todayStr = getLocalDateString();
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const d = new Date(year, month, i);
+            const dateStr = getLocalDateString(d); 
+            const dayNum = d.getDate();
+            const isToday = dateStr === todayStr;
+            const dayIdx = d.getDay();
+
+            const scheduledHabits = app.data.habits.filter(h => h.days.includes(dayIdx));
+            let completedCount = 0;
+            scheduledHabits.forEach(h => { 
+                if(h.logs.includes(dateStr)) completedCount++; 
+            });
+            
+            const hasCompletion = completedCount > 0 && completedCount === scheduledHabits.length;
+            const partial = completedCount > 0 && completedCount < scheduledHabits.length;
+
+            const div = document.createElement('div');
+            div.className = `cal-day ${isToday ? 'today' : ''}`;
+            if (hasCompletion) div.classList.add('completed');
+            if (partial) div.style.backgroundColor = 'rgba(0, 210, 255, 0.3)';
+            div.textContent = dayNum;
+            grid.appendChild(div);
+        }
+
+        app.drawChart();
+        app.drawOverallRing();
+    },
+
+    drawChart: () => {
+        const canvas = document.getElementById('historyChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const parent = canvas.parentElement;
+        if (!parent || parent.offsetWidth === 0);
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
+
+        const dataPoints = [];
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = getLocalDateString(d);
+            const dayIdx = d.getDay();
+            const scheduled = app.data.habits.filter(h => h.days.includes(dayIdx)).length;
+            if (scheduled === 0) { dataPoints.push(0); continue; }
+            let completed = 0;
+            app.data.habits.forEach(h => { if (h.days.includes(dayIdx) && h.logs.includes(dateStr)) completed++; });
+            dataPoints.push((completed / scheduled) * 100);
+        }
+
+        const isDark = app.data.theme === 'dark';
+        const colorLine = isDark ? '#00d2ff' : '#2563eb';
+        const colorFill = isDark ? 'rgba(0, 210, 255, 0.2)' : 'rgba(37, 99, 235, 0.2)';
+        const colorGrid = isDark ? '#222' : '#e2e8f0';
+
+        const w = canvas.width;
+        const h = canvas.height;
+        const padding = 20;
+
+        ctx.clearRect(0,0,w,h);
+        ctx.strokeStyle = colorGrid;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding, h - padding);
+        ctx.lineTo(w - padding, h - padding);
+        ctx.stroke();
+
+        if (dataPoints.length > 1) {
+            const stepX = (w - 2*padding) / (dataPoints.length - 1);
+            ctx.beginPath();
+            ctx.moveTo(padding, h - padding);
+            dataPoints.forEach((val, i) => {
+                const x = padding + i * stepX;
+                const y = (h - padding) - (val / 100) * (h - 2*padding);
+                ctx.lineTo(x, y);
+            });
+            ctx.lineTo(padding + (dataPoints.length - 1) * stepX, h - padding);
+            ctx.fillStyle = colorFill;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.strokeStyle = colorLine;
+            ctx.lineWidth = 2;
+            dataPoints.forEach((val, i) => {
+                const x = padding + i * stepX;
+                const y = (h - padding) - (val / 100) * (h - 2*padding);
+                if (i===0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+    },
+
+    drawOverallRing: () => {
+        let totalPossible = 0;
+        let totalDone = 0;
+        for (let i = 0; i < 30; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = getLocalDateString(d);
+            const dayIdx = d.getDay();
+            const habits = app.data.habits.filter(h => h.days.includes(dayIdx));
+            totalPossible += habits.length;
+            habits.forEach(h => { if(h.logs.includes(dateStr)) totalDone++; });
+        }
+        const pct = totalPossible === 0 ? 0 : Math.round((totalDone / totalPossible) * 100);
+        const circle = document.getElementById('history-ring');
+        if (circle) {
+            const circumference = 502.65; 
+            const offset = circumference - (pct / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+        const percentEl = document.getElementById('history-percent');
+        if (percentEl) percentEl.textContent = `${pct}%`;
+    },
+
+    save: () => Store.set(app.data),
+    
+    showToast: (msg) => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<span>${msg}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    },
+    
+    // --- NEW: SHADOW MONARCH SYSTEM FUNCTIONS ---
+    
+    addXP: (amount, reason = "") => {
+        const oldLevel = app.data.level;
+        app.data.xp += amount;
+        
+        // Prevent negative XP
+        if (app.data.xp < 0) app.data.xp = 0;
+        
+        // Check for Level Up
+        const nextLevelXP = getXPForNextLevel(app.data.level);
+        if (app.data.xp >= nextLevelXP) {
+            app.levelUp();
+        }
+        
+        // Update XP bar
+        app.renderRankUI();
+        
+        if (reason && amount > 0) {
+            console.log(`+${amount} XP: ${reason}`);
+        }
+    },
+
+    levelUp: () => {
+        app.data.level++;
+        app.data.xp = app.data.xp - getXPForNextLevel(app.data.level - 1);
+        app.data.skillPoints++;
+        
+        app.showToast(`LEVEL UP! You are now Level ${app.data.level}`);
+        app.showAchievement("Level Up!", `Reached Level ${app.data.level}`, "⭐");
+        
+        // Play level up sound
+        app.playLevelUpSound();
+    },
+    
+    playLevelUpSound: () => {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+            const t = ctx.currentTime;
+
+            // Level up sound
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, t); // C5
+            osc1.frequency.exponentialRampToValueAtTime(1046.50, t + 0.3); // C6
+            
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            
+            gain1.gain.setValueAtTime(0, t);
+            gain1.gain.linearRampToValueAtTime(0.3, t + 0.05);
+            gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+            
+            osc1.start(t);
+            osc1.stop(t + 0.5);
+
+            // Second harmonic
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(659.25, t); // E5
+            
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            
+            gain2.gain.setValueAtTime(0, t);
+            gain2.gain.linearRampToValueAtTime(0.2, t + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+
+            osc2.start(t);
+            osc2.stop(t + 0.4);
+        } catch (e) {
+            console.log('Audio not supported');
+        }
+    },
+
+    renderRankUI: () => {
+        const level = app.data.level;
+        const xp = app.data.xp;
+        const rank = getCurrentRank(level);
+        const nextXP = getXPForNextLevel(level);
+        const percent = Math.min(100, Math.floor((xp / nextXP) * 100));
+
+        // Update DOM Elements
+        const rankNameEl = document.getElementById('rank-name');
+        const rankBadgeEl = document.getElementById('rank-badge');
+        const levelNumEl = document.getElementById('level-number');
+        const xpBarEl = document.getElementById('xp-bar-fill');
+        const skillPointsEl = document.getElementById('skill-points');
+        const userTitleEl = document.getElementById('user-title');
+
+        if (rankNameEl) rankNameEl.textContent = rank.name;
+        if (rankBadgeEl) {
+            rankBadgeEl.textContent = rank.name.substring(0, 1).toUpperCase();
+            rankBadgeEl.style.color = rank.color;
+            rankBadgeEl.style.borderColor = rank.color;
+        }
+        if (levelNumEl) levelNumEl.textContent = `LVL ${level}`;
+        if (xpBarEl) {
+            xpBarEl.style.width = `${percent}%`;
+            xpBarEl.style.background = `linear-gradient(90deg, ${rank.color}, #ff9f43, ${rank.color})`;
+        }
+        if (skillPointsEl) skillPointsEl.textContent = `${app.data.skillPoints} SP`;
+        if (userTitleEl) userTitleEl.textContent = rank.title.toUpperCase();
+    },
+    
+    // --- DAILY DUNGEON SYSTEM ---
+    initDailyDungeon: () => {
+        const today = getLocalDateString();
+        
+        // Reset dungeon if it's a new day
+        if (app.data.lastDungeonDate !== today) {
+            app.data.dailyDungeon = Math.floor(Math.random() * DUNGEONS.length);
+            app.data.dungeonProgress = 0;
+            app.data.lastDungeonDate = today;
+            app.save();
+        }
+        
+        app.updateDungeonDisplay();
+    },
+    
+    updateDungeonDisplay: () => {
+        const dungeon = DUNGEONS[app.data.dailyDungeon];
+        if (!dungeon) return;
+        
+        document.getElementById('dungeon-name').textContent = dungeon.name;
+        document.getElementById('dungeon-desc').textContent = dungeon.description;
+        document.getElementById('dungeon-btn').textContent = app.data.dungeonProgress >= dungeon.target ? 'Claim Reward' : 'Enter Dungeon';
+        
+        app.updateDungeonProgress();
+    },
+    
+    updateDungeonProgress: () => {
+        const dungeon = DUNGEONS[app.data.dailyDungeon];
+        if (!dungeon) return;
+        
+        const progress = Math.min(100, (app.data.dungeonProgress / dungeon.target) * 100);
+        const dungeonBtn = document.getElementById('dungeon-btn');
+        
+        if (app.data.dungeonProgress >= dungeon.target) {
+            dungeonBtn.style.background = 'linear-gradient(135deg, #2ed573, #7bed9f)';
+            dungeonBtn.textContent = 'Claim Reward';
+        } else {
+            dungeonBtn.style.background = 'linear-gradient(135deg, var(--danger), #ff6b6b)';
+            dungeonBtn.textContent = `Progress: ${app.data.dungeonProgress}/${dungeon.target}`;
+        }
+    },
+    
+    updateDungeonTimer: () => {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        
+        const diff = tomorrow - now;
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        document.getElementById('dungeon-timer').textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    },
+    
+    completeDungeon: () => {
+        const dungeon = DUNGEONS[app.data.dailyDungeon];
+        if (!dungeon) return;
+        
+        if (app.data.dungeonProgress >= dungeon.target) {
+            // Claim reward
+            app.addXP(dungeon.reward, `Completed ${dungeon.name} dungeon`);
+            app.data.dungeonProgress = 0;
+            app.data.dailyDungeon = Math.floor(Math.random() * DUNGEONS.length);
+            app.save();
+            
+            app.showToast(`+${dungeon.reward} XP from dungeon!`);
+            app.updateDungeonDisplay();
+            
+            // Show achievement
+            app.showAchievement("Dungeon Master", `Completed ${dungeon.name}`, "⚔️");
+        } else {
+            app.showToast(`Progress: ${app.data.dungeonProgress}/${dungeon.target}`);
+        }
+    },
+    
+    // --- MONSTER HUNT SYSTEM ---
+    renderMonster: () => {
+        const monster = MONSTERS[app.data.currentMonster];
+        const hpPercent = (app.data.monsterHp / monster.maxHp) * 100;
+        
+        document.getElementById('monster-name').textContent = monster.name;
+        document.getElementById('monster-current-hp').textContent = app.data.monsterHp;
+        document.getElementById('monster-max-hp').textContent = monster.maxHp;
+        document.getElementById('monster-reward').textContent = `${monster.reward} XP`;
+        document.getElementById('monster-hp-fill').style.width = `${hpPercent}%`;
+        document.getElementById('monster-hp-fill').style.background = `linear-gradient(90deg, ${monster.color}, #ff6b6b)`;
+        document.getElementById('monsters-defeated').textContent = `${app.data.monstersDefeated} Defeated`;
+        
+        const attackBtn = document.getElementById('attack-btn');
+        if (app.data.monsterHp <= 0) {
+            attackBtn.textContent = "Monster Defeated!";
+            attackBtn.style.background = "linear-gradient(135deg, #2ed573, #7bed9f)";
+            attackBtn.onclick = () => app.nextMonster();
+        } else {
+            attackBtn.innerHTML = `<span>⚔️</span> Attack ${monster.name}`;
+            attackBtn.style.background = `linear-gradient(135deg, ${monster.color}, #ff6b6b)`;
+            attackBtn.onclick = () => app.attackMonster();
+        }
+    },
+    
+    attackMonster: () => {
+        if (app.data.monsterHp <= 0) {
+            app.nextMonster();
+            return;
+        }
+        
+        // Calculate damage based on stats
+        const damage = 10 + Math.floor(app.data.stats.strength / 10) + Math.floor(app.data.stats.discipline / 20);
+        app.data.monsterHp -= damage;
+        
+        if (app.data.monsterHp < 0) app.data.monsterHp = 0;
+        
+        app.save();
+        app.renderMonster();
+        app.showToast(`Dealt ${damage} damage to ${MONSTERS[app.data.currentMonster].name}!`);
+        
+        // Check if monster is defeated
+        if (app.data.monsterHp <= 0) {
+            setTimeout(() => {
+                const monster = MONSTERS[app.data.currentMonster];
+                app.addXP(monster.reward, `Defeated ${monster.name}`);
+                app.data.monstersDefeated++;
+                app.showToast(`Monster defeated! +${monster.reward} XP`);
+                
+                // Show achievement for first monster
+                if (app.data.monstersDefeated === 1) {
+                    app.showAchievement("Monster Hunter", "Defeated your first monster", "👹");
+                }
+                
+                app.save();
+                app.renderMonster();
+            }, 500);
+        }
+    },
+    
+    nextMonster: () => {
+        app.data.currentMonster = (app.data.currentMonster + 1) % MONSTERS.length;
+        app.data.monsterHp = MONSTERS[app.data.currentMonster].maxHp;
+        app.save();
+        app.renderMonster();
+        app.showToast(`New monster appeared: ${MONSTERS[app.data.currentMonster].name}`);
+    },
+    
+    // --- SHADOW ARMY SYSTEM ---
+    renderShadowArmy: () => {
+        const container = document.getElementById('shadow-army');
+        container.innerHTML = '';
+        
+        if (app.data.habits.length === 0) {
+            container.innerHTML = `
+                <div class="shadow-soldier" style="grid-column: 1 / -1;">
+                    <div class="shadow-rank">👻</div>
+                    <div class="shadow-name">No soldiers yet</div>
+                    <div class="shadow-level">Recruit some!</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // Sort habits by soldier level (highest first)
+        const sortedHabits = [...app.data.habits].sort((a, b) => b.soldierLevel - a.soldierLevel);
+        
+        sortedHabits.forEach(habit => {
+            const streak = app.calculateStreak(habit);
+            const soldierDiv = document.createElement('div');
+            soldierDiv.className = 'shadow-soldier';
+            soldierDiv.innerHTML = `
+                <div class="shadow-rank">${this.getSoldierEmoji(habit.soldierType)}</div>
+                <div class="shadow-name">${habit.name}</div>
+                <div class="shadow-level">Lv.${habit.soldierLevel}</div>
+            `;
+            
+            // Add glow effect based on level
+            if (habit.soldierLevel >= 5) {
+                soldierDiv.style.boxShadow = '0 0 20px var(--primary)';
+            }
+            
+            container.appendChild(soldierDiv);
+        });
+    },
+    
+    getSoldierEmoji: (type) => {
+        switch(type) {
+            case 'strength': return '💪';
+            case 'intelligence': return '🧠';
+            case 'willpower': return '⚡';
+            default: return '🛡️';
+        }
+    },
+    
+    // --- STATS SYSTEM ---
+    updateStat: (statName, amount) => {
+        if (app.data.stats[statName] !== undefined) {
+            app.data.stats[statName] += amount;
+            if (app.data.stats[statName] < 0) app.data.stats[statName] = 0;
+            app.save();
+            app.renderGrowthView();
+        }
+    },
+    
+    renderGrowthView: () => {
+        // Update stats
+        document.getElementById('stat-strength').textContent = app.data.stats.strength;
+        document.getElementById('stat-intelligence').textContent = app.data.stats.intelligence;
+        document.getElementById('stat-willpower').textContent = app.data.stats.willpower;
+        document.getElementById('stat-discipline').textContent = app.data.stats.discipline;
+        
+        // Update stat bars (max 100 for visualization)
+        document.getElementById('strength-bar').style.width = `${Math.min(100, app.data.stats.strength)}%`;
+        document.getElementById('intelligence-bar').style.width = `${Math.min(100, app.data.stats.intelligence)}%`;
+        document.getElementById('willpower-bar').style.width = `${Math.min(100, app.data.stats.willpower)}%`;
+        document.getElementById('discipline-bar').style.width = `${Math.min(100, app.data.stats.discipline)}%`;
+        
+        // Update detailed stats
+        document.getElementById('total-habits').textContent = app.data.habits.length;
+        document.getElementById('total-habits-bar').style.width = `${Math.min(100, app.data.habits.length * 10)}%`;
+        
+        document.getElementById('longest-streak').textContent = `${app.data.longestStreak} days`;
+        document.getElementById('longest-streak-bar').style.width = `${Math.min(100, app.data.longestStreak)}%`;
+        
+        document.getElementById('total-completions').textContent = app.data.totalCompletions;
+        document.getElementById('total-completions-bar').style.width = `${Math.min(100, app.data.totalCompletions / 10)}%`;
+        
+        // Calculate consistency rate
+        const consistencyRate = app.data.habits.length > 0 ? 
+            Math.min(100, Math.floor((app.data.totalCompletions / (app.data.habits.length * 30)) * 100)) : 0;
+        document.getElementById('consistency-rate').textContent = `${consistencyRate}%`;
+        document.getElementById('consistency-bar').style.width = `${consistencyRate}%`;
+        
+        // Update skill points
+        document.getElementById('available-sp').textContent = app.data.skillPoints;
+        
+        // Render skill tree
+        app.renderSkillTree();
+        
+        // Update hunter rank
+        const hunterRank = getHunterRank(app.data.totalCompletions);
+        const nextRank = HUNTER_RANKS[HUNTER_RANKS.findIndex(r => r.name === hunterRank.name) + 1];
+        const rankProgress = nextRank ? 
+            Math.min(100, (app.data.totalCompletions / nextRank.threshold) * 100) : 100;
+        
+        document.getElementById('rank-progress').style.width = `${rankProgress}%`;
+    },
+    
+    renderSkillTree: () => {
+        const container = document.getElementById('skill-tree');
+        container.innerHTML = '';
+        
+        app.data.skills.forEach(skill => {
+            const skillDiv = document.createElement('div');
+            skillDiv.className = `skill-node ${skill.unlocked ? 'unlocked' : 'locked'} ${app.data.skillPoints >= skill.cost ? 'available' : ''}`;
+            skillDiv.onclick = () => app.unlockSkill(skill.id);
+            
+            skillDiv.innerHTML = `
+                <div class="skill-icon">${this.getSkillIcon(skill.type)}</div>
+                <div class="skill-name">${skill.name}</div>
+                <div class="skill-cost">${skill.cost} SP</div>
+            `;
+            
+            container.appendChild(skillDiv);
+        });
+    },
+    
+    getSkillIcon: (type) => {
+        switch(type) {
+            case 'passive': return '🛡️';
+            case 'active': return '⚡';
+            default: return '🌟';
+        }
+    },
+    
+    unlockSkill: (skillId) => {
+        const skill = app.data.skills.find(s => s.id === skillId);
+        if (!skill || skill.unlocked) return;
+        
+        if (app.data.skillPoints >= skill.cost) {
+            skill.unlocked = true;
+            app.data.skillPoints -= skill.cost;
+            app.save();
+            
+            app.renderGrowthView();
+            app.showToast(`Unlocked skill: ${skill.name}!`);
+            app.showAchievement("Skill Unlocked", skill.name, "🌟");
+            
+            // Apply skill effects
+            if (skill.id === 1) { // Double XP on weekends
+                app.showToast("Weekend XP bonus activated!");
+            }
+        } else {
+            app.showToast(`Need ${skill.cost - app.data.skillPoints} more skill points`);
+        }
+    },
+    
+    // --- ACHIEVEMENTS ---
+    checkAchievements: () => {
+        // Check for various achievements
+        if (app.data.habits.length >= 5 && !app.data.achievements?.firstArmy) {
+            app.showAchievement("Army Builder", "Recruited 5 soldiers", "👥");
+        }
+        
+        if (app.data.longestStreak >= 7 && !app.data.achievements?.weekStreak) {
+            app.showAchievement("Week Warrior", "7-day streak achieved", "🔥");
+        }
+        
+        if (app.data.totalCompletions >= 50 && !app.data.achievements?.fiftyCompletions) {
+            app.showAchievement("Consistency King", "50 total completions", "👑");
+        }
+        
+        if (app.data.level >= 10 && !app.data.achievements?.levelTen) {
+            app.showAchievement("Decade of Growth", "Reached Level 10", "⭐");
+        }
+    },
+    
+    showAchievement: (title, description, icon = "🏆") => {
+        const popup = document.getElementById('achievement-popup');
+        document.getElementById('achievement-title').textContent = title;
+        document.getElementById('achievement-desc').textContent = description;
+        document.getElementById('achievement-icon').textContent = icon;
+        
+        popup.style.display = 'block';
+        
+        // Auto close after 5 seconds
+        setTimeout(() => {
+            app.closeAchievement();
+        }, 5000);
+    },
+    
+    closeAchievement: () => {
+        document.getElementById('achievement-popup').style.display = 'none';
+    },
+    
+    // --- POWER LEVEL CALCULATION ---
+    calculatePowerLevel: () => {
+        // Calculate power level based on various factors
+        let power = 0;
+        
+        // Base from level
+        power += app.data.level * 10;
+        
+        // Add from stats
+        power += Object.values(app.data.stats).reduce((a, b) => a + b, 0);
+        
+        // Add from habits (level and streak)
+        app.data.habits.forEach(habit => {
+            power += habit.soldierLevel * 5;
+            power += app.calculateStreak(habit) * 2;
+        });
+        
+        // Add from monsters defeated
+        power += app.data.monstersDefeated * 25;
+        
+        // Add from total completions
+        power += app.data.totalCompletions * 0.5;
+        
+        // Update display
+        document.getElementById('power-level').textContent = Math.round(power);
+        app.data.powerLevel = Math.round(power);
+        app.save();
+    },
+    
+    showStats: () => {
+        app.navigate('growth');
+    },
+
+    playSuccessSound: () => {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+            const t = ctx.currentTime;
+
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'triangle'; 
+            osc1.frequency.setValueAtTime(400, t);
+            osc1.frequency.exponentialRampToValueAtTime(800, t + 0.1);
+            
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            
+            gain1.gain.setValueAtTime(0, t);
+            gain1.gain.linearRampToValueAtTime(0.1, t + 0.02);
+            gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+            
+            osc1.start(t);
+            osc1.stop(t + 0.15);
+
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1200, t + 0.05);
+            
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            
+            gain2.gain.setValueAtTime(0, t + 0.05);
+            gain2.gain.linearRampToValueAtTime(0.1, t + 0.07);
+            gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+
+            osc2.start(t + 0.05);
+            osc2.stop(t + 0.45);
+        } catch (e) {
+            console.log('Audio not supported or blocked');
+        }
+    }
+};
+
+/* --- Timer Logic --- */
+const timer = {
+    interval: null,
+    timeLeft: 25 * 60,
+    totalTime: 25 * 60,
+    isRunning: false,
+    mode: 'pomodoro',
+    
+    pomodoroState: 'focus',
+    cycleCount: 1,
+    
+    stopwatchTime: 0,
+    laps: [],
+
+    switchMode: (mode) => {
+        timer.reset();
+        timer.mode = mode;
+        document.getElementById('mode-pomodoro').classList.toggle('active', mode === 'pomodoro');
+        document.getElementById('mode-stopwatch').classList.toggle('active', mode === 'stopwatch');
+
+        if (mode === 'stopwatch') {
+            document.getElementById('timer-status').textContent = "Stopwatch";
+            document.getElementById('timer-display').textContent = "00:00";
+            document.getElementById('cycle-info').style.display = 'none';
+            document.getElementById('lap-btn').style.display = 'inline-flex';
+            document.getElementById('stopwatch-laps').style.display = 'block';
+            document.getElementById('timer-ring').style.strokeDashoffset = 0; 
+        } else {
+            timer.setPomodoroState('focus');
+            document.getElementById('cycle-info').style.display = 'block';
+            document.getElementById('lap-btn').style.display = 'none';
+            document.getElementById('stopwatch-laps').style.display = 'none';
+        }
+    },
+
+    setPomodoroState: (state) => {
+        timer.pomodoroState = state;
+        const display = document.getElementById('timer-status');
+        const ring = document.getElementById('timer-ring');
+        
+        if (state === 'focus') {
+            timer.totalTime = 25 * 60;
+            timer.timeLeft = 25 * 60;
+            display.textContent = "Focus Time";
+            ring.style.stroke = "var(--primary)";
+        } else if (state === 'short') {
+            timer.totalTime = 5 * 60;
+            timer.timeLeft = 5 * 60;
+            display.textContent = "Short Break";
+            ring.style.stroke = "var(--success)";
+        } else if (state === 'long') {
+            timer.totalTime = 20 * 60;
+            timer.timeLeft = 20 * 60;
+            display.textContent = "Long Break";
+            ring.style.stroke = "var(--success)";
+        }
+        timer.updateDisplay();
+        timer.updateRing();
+        timer.updateCycleInfo();
+    },
+
+    updateCycleInfo: () => {
+        document.getElementById('cycle-info').textContent = `Cycle ${timer.cycleCount} of 4`;
+    },
+
+    toggle: () => {
+        if (timer.isRunning) {
+            clearInterval(timer.interval);
+            timer.isRunning = false;
+            document.getElementById('timer-toggle').textContent = 'Start';
+            document.getElementById('timer-toggle').classList.remove('btn-outline');
+            document.getElementById('timer-toggle').classList.add('btn-primary');
+        } else {
+            timer.isRunning = true;
+            document.getElementById('timer-toggle').textContent = 'Pause';
+            document.getElementById('timer-toggle').classList.remove('btn-primary');
+            document.getElementById('timer-toggle').classList.add('btn-outline');
+            
+            timer.interval = setInterval(() => {
+                if (timer.mode === 'stopwatch') {
+                    timer.stopwatchTime++;
+                    timer.updateStopwatchDisplay();
+                } else {
+                    if (timer.timeLeft > 0) {
+                        timer.timeLeft--;
+                        timer.updateDisplay();
+                        timer.updateRing();
+                    } else {
+                        timer.pomodoroComplete();
+                    }
+                }
+            }, 1000);
+        }
+    },
+
+    reset: () => {
+        clearInterval(timer.interval);
+        timer.isRunning = false;
+        document.getElementById('timer-toggle').textContent = 'Start';
+        document.getElementById('timer-toggle').classList.add('btn-primary');
+        
+        if (timer.mode === 'stopwatch') {
+            timer.stopwatchTime = 0;
+            timer.laps = [];
+            document.getElementById('stopwatch-laps').innerHTML = '';
+            timer.updateStopwatchDisplay();
+        } else {
+            timer.setPomodoroState(timer.pomodoroState);
+        }
+    },
+
+    lap: () => {
+        if (timer.mode !== 'stopwatch') return;
+        timer.laps.push(timer.stopwatchTime);
+        const lapsDiv = document.getElementById('stopwatch-laps');
+        const div = document.createElement('div');
+        div.className = 'lap-item';
+        const lapTime = timer.formatTime(timer.stopwatchTime);
+        div.innerHTML = `<span>Lap ${timer.laps.length}</span> <span>${lapTime}</span>`;
+        lapsDiv.prepend(div);
+    },
+
+    updateDisplay: () => {
+        document.getElementById('timer-display').textContent = timer.formatTime(timer.timeLeft);
+    },
+
+    updateStopwatchDisplay: () => {
+        document.getElementById('timer-display').textContent = timer.formatTime(timer.stopwatchTime);
+    },
+
+    formatTime: (seconds) => {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    },
+
+    updateRing: () => {
+        const circle = document.getElementById('timer-ring');
+        const radius = 150;
+        const circumference = 2 * Math.PI * radius; 
+        const offset = circumference - (timer.timeLeft / timer.totalTime) * circumference;
+        circle.style.strokeDashoffset = Math.round(offset);
+    },
+
+    pomodoroComplete: () => {
+        clearInterval(timer.interval);
+        timer.isRunning = false;
+        app.playSuccessSound();
+
+        // Give XP for completing a timer session
+        if (timer.pomodoroState === 'focus') {
+            app.addXP(50, "Completed focus session");
+            app.updateStat('willpower', 3);
+            
+            if (timer.cycleCount === 4) {
+                app.showToast("Cycle Complete! Taking a Long Break.");
+                timer.setPomodoroState('long');
+            } else {
+                app.showToast("Focus done! Time for a Short Break.");
+                timer.setPomodoroState('short');
+            }
+        } else {
+            app.showToast("Break over! Back to Focus.");
+            timer.cycleCount++;
+            timer.setPomodoroState('focus');
+        }
+        
+        setTimeout(() => {
+            timer.toggle();
+        }, 1500);
+    }
+};
+
+// --- PWA Configuration ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/APEX-habit-tracker/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registered:', registration.scope);
+            })
+            .catch(error => {
+                console.log('ServiceWorker registration failed:', error);
+            });
+    });
+}
+
+// Save current page for offline
+const cacheName = 'apex-shadow-v1';
+const filesToCache = [
+    '/APEX-habit-tracker/',
+    '/APEX-habit-tracker/index.html'
+];
+
+// Install event - cache files
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(cacheName)
+            .then(cache => {
+                return cache.addAll(filesToCache);
+            })
+    );
+});
+
+// Fetch event - serve from cache if offline
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                return response || fetch(event.request);
+            })
+    );
+});
+
+// Force offline support
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+function updateOnlineStatus() {
+    if (!navigator.onLine) {
+        document.body.innerHTML = document.body.innerHTML.replace(
+            'APEX | Shadow Monarch Habit System',
+            'APEX | Shadow Realm (Offline)'
+        );
+    }
+}
+
+// Check on load
+updateOnlineStatus();
+
+// --- Improved Splash Screen Logic ---
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Shadow Monarch System Loading...');
+    
+    // Force show app after 3 seconds regardless of load events
+    setTimeout(function() {
+        const splash = document.getElementById('splash-screen');
+        const appContainer = document.getElementById('app-container');
+        
+        console.log('Splash timeout triggered');
+        
+        if (splash) {
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                if (splash.parentNode) {
+                    splash.parentNode.removeChild(splash);
+                    console.log('Splash screen removed');
+                }
+            }, 600);
+        }
+        
+        if (appContainer) {
+            appContainer.style.opacity = '1';
+            appContainer.classList.add('app-content-reveal');
+            console.log('App container revealed');
+            
+            // Initialize app
+            try {
+                app.init();
+                console.log('Shadow Monarch System initialized successfully');
+            } catch (error) {
+                console.error('Error initializing system:', error);
+                // Force show content even if initialization fails
+                document.getElementById('dashboard').style.display = 'block';
+            }
+        }
+    }, 3000);
+});
+
+// Fallback: if window load happens after DOMContentLoaded
+window.addEventListener('load', function() {
+    console.log('Shadow Realm fully loaded');
+});
+
+// Emergency fallback: if nothing loads after 5 seconds
+setTimeout(function() {
+    const appContainer = document.getElementById('app-container');
+    if (appContainer && appContainer.style.opacity === '0') {
+        console.log('Emergency fallback: forcing system to show');
+        appContainer.style.opacity = '1';
+        document.getElementById('splash-screen').style.display = 'none';
+        try {
+            app.init();
+        } catch (e) {
+            console.error('Fallback init error:', e);
+        }
+    }
+}, 5000);</script><script type="text/javascript" id="dcoder_script">// App.js - Complete Mobile-Optimized Version
+import React, { useState, useEffect } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  FlatList,
+  SectionList,
+  Modal,
+  Alert,
+  StyleSheet,
+  StatusBar,
+  Dimensions,
+  Animated,
+  PanResponder,
+  RefreshControl,
+  Platform,
+  Switch,
+  BackHandler,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  ChevronLeft,
+  Plus,
+  Trash2,
+  Sun,
+  Moon,
+  TrendingUp,
+  Calendar,
+  CheckCircle,
+  X,
+  Menu,
+  Check,
+  ChevronRight,
+  BarChart3,
+  Target,
+  Award,
+  Clock,
+  Bell,
+  Settings,
+  User,
+} from 'lucide-react-native';
+import { LineChart, ProgressChart } from 'react-native-chart-kit';
+import { format, addDays, startOfWeek, eachDayOfInterval } from 'date-fns';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Color palette
+const COLORS = {
+  primary: '#10b981', // Emerald
+  primaryDark: '#059669',
+  primaryLight: '#34d399',
+  dark: {
+    bg: '#0f172a',
+    card: '#1e293b',
+    border: '#334155',
+    text: '#f8fafc',
+    textSecondary: '#94a3b8',
+  },
+  light: {
+    bg: '#f8fafc',
+    card: '#ffffff',
+    border: '#e2e8f0',
+    text: '#1e293b',
+    textSecondary: '#64748b',
+  },
+  habitColors: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'],
+};
+
+const HabitTracker = () => {
+  const [darkMode, setDarkMode] = useState(true);
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [habits, setHabits] = useState([]);
+  const [habitCompletions, setHabitCompletions] = useState({});
+  const [tasks, setTasks] = useState([]);
+  const [newHabitName, setNewHabitName] = useState('');
+  const [showAddHabit, setShowAddHabit] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [streaks, setStreaks] = useState({});
+  const [notifications, setNotifications] = useState(true);
+  const [userName, setUserName] = useState('');
+
+  // Animations
+  const slideAnim = useState(new Animated.Value(-300))[0];
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+  // Load data on mount
+  useEffect(() => {
+    loadData();
+    animateEntrance();
+    
+    // Handle Android back button
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    return () => backHandler.remove();
+  }, []);
+
+  // Animate entrance
+  const animateEntrance = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start(() => setLoading(false));
+  };
+
+  // Handle back press
+  const handleBackPress = () => {
+    if (sidebarOpen) {
+      closeSidebar();
+      return true;
+    }
+    if (currentView !== 'dashboard') {
+      setCurrentView('dashboard');
+      return true;
+    }
+    return false;
+  };
+
+  // Load data from AsyncStorage
+  const loadData = async () => {
+    try {
+      const savedData = await AsyncStorage.getItem('forge_mobile_data');
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        setHabits(parsed.habits || []);
+        setHabitCompletions(parsed.habitCompletions || {});
+        setTasks(parsed.tasks || []);
+        setDarkMode(parsed.darkMode ?? true);
+        setUserName(parsed.userName || '');
+        setNotifications(parsed.notifications ?? true);
+        calculateStreaks(parsed.habitCompletions || {});
+      } else {
+        initializeDefaultData();
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+      initializeDefaultData();
+    }
+  };
+
+  // Initialize default data
+  const initializeDefaultData = () => {
+    const defaultHabits = [
+      { id: 1, name: 'Morning Exercise', color: COLORS.habitColors[0], icon: '🏃', frequency: 'daily', reminder: '08:00' },
+      { id: 2, name: 'Read 30 mins', color: COLORS.habitColors[1], icon: '📚', frequency: 'daily', reminder: '21:00' },
+      { id: 3, name: 'Drink Water', color: COLORS.habitColors[2], icon: '💧', frequency: 'daily', reminder: null },
+      { id: 4, name: 'Meditate', color: COLORS.habitColors[3], icon: '🧘', frequency: 'daily', reminder: '09:00' },
+      { id: 5, name: 'No Social Media', color: COLORS.habitColors[4], icon: '📵', frequency: 'daily', reminder: null },
+    ];
+    setHabits(defaultHabits);
+    initializeHabitCompletions(defaultHabits);
+  };
+
+  // Initialize completions
+  const initializeHabitCompletions = (habitsList) => {
+    const completions = {};
+    const today = format(new Date(), 'yyyy-MM-dd');
+    
+    habitsList.forEach(habit => {
+      completions[habit.id] = {
+        [today]: false,
+        streak: 0,
+        bestStreak: 0,
+      };
+    });
+    
+    setHabitCompletions(completions);
+  };
+
+  // Save data
+  const saveData = async () => {
+    try {
+      const data = {
+        habits,
+        habitCompletions,
+        tasks,
+        darkMode,
+        userName,
+        notifications,
+      };
+      await AsyncStorage.setItem('forge_mobile_data', JSON.stringify(data));
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+
+  // Toggle habit completion
+  const toggleHabit = (habitId) => {
+    const today = format(selectedDate, 'yyyy-MM-dd');
+    const newCompletions = { ...habitCompletions };
+    
+    if (!newCompletions[habitId]) {
+      newCompletions[habitId] = {};
+    }
+    
+    newCompletions[habitId][today] = !newCompletions[habitId][today];
+    
+    // Update streak
+    const habit = habits.find(h => h.id === habitId);
+    if (habit && newCompletions[habitId][today]) {
+      updateStreak(habitId);
+    }
+    
+    setHabitCompletions(newCompletions);
+    saveData();
+  };
+
+  // Update streak for a habit
+  const updateStreak = (habitId) => {
+    setStreaks(prev => ({
+      ...prev,
+      [habitId]: (prev[habitId] || 0) + 1,
+    }));
+  };
+
+  // Add new habit
+  const addHabit = () => {
+    if (newHabitName.trim()) {
+      const newHabit = {
+        id: Date.now(),
+        name: newHabitName,
+        color: COLORS.habitColors[habits.length % COLORS.habitColors.length],
+        icon: '✅',
+        frequency: 'daily',
+        reminder: null,
+        createdAt: new Date().toISOString(),
+      };
+      
+      setHabits([...habits, newHabit]);
+      setNewHabitName('');
+      setShowAddHabit(false);
+      
+      // Initialize completions for new habit
+      const today = format(new Date(), 'yyyy-MM-dd');
+      setHabitCompletions(prev => ({
+        ...prev,
+        [newHabit.id]: { [today]: false, streak: 0, bestStreak: 0 },
+      }));
+      
+      saveData();
+    }
+  };
+
+  // Delete habit with confirmation
+  const deleteHabit = (habitId) => {
+    Alert.alert(
+      'Delete Habit',
+      'Are you sure you want to delete this habit? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            setHabits(habits.filter(h => h.id !== habitId));
+            const newCompletions = { ...habitCompletions };
+            delete newCompletions[habitId];
+            setHabitCompletions(newCompletions);
+            saveData();
+          },
+        },
+      ]
+    );
+  };
+
+  // Calculate statistics
+  const getDailyProgress = () => {
+    const today = format(selectedDate, 'yyyy-MM-dd');
+    let completed = 0;
+    habits.forEach(habit => {
+      if (habitCompletions[habit.id]?.[today]) completed++;
+    });
+    return habits.length > 0 ? (completed / habits.length) * 100 : 0;
+  };
+
+  const getWeeklyProgress = () => {
+    const weekStart = startOfWeek(selectedDate);
+    const weekDays = eachDayOfInterval({
+      start: weekStart,
+      end: addDays(weekStart, 6),
+    });
+    
+    let totalPossible = habits.length * 7;
+    let totalCompleted = 0;
+    
+    weekDays.forEach(day => {
+      const dayStr = format(day, 'yyyy-MM-dd');
+      habits.forEach(habit => {
+        if (habitCompletions[habit.id]?.[dayStr]) totalCompleted++;
+      });
+    });
+    
+    return totalPossible > 0 ? (totalCompleted / totalPossible) * 100 : 0;
+  };
+
+  const getLongestStreak = () => {
+    return Math.max(...Object.values(streaks), 0);
+  };
+
+  // Render swipeable habit item
+  const renderHabitItem = ({ item, index }) => {
+    const today = format(selectedDate, 'yyyy-MM-dd');
+    const isCompleted = habitCompletions[item.id]?.[today] || false;
+    const streak = streaks[item.id] || 0;
+
+    const renderRightActions = (progress, dragX) => {
+      const scale = dragX.interpolate({
+        inputRange: [-100, 0],
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
+      });
+
+      return (
+        <TouchableOpacity
+          style={[styles.deleteButton, { backgroundColor: '#ef4444' }]}
+          onPress={() => deleteHabit(item.id)}
+        >
+          <Animated.View style={{ transform: [{ scale }] }}>
+            <Trash2 size={24} color="#fff" />
+          </Animated.View>
+        </TouchableOpacity>
+      );
+    };
+
+    return (
+      <Swipeable renderRightActions={renderRightActions}>
+        <TouchableOpacity
+          style={[
+            styles.habitCard,
+            {
+              backgroundColor: darkMode ? COLORS.dark.card : COLORS.light.card,
+              borderColor: darkMode ? COLORS.dark.border : COLORS.light.border,
+            },
+          ]}
+          onPress={() => toggleHabit(item.id)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.habitContent}>
+            <View style={[styles.habitIconContainer, { backgroundColor: item.color + '20' }]}>
+              <Text style={styles.habitIcon}>{item.icon}</Text>
+            </View>
+            
+            <View style={styles.habitInfo}>
+              <Text style={[styles.habitName, { color: darkMode ? COLORS.dark.text : COLORS.light.text }]}>
+                {item.name}
+              </Text>
+              <View style={styles.habitMeta}>
+                <View style={[styles.streakBadge, { backgroundColor: item.color + '20' }]}>
+                  <Text style={[styles.streakText, { color: item.color }]}>
+                    🔥 {streak} day{streak !== 1 ? 's' : ''}
+                  </Text>
+                </View>
+                {item.reminder && (
+                  <View style={styles.reminderBadge}>
+                    <Clock size={12} color={darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary} />
+                    <Text style={[styles.reminderText, { color: darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary }]}>
+                      {item.reminder}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+            
+            <View style={styles.habitActions}>
+              <TouchableOpacity
+                style={[
+                  styles.checkButton,
+                  isCompleted && { backgroundColor: item.color },
+                  { borderColor: item.color },
+                ]}
+                onPress={() => toggleHabit(item.id)}
+              >
+                {isCompleted && <Check size={20} color="#fff" />}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Swipeable>
+    );
+  };
+
+  // Render dashboard
+  const renderDashboard = () => {
+    const dailyProgress = getDailyProgress();
+    const weeklyProgress = getWeeklyProgress();
+    const longestStreak = getLongestStreak();
+
+    const chartData = {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        data: [65, 78, 45, 92, 67, 83, 74].map(() => Math.random() * 100), // Replace with real data
+      }],
+    };
+
+    return (
+      <ScrollView
+        style={styles.dashboardContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              setRefreshing(true);
+              await loadData();
+              setRefreshing(false);
+            }}
+            colors={[COLORS.primary]}
+            tintColor={darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary}
+          />
+        }
+      >
+        {/* Welcome Header */}
+        <View style={styles.welcomeHeader}>
+          <View>
+            <Text style={[styles.greeting, { color: darkMode ? COLORS.dark.text : COLORS.light.text }]}>
+              {getGreeting()}, {userName || 'User'} 👋
+            </Text>
+            <Text style={[styles.dateText, { color: darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary }]}>
+              {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.profileButton}>
+            <User size={24} color={darkMode ? COLORS.dark.text : COLORS.light.text} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Stats Cards */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.statsScroll}
+          contentContainerStyle={styles.statsContainer}
+        >
+          <View style={[styles.statCard, { backgroundColor: COLORS.habitColors[0] + '20' }]}>
+            <Target size={24} color={COLORS.habitColors[0]} />
+            <Text style={styles.statNumber}>{habits.length}</Text>
+            <Text style={styles.statLabel}>Habits</Text>
+          </View>
+          
+          <View style={[styles.statCard, { backgroundColor: COLORS.habitColors[1] + '20' }]}>
+            <CheckCircle size={24} color={COLORS.habitColors[1]} />
+            <Text style={styles.statNumber}>{Math.round(dailyProgress)}%</Text>
+            <Text style={styles.statLabel}>Today</Text>
+          </View>
+          
+          <View style={[styles.statCard, { backgroundColor: COLORS.habitColors[2] + '20' }]}>
+            <Award size={24} color={COLORS.habitColors[2]} />
+            <Text style={styles.statNumber}>{longestStreak}</Text>
+            <Text style={styles.statLabel}>Best Streak</Text>
+          </View>
+          
+          <View style={[styles.statCard, { backgroundColor: COLORS.habitColors[3] + '20' }]}>
+            <BarChart3 size={24} color={COLORS.habitColors[3]} />
+            <Text style={styles.statNumber}>{Math.round(weeklyProgress)}%</Text>
+            <Text style={styles.statLabel}>Week</Text>
+          </View>
+        </ScrollView>
+
+        {/* Progress Chart */}
+        <View style={[
+          styles.chartContainer,
+          { backgroundColor: darkMode ? COLORS.dark.card : COLORS.light.card },
+        ]}>
+          <View style={styles.chartHeader}>
+            <Text style={[
+              styles.chartTitle,
+              { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+            ]}>
+              Weekly Progress
+            </Text>
+            <TouchableOpacity onPress={() => setCurrentView('analysis')}>
+              <Text style={[styles.viewAll, { color: COLORS.primary }]}>View Details</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <LineChart
+            data={chartData}
+            width={SCREEN_WIDTH - 48}
+            height={220}
+            chartConfig={{
+              backgroundColor: darkMode ? COLORS.dark.card : COLORS.light.card,
+              backgroundGradientFrom: darkMode ? COLORS.dark.card : COLORS.light.card,
+              backgroundGradientTo: darkMode ? COLORS.dark.card : COLORS.light.card,
+              decimalPlaces: 0,
+              color: (opacity = 1) => COLORS.primary,
+              labelColor: (opacity = 1) => darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary,
+              style: { borderRadius: 16 },
+              propsForDots: { r: '6', strokeWidth: '2', stroke: COLORS.primary },
+            }}
+            bezier
+            style={styles.chart}
+          />
+        </View>
+
+        {/* Habits List */}
+        <View style={styles.habitsSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={[
+              styles.sectionTitle,
+              { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+            ]}>
+              Today's Habits
+            </Text>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => setShowAddHabit(true)}
+            >
+              <Plus size={20} color={COLORS.primary} />
+            </TouchableOpacity>
+          </View>
+          
+          {habits.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Target size={48} color={darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary} />
+              <Text style={[styles.emptyText, { color: darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary }]}>
+                No habits yet. Add your first habit!
+              </Text>
+              <TouchableOpacity
+                style={styles.emptyButton}
+                onPress={() => setShowAddHabit(true)}
+              >
+                <Text style={styles.emptyButtonText}>Add Habit</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={habits}
+              renderItem={renderHabitItem}
+              keyExtractor={item => item.id.toString()}
+              scrollEnabled={false}
+              contentContainerStyle={styles.habitsList}
+            />
+          )}
+        </View>
+
+        {/* Quote of the Day */}
+        <View style={[
+          styles.quoteCard,
+          { backgroundColor: darkMode ? COLORS.dark.card : COLORS.light.card },
+        ]}>
+          <Text style={styles.quoteText}>"Consistency under pressure."</Text>
+          <Text style={[
+            styles.quoteAuthor,
+            { color: darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary },
+          ]}>
+            — FORGE
+          </Text>
+        </View>
+      </ScrollView>
+    );
+  };
+
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  // Open sidebar
+  const openSidebar = () => {
+    setSidebarOpen(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Close sidebar
+  const closeSidebar = () => {
+    Animated.timing(slideAnim, {
+      toValue: -300,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setSidebarOpen(false));
+  };
+
+  // Render sidebar
+  const renderSidebar = () => {
+    return (
+      <Animated.View style={[
+        styles.sidebar,
+        {
+          transform: [{ translateX: slideAnim }],
+          backgroundColor: darkMode ? COLORS.dark.card : COLORS.light.card,
+        },
+      ]}>
+        <View style={styles.sidebarHeader}>
+          <View style={[styles.logo, { backgroundColor: COLORS.primary + '20' }]}>
+            <ChevronLeft size={28} color={COLORS.primary} />
+          </View>
+          <Text style={[
+            styles.appName,
+            { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+          ]}>
+            FORGE
+          </Text>
+          <TouchableOpacity onPress={closeSidebar} style={styles.closeButton}>
+            <X size={24} color={darkMode ? COLORS.dark.text : COLORS.light.text} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.sidebarMenu}>
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              currentView === 'dashboard' && { backgroundColor: COLORS.primary + '20' },
+            ]}
+            onPress={() => {
+              setCurrentView('dashboard');
+              closeSidebar();
+            }}
+          >
+            <CheckCircle size={24} color={currentView === 'dashboard' ? COLORS.primary : (darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary)} />
+            <Text style={[
+              styles.menuText,
+              { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+            ]}>
+              Dashboard
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              currentView === 'calendar' && { backgroundColor: COLORS.primary + '20' },
+            ]}
+            onPress={() => {
+              setCurrentView('calendar');
+              closeSidebar();
+            }}
+          >
+            <Calendar size={24} color={currentView === 'calendar' ? COLORS.primary : (darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary)} />
+            <Text style={[
+              styles.menuText,
+              { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+            ]}>
+              Calendar
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              currentView === 'analysis' && { backgroundColor: COLORS.primary + '20' },
+            ]}
+            onPress={() => {
+              setCurrentView('analysis');
+              closeSidebar();
+            }}
+          >
+            <TrendingUp size={24} color={currentView === 'analysis' ? COLORS.primary : (darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary)} />
+            <Text style={[
+              styles.menuText,
+              { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+            ]}>
+              Analysis
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              currentView === 'settings' && { backgroundColor: COLORS.primary + '20' },
+            ]}
+            onPress={() => {
+              setCurrentView('settings');
+              closeSidebar();
+            }}
+          >
+            <Settings size={24} color={currentView === 'settings' ? COLORS.primary : (darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary)} />
+            <Text style={[
+              styles.menuText,
+              { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+            ]}>
+              Settings
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.sidebarFooter}>
+          <View style={styles.themeToggle}>
+            <Sun size={20} color={darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary} />
+            <Switch
+              value={darkMode}
+              onValueChange={(value) => {
+                setDarkMode(value);
+                saveData();
+              }}
+              trackColor={{ false: '#cbd5e1', true: COLORS.primary + '80' }}
+              thumbColor={darkMode ? COLORS.primary : '#f8fafc'}
+            />
+            <Moon size={20} color={darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary} />
+          </View>
+          <Text style={[
+            styles.footerText,
+            { color: darkMode ? COLORS.dark.textSecondary : COLORS.light.textSecondary },
+          ]}>
+            v1.0.0 • Consistency under pressure
+          </Text>
+        </View>
+      </Animated.View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={[
+      styles.container,
+      { backgroundColor: darkMode ? COLORS.dark.bg : COLORS.light.bg },
+    ]}>
+      <StatusBar
+        barStyle={darkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={darkMode ? COLORS.dark.bg : COLORS.light.bg}
+      />
+
+      {/* Header */}
+      <View style={[
+        styles.header,
+        { backgroundColor: darkMode ? COLORS.dark.card : COLORS.light.card },
+      ]}>
+        <TouchableOpacity onPress={openSidebar} style={styles.headerButton}>
+          <Menu size={24} color={darkMode ? COLORS.dark.text : COLORS.light.text} />
+        </TouchableOpacity>
+        
+        <Text style={[
+          styles.headerTitle,
+          { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+        ]}>
+          {currentView === 'dashboard' ? 'Dashboard' : 
+           currentView === 'calendar' ? 'Calendar' : 
+           currentView === 'analysis' ? 'Analysis' : 'Settings'}
+        </Text>
+        
+        <TouchableOpacity
+          onPress={() => setDarkMode(!darkMode)}
+          style={styles.headerButton}
+        >
+          {darkMode ? (
+            <Sun size={24} color={COLORS.dark.text} />
+          ) : (
+            <Moon size={24} color={COLORS.light.text} />
+          )}
+        </TouchableOpacity>
+      </View>
+
+      {/* Main Content */}
+      <Animated.View style={[
+        styles.content,
+        { opacity: fadeAnim },
+      ]}>
+        {currentView === 'dashboard' && renderDashboard()}
+        {/* Add other views (calendar, analysis, settings) similarly */}
+      </Animated.View>
+
+      {/* Sidebar */}
+      {sidebarOpen && (
+        <TouchableOpacity
+          style={styles.overlay}
+          onPress={closeSidebar}
+          activeOpacity={1}
+        />
+      )}
+      {renderSidebar()}
+
+      {/* Add Habit Modal */}
+      <Modal
+        visible={showAddHabit}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowAddHabit(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[
+            styles.modalContent,
+            { backgroundColor: darkMode ? COLORS.dark.card : COLORS.light.card },
+          ]}>
+            <View style={styles.modalHeader}>
+              <Text style={[
+                styles.modalTitle,
+                { color: darkMode ? COLORS.dark.text : COLORS.light.text },
+              ]}>
+                Add New Habit
+              </Text>
+              <TouchableOpacity onPress={() => setShowAddHabit(false)}>
+                <X size={24} color={darkMode ? COLORS.dark.text : COLORS.light.text} />
+              </TouchableOpacity>
+            </View>
+            
+            <TextInput
+              style={[
+                styles.input,
+                { 
+                  backgroundColor: darkMode ? '#2d3748' : '#f1f5f9',
+                  color: darkMode ? COLORS.dark.text : COLORS.light.text,
+                  borderColor: darkMode ? COLORS.dark.border : COLORS.light.border,
+                },
+              ]}
+              placeholder="Enter habit name..."
+              placeholderTextColor={darkMode ? '#64748b' : '#94a3b8'}
+              value={newHabitName}
+              onChangeText={setNewHabitName}
+              autoFocus
+            />
+            
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowAddHabit(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={addHabit}
+                disabled={!newHabitName.trim()}
+              >
+                <Text style={styles.saveButtonText}>Add Habit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  headerButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  content: {
+    flex: 1,
+  },
+  dashboardContainer: {
+    flex: 1,
+  },
+  welcomeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+  },
+  greeting: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  dateText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  profileButton: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+  },
+  statsScroll: {
+    marginBottom: 20,
+  },
+  statsContainer: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  statCard: {
+    width: 140,
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#1e293b',
+    marginVertical: 8,
+  },
+  statLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#64748b',
+  },
+  chartContainer: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 20,
+    borderRadius: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  chartHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  viewAll: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  chart: {
+    borderRadius: 16,
+  },
+  habitsSection: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  addButton: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+  },
+  habitsList: {
+    gap: 12,
+  },
+  habitCard: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  habitContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  habitIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  habitIcon: {
+    fontSize: 24,
+  },
+  habitInfo: {
+    flex: 1,
+  },
+  habitName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  habitMeta: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  streakBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  streakText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  reminderBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  reminderText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  habitActions: {
+    marginLeft: 12,
+  },
+  checkButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    height: '80%',
+    borderRadius: 16,
+    marginVertical: 8,
+    marginRight: 8,
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginVertical: 16,
+  },
+  emptyButton: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  emptyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  quoteCard: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  quoteText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginBottom: 8,
+    fontStyle: 'italic',
+  },
+  quoteAuthor: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  sidebar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: 300,
+    zIndex: 1000,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 999,
+  },
+  sidebarHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  logo: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  appName: {
+    fontSize: 28,
+    fontWeight: '800',
+    flex: 1,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  sidebarMenu: {
+    padding: 20,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  menuText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 16,
+  },
+  sidebarFooter: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    right: 20,
+  },
+  themeToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  footerText: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    minHeight: 300,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    marginBottom: 24,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: 'rgba(0,0,0,0.05)',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#64748b',
+  },
+  saveButton: {
+    backgroundColor: COLORS.primary,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+});
+
+export default HabitTracker;</script></body></html>
