@@ -196,6 +196,25 @@
         .stamina-fill { background: linear-gradient(90deg, #00ff9d, #00cc7a); }
         .strength-fill { background: linear-gradient(90deg, #ffcc00, #ff9900); }
 
+        /* Stats Info Tooltip */
+        .stat-info {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-recovery {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .recovery-icon {
+            color: var(--success);
+            font-size: 0.8rem;
+        }
+
         /* Recruits Section */
         .recruits-section {
             margin-top: 1rem;
@@ -413,6 +432,60 @@
         .difficulty-easy { background: rgba(0, 255, 157, 0.2); color: var(--success); }
         .difficulty-medium { background: rgba(255, 204, 0, 0.2); color: var(--warning); }
         .difficulty-hard { background: rgba(255, 0, 60, 0.2); color: var(--danger); }
+
+        /* Stamina Info Panel */
+        .stamina-info {
+            background: var(--panel-bg);
+            border: var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stamina-details {
+            flex: 1;
+        }
+        .stamina-title {
+            font-family: var(--font-display);
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .stamina-benefits {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        .stamina-benefits li {
+            margin-bottom: 3px;
+        }
+        .recovery-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .recovery-btn {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .recovery-btn:hover {
+            background: rgba(0, 255, 157, 0.2);
+            transform: translateY(-2px);
+        }
+        .recovery-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .recovery-btn:disabled:hover {
+            background: rgba(0, 255, 157, 0.1);
+            transform: none;
+        }
 
         /* Floating Action Button */
         #fab { 
@@ -714,325 +787,58 @@
             font-size: 0.8rem;
         }
 
-        /* --- HISTORY / CHRONICLES --- */
+        /* --- HISTORY VIEW (from index.html) --- */
         .history-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
             gap: 2rem; 
             margin-bottom: 2rem; 
+            min-height: 300px; /* Ensure minimum height */
         }
-        
-        .chart-card { 
-            background: var(--panel-bg); 
-            border: var(--border); 
-            border-radius: 12px; 
-            padding: 1.5rem; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
-        .chart-title { 
-            font-size: 0.9rem; 
-            color: var(--text-dim); 
-            text-transform: uppercase; 
-            margin-bottom: 1.5rem; 
-            width: 100%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-        }
-
-        /* Bar Graph Container */
-        .graph-container { 
-            width: 100%; 
+        .chart-container { 
             height: 250px; 
             position: relative; 
+            width: 100%; 
+            min-height: 250px; /* Ensure chart has minimum height */
         }
-
-        /* Bar Graph Styles */
-        .bar-graph {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            height: 200px;
-            padding: 0 10px;
-            margin-top: 20px;
-        }
-
-        .bar-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            height: 100%;
-            margin: 0 2px;
-        }
-
-        .bar {
-            width: 100%;
-            background: linear-gradient(to top, var(--primary), var(--primary-glow));
-            border-radius: 3px 3px 0 0;
-            transition: height 0.3s ease;
-            position: relative;
-            max-width: 20px;
-            margin: 0 auto;
-        }
-
-        .bar:hover {
-            background: linear-gradient(to top, #00ff9d, #00cc7a);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-        }
-
-        .bar-label {
-            margin-top: 5px;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            text-align: center;
-        }
-
-        .bar-value {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8rem;
-            color: var(--text-main);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 2px 5px;
-            border-radius: 3px;
-            display: none;
-        }
-
-        .bar-container:hover .bar-value {
-            display: block;
-        }
-
-        .graph-axis {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-top: 1px solid #333;
-            margin-top: 10px;
-        }
-
-        .axis-label {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-        }
-
-        /* Consistency Ring */
-        .ring-container { 
+        .ring-container-large { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 250px; 
             position: relative; 
-            width: 180px; 
-            height: 180px; 
-            margin: 0 auto;
+            min-height: 250px; /* Ensure ring has minimum height */
         }
-        .ring-svg { 
-            transform: rotate(-90deg); 
-            width: 180px; 
-            height: 180px; 
-        }
-        .ring-bg { 
-            stroke: #222; 
-            fill: none; 
-            stroke-width: 8; 
-        }
-        .ring-fill { 
-            stroke: var(--primary); 
-            fill: none; 
-            stroke-width: 8; 
-            stroke-linecap: round; 
-            transition: stroke-dashoffset 1s ease; 
-            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3)); 
-        }
-        .ring-text { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            text-align: center; 
-        }
-        .ring-percent { 
-            font-size: 2.5rem; 
-            font-weight: 900; 
-            font-family: var(--font-display); 
-            color: #fff; 
-        }
-        .ring-label { 
-            font-size: 0.8rem; 
-            color: var(--text-dim); 
-        }
+        .ring-large-svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+        .ring-large-bg { stroke: var(--panel-bg); }
+        .ring-large-fill { stroke: var(--primary); stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+        .ring-text-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .ring-percent { font-size: 2.5rem; font-weight: 700; color: var(--text-main); }
+        .ring-label { color: var(--text-dim); font-size: 0.9rem; }
 
-        /* --- HEATMAP (Month View) --- */
-        .heatmap-wrapper { 
+        .calendar-container { 
             background: var(--panel-bg); 
-            border: var(--border); 
-            border-radius: 12px; 
             padding: 1.5rem; 
-            overflow-x: auto; 
+            border-radius: 16px; 
+            border: var(--border); 
+            min-height: 300px; /* Ensure calendar has minimum height */
+            margin-bottom: 2rem;
         }
-        
-        .heatmap-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+        .calendar-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); 
+            gap: 6px; 
+            margin-top: 1rem; 
+            min-height: 200px; /* Ensure calendar grid has minimum height */
         }
+        .cal-day { aspect-ratio: 1; border-radius: 4px; background: var(--bg-color); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--text-dim); position: relative; }
+        .cal-day.today { border: 1px solid var(--primary); color: var(--primary); }
+        .cal-day.completed { background-color: var(--primary); color: #000; }
 
-        .month-navigation {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .month-nav-btn {
-            background: #000;
-            border: var(--border);
-            color: var(--text-dim);
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-        }
-
-        .month-nav-btn:hover {
-            border-color: var(--primary);
-            color: var(--text-main);
-        }
-
-        .current-month {
-            font-family: var(--font-display);
-            color: var(--text-main);
-            font-size: 1.1rem;
-        }
-
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            min-width: 700px;
-        }
-
-        .day-header {
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            padding: 5px;
-            text-transform: uppercase;
-        }
-
-        .heat-cell {
-            width: 40px;
-            height: 40px;
-            border-radius: 6px;
-            background: var(--heat-0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-display);
-            font-size: 0.9rem;
-            color: #333;
-            position: relative;
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-
-        .heat-cell:hover { 
-            transform: scale(1.1); 
-            z-index: 10; 
-            border: 1px solid #fff; 
-        }
-        
-        .heat-cell span { 
-            pointer-events: none; 
-        }
-        
-        .heat-cell[data-lvl="1"] { 
-            background: var(--heat-1); 
-            color: #fff; 
-            text-shadow: 0 0 5px rgba(0,0,0,0.3); 
-        }
-        .heat-cell[data-lvl="2"] { 
-            background: var(--heat-2); 
-            color: #fff; 
-            text-shadow: 0 0 5px rgba(0,0,0,0.3); 
-        }
-        .heat-cell[data-lvl="3"] { 
-            background: var(--heat-3); 
-            color: #fff; 
-            text-shadow: 0 0 5px rgba(0,0,0,0.3); 
-        }
-        .heat-cell[data-lvl="4"] { 
-            background: var(--heat-4); 
-            color: #000; 
-            font-weight: bold; 
-        }
-
-        .heat-cell.today {
-            border: 2px solid var(--primary);
-        }
-
-        .heat-cell.empty {
-            background: transparent;
-            cursor: default;
-        }
-
-        .heat-cell.empty:hover {
-            transform: none;
-            border: none;
-        }
-
-        /* Heatmap Tooltip */
-        .heat-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            border: 1px solid var(--primary);
-            z-index: 100;
-        }
-
-        .heat-cell:hover .heat-tooltip {
-            opacity: 1;
-        }
-
-        /* Heatmap Legend */
-        .heatmap-legend {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #333;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .legend-color {
-            width: 15px;
-            height: 15px;
-            border-radius: 3px;
-        }
-
-        .legend-label {
-            font-size: 0.8rem;
-            color: var(--text-dim);
+        /* Activity Map Container for better scrolling */
+        .activity-map-container {
+            min-height: 400px; /* Ensure enough height for scrolling */
         }
 
         /* --- ARMY VIEW --- */
@@ -1143,14 +949,14 @@
                 font-size: 0.9rem;
             }
             
-            .heatmap-grid {
-                min-width: 500px;
+            .stamina-info {
+                flex-direction: column;
+                gap: 1rem;
             }
             
-            .heat-cell {
-                width: 30px;
-                height: 30px;
-                font-size: 0.8rem;
+            .recovery-actions {
+                width: 100%;
+                justify-content: space-between;
             }
         }
         
@@ -1192,13 +998,11 @@
                 <button class="day-btn" data-day="6">S</button>
             </div>
             
-            <button style="font-size: 0.8rem; color: var(--primary); background: none; border: none; cursor: pointer; text-decoration: underline; margin-bottom: 1rem; display: block;"
-                    onclick="App.toggleEveryday()">Select Every Day</button>
+            <button style="font-size: 0.8rem; color: var(--primary); background: none; border: none; cursor: pointer; text-decoration: underline; margin-bottom: 1rem; display: block;" onclick="App.toggleEveryday()">Select Every Day</button>
             
             <button class="btn-primary" onclick="App.saveHabit()">Initialize Quest</button>
             
-            <button style="background: none; border: none; color: #666; width: 100%; margin-top: 1rem; cursor: pointer;"
-                    onclick="App.closeModal()">Cancel</button>
+            <button style="background: none; border: none; color: #666; width: 100%; margin-top: 1rem; cursor: pointer;" onclick="App.closeModal()">Cancel</button>
         </div>
     </div>
     
@@ -1241,6 +1045,10 @@
                     <div class="stat-fill">
                         <div class="stat-fill-inner stamina-fill" id="stamina-bar" style="width: 100%;"></div>
                     </div>
+                    <div class="stat-info">
+                        <span>Recovery: <span class="recovery-icon">⚡</span> <span id="stamina-recovery">12/hour</span></span>
+                        <span id="strength-bonus">-10% cost</span>
+                    </div>
                 </div>
                 
                 <div class="stat-bar">
@@ -1249,7 +1057,11 @@
                         <span id="strength-value">10</span>
                     </div>
                     <div class="stat-fill">
-                        <div class="stat-fill-inner strength-fill" style="width: 100%;"></div>
+                        <div class="stat-fill-inner strength-fill" id="strength-bar" style="width: 100%;"></div>
+                    </div>
+                    <div class="stat-info">
+                        <span>+5% XP | +10 Max Stamina</span>
+                        <span id="strength-change">+0 today</span>
                     </div>
                 </div>
             </div>
@@ -1281,6 +1093,25 @@
                             <div class="xp-fill" id="xp-bar"></div>
                         </div>
                         <span class="xp-text" id="xp-text">0 / 100 XP</span>
+                    </div>
+                    
+                    <div class="stamina-info">
+                        <div class="stamina-details">
+                            <div class="stamina-title">STAMINA SYSTEM</div>
+                            <div class="stamina-benefits">
+                                <div>• <strong>Passive Recovery:</strong> 12/hour (1 per 5 min)</div>
+                                <div>• <strong>Strength Bonus:</strong> +10 max stamina per strength point</div>
+                                <div>• <strong>Cost Reduction:</strong> -10% stamina cost per strength point</div>
+                            </div>
+                        </div>
+                        <div class="recovery-actions">
+                            <button class="recovery-btn" onclick="App.activeRecovery('easy')" id="easy-recovery">
+                                Quick Rest (5 Stamina)
+                            </button>
+                            <button class="recovery-btn" onclick="App.activeRecovery('meditate')" id="meditate-btn">
+                                Meditate (20 Stamina)
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="stats-grid">
@@ -1352,98 +1183,44 @@
                     </div>
                 </section>
                 
-                <!-- HISTORY VIEW -->
+                <!-- HISTORY VIEW (Replaced with index.html features) -->
                 <section id="history" class="view-section">
                     <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 1.5rem;">Chronicles</h2>
                     
-                    <div class="history-grid">
-                        <!-- Left: Activity Graph (Bar Chart) -->
-                        <div class="chart-card">
-                            <div class="chart-title">
-                                Activity Trend (30 Days)
-                                <span id="graph-pct" style="color:var(--primary); font-weight:bold; font-family: var(--font-display);">0%</span>
-                            </div>
-                            <div class="graph-container">
-                                <div id="bar-graph" class="bar-graph"></div>
-                                <div class="graph-axis">
-                                    <span class="axis-label">Start</span>
-                                    <span class="axis-label">15 Days</span>
-                                    <span class="axis-label">Today</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Right: Consistency Ring -->
-                        <div class="chart-card">
-                            <div class="chart-title">
-                                Monthly Consistency
-                            </div>
-                            <div class="ring-container">
-                                <svg class="ring-svg" viewBox="0 0 180 180">
-                                    <circle class="ring-bg" cx="90" cy="90" r="80"></circle>
-                                    <circle class="ring-fill" id="consistency-ring" cx="90" cy="90" r="80" stroke-dasharray="502" stroke-dashoffset="502"></circle>
-                                </svg>
-                                <div class="ring-text">
-                                    <div class="ring-percent" id="consistency-pct">0%</div>
-                                    <div class="ring-label">Completed</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Heatmap -->
-                    <div class="heatmap-wrapper">
-                        <div class="heatmap-header">
-                            <div>
-                                <div class="chart-title" style="margin-bottom: 0.5rem;">
-                                    Activity Map
-                                </div>
-                                <div style="font-size: 0.8rem; color: var(--text-dim);">
-                                    Month to date view.
-                                </div>
-                            </div>
-                            <div class="month-navigation">
-                                <button class="month-nav-btn" onclick="Heatmap.prevMonth()">←</button>
-                                <div class="current-month" id="current-month">January 2024</div>
-                                <button class="month-nav-btn" onclick="Heatmap.nextMonth()">→</button>
-                            </div>
-                        </div>
-                        
-                        <div class="heatmap-grid" id="heatmap-grid">
-                            <!-- Day headers -->
-                            <div class="day-header">S</div>
-                            <div class="day-header">M</div>
-                            <div class="day-header">T</div>
-                            <div class="day-header">W</div>
-                            <div class="day-header">T</div>
-                            <div class="day-header">F</div>
-                            <div class="day-header">S</div>
-                            <!-- Heat cells will be inserted here -->
-                        </div>
-                        
-                        <div class="heatmap-legend">
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: var(--heat-0);"></div>
-                                <span class="legend-label">0</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: var(--heat-1);"></div>
-                                <span class="legend-label">1</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: var(--heat-2);"></div>
-                                <span class="legend-label">2</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: var(--heat-3);"></div>
-                                <span class="legend-label">3</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: var(--heat-4);"></div>
-                                <span class="legend-label">4+</span>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="history-grid"> 
+                       <div class="card"> 
+                        <div class="stat-label">
+                          Activity Trend (30 Days) 
+                        </div> 
+                        <div class="chart-container"> 
+                         <canvas id="historyChart"></canvas> 
+                        </div> 
+                       </div> 
+                       <div class="card"> 
+                        <div class="stat-label">
+                          Monthly Consistency 
+                        </div> 
+                        <div class="ring-container-large"> 
+                         <svg class="ring-large-svg" viewbox="0 0 200 200"> <circle class="ring-large-bg" cx="100" cy="100" r="80" stroke-width="12" fill="none"></circle> <circle class="ring-large-fill" id="history-ring" cx="100" cy="100" r="80" stroke-width="12" fill="none" stroke-dasharray="502.65" stroke-dashoffset="502.65"></circle> 
+                         </svg> 
+                         <div class="ring-text-center"> 
+                          <div class="ring-percent" id="history-percent">
+                            0% 
+                          </div> 
+                          <div class="ring-label">
+                            Completed 
+                          </div> 
+                         </div> 
+                        </div> 
+                       </div> 
+                      </div> 
+                      <div class="activity-map-container"> 
+                       <div class="calendar-container"> 
+                        <h3>Activity Map</h3> 
+                        <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem;">Month to date view.</p> 
+                        <div class="calendar-grid" id="calendar-grid"></div> 
+                       </div> 
+                      </div>
                 </section>
                 
                 <!-- ARMY VIEW -->
@@ -1526,8 +1303,16 @@
     <script>
         // --- AUDIO SYSTEM ---
         const AudioSys = {
-            ctx: new (window.AudioContext || window.webkitAudioContext)(),
+            ctx: null,
+            init() {
+                try {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            },
             play(type) {
+                if (!this.ctx) return;
                 if(this.ctx.state === 'suspended') this.ctx.resume();
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
@@ -1562,12 +1347,19 @@
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 1);
                     osc.start(now); osc.stop(now + 1);
+                } else if (type === 'recover') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(600, now + 0.5);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 1);
+                    osc.start(now); osc.stop(now + 1);
                 }
             }
         };
 
         // --- STATE MANAGEMENT ---
-        const STORAGE_KEY = 'apex_v9_fixed';
+        const STORAGE_KEY = 'apex_final_fixed';
         const defaultState = {
             user: { 
                 level: 1, 
@@ -1579,7 +1371,11 @@
                 maxStamina: 100,
                 strength: 10,
                 recruits: 0,
-                lastStaminaUpdate: Date.now()
+                lastStaminaUpdate: Date.now(),
+                lastStrengthCheck: Date.now(),
+                dailyCompletions: 0,
+                consecutiveInactiveDays: 0,
+                sleepBonusAvailable: true
             },
             habits: [],
             activityLog: {},
@@ -1600,7 +1396,6 @@
 
         // --- UTILITY FUNCTIONS ---
         function getLocalDateString(date = new Date()) {
-            // Get date in YYYY-MM-DD format in local timezone (FIXED)
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
@@ -1613,18 +1408,130 @@
             return getLocalDateString(yesterday);
         }
 
-        function diffToXP(diff) {
-            const map = {'easy':10, 'medium':25, 'hard':50};
-            return map[diff] || 10;
+        // --- HISTORY FUNCTIONS (from index.html) ---
+        function drawHistoryChart() {
+            const canvas = document.getElementById('historyChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const parent = canvas.parentElement;
+            if (!parent || parent.offsetWidth === 0) return;
+            canvas.width = parent.offsetWidth;
+            canvas.height = parent.offsetHeight;
+
+            const dataPoints = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = getLocalDateString(d);
+                const dayIdx = d.getDay();
+                const scheduled = State.habits.filter(h => h.days.includes(dayIdx)).length;
+                if (scheduled === 0) { dataPoints.push(0); continue; }
+                let completed = 0;
+                State.habits.forEach(h => { if (h.days.includes(dayIdx) && h.completedDates.includes(dateStr)) completed++; });
+                dataPoints.push((completed / scheduled) * 100);
+            }
+
+            const colorLine = '#00f0ff'; // Fixed color for dark theme
+            const colorFill = 'rgba(0, 240, 255, 0.2)';
+            const colorGrid = '#333';
+
+            const w = canvas.width;
+            const h = canvas.height;
+            const padding = 20;
+
+            ctx.clearRect(0,0,w,h);
+            ctx.strokeStyle = colorGrid;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, h - padding);
+            ctx.lineTo(w - padding, h - padding);
+            ctx.stroke();
+
+            if (dataPoints.length > 1) {
+                const stepX = (w - 2*padding) / (dataPoints.length - 1);
+                ctx.beginPath();
+                ctx.moveTo(padding, h - padding);
+                dataPoints.forEach((val, i) => {
+                    const x = padding + i * stepX;
+                    const y = (h - padding) - (val / 100) * (h - 2*padding);
+                    ctx.lineTo(x, y);
+                });
+                ctx.lineTo(padding + (dataPoints.length - 1) * stepX, h - padding);
+                ctx.fillStyle = colorFill;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.strokeStyle = colorLine;
+                ctx.lineWidth = 2;
+                dataPoints.forEach((val, i) => {
+                    const x = padding + i * stepX;
+                    const y = (h - padding) - (val / 100) * (h - 2*padding);
+                    if (i===0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            }
         }
 
-        function getDifficultyColor(diff) {
-            const colors = {
-                'easy': '#00ff9d',
-                'medium': '#ffcc00',
-                'hard': '#ff003c'
-            };
-            return colors[diff] || '#666';
+        function drawOverallRing() {
+            let totalPossible = 0;
+            let totalDone = 0;
+            for (let i = 0; i < 30; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = getLocalDateString(d);
+                const dayIdx = d.getDay();
+                const habits = State.habits.filter(h => h.days.includes(dayIdx));
+                totalPossible += habits.length;
+                habits.forEach(h => { if(h.completedDates.includes(dateStr)) totalDone++; });
+            }
+            const pct = totalPossible === 0 ? 0 : Math.round((totalDone / totalPossible) * 100);
+            const circle = document.getElementById('history-ring');
+            if (circle) {
+                const circumference = 502.65; 
+                const offset = circumference - (pct / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+            }
+            const percentEl = document.getElementById('history-percent');
+            if (percentEl) percentEl.textContent = `${pct}%`;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const todayStr = getLocalDateString();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const d = new Date(year, month, i);
+                const dateStr = getLocalDateString(d); 
+                const dayNum = d.getDate();
+                const isToday = dateStr === todayStr;
+                const dayIdx = d.getDay();
+
+                const scheduledHabits = State.habits.filter(h => h.days.includes(dayIdx));
+                let completedCount = 0;
+                scheduledHabits.forEach(h => { 
+                    if(h.completedDates.includes(dateStr)) completedCount++; 
+                });
+                
+                const hasCompletion = completedCount > 0 && completedCount === scheduledHabits.length;
+                const partial = completedCount > 0 && completedCount < scheduledHabits.length;
+
+                const div = document.createElement('div');
+                div.className = `cal-day ${isToday ? 'today' : ''}`;
+                if (hasCompletion) div.classList.add('completed');
+                if (partial) div.style.backgroundColor = 'rgba(0, 240, 255, 0.3)';
+                div.textContent = dayNum;
+                grid.appendChild(div);
+            }
         }
 
         // --- APP LOGIC ---
@@ -1633,6 +1540,9 @@
             staminaInterval: null,
 
             init() {
+                // Initialize audio system
+                AudioSys.init();
+                
                 // Start intro animation
                 setTimeout(() => {
                     const intro = document.getElementById('intro-overlay');
@@ -1650,6 +1560,9 @@
                 
                 // Initialize stamina regeneration
                 this.initStaminaSystem();
+                
+                // Initialize strength system
+                this.initStrengthSystem();
                 
                 // Set up day selector
                 document.querySelectorAll('.day-btn').forEach(btn => {
@@ -1669,8 +1582,8 @@
                 // Initialize Timer
                 Timer.init();
                 
-                // Initialize Heatmap
-                Heatmap.render();
+                // Initialize History components
+                this.renderHistory();
             },
 
             updateDate() {
@@ -1688,24 +1601,185 @@
                 // Calculate stamina regeneration since last update
                 const now = Date.now();
                 const lastUpdate = State.user.lastStaminaUpdate || now;
-                const hoursPassed = (now - lastUpdate) / (1000 * 60 * 60);
-                const staminaGained = Math.floor(hoursPassed * 5); // 5 stamina per hour
+                const minutesPassed = (now - lastUpdate) / (1000 * 60);
+                
+                // Passive recovery: 1 stamina per 5 minutes (12 per hour)
+                const staminaGained = Math.floor(minutesPassed / 5);
                 
                 State.user.stamina = Math.min(
-                    State.user.maxStamina,
+                    this.getMaxStamina(),
                     State.user.stamina + staminaGained
                 );
+                
                 State.user.lastStaminaUpdate = now;
                 saveState();
                 
                 // Update stamina every minute
                 this.staminaInterval = setInterval(() => {
-                    State.user.stamina = Math.min(
-                        State.user.maxStamina,
-                        State.user.stamina + 0.0833
-                    );
-                    this.render();
+                    const currentTime = Date.now();
+                    const minutesSinceLast = (currentTime - State.user.lastStaminaUpdate) / (1000 * 60);
+                    
+                    if (minutesSinceLast >= 5) {
+                        State.user.stamina = Math.min(
+                            this.getMaxStamina(),
+                            State.user.stamina + 1
+                        );
+                        State.user.lastStaminaUpdate = currentTime;
+                        this.render();
+                    }
                 }, 60000);
+            },
+
+            initStrengthSystem() {
+                const now = Date.now();
+                const lastCheck = State.user.lastStrengthCheck || now;
+                const daysSinceLastCheck = (now - lastCheck) / (1000 * 60 * 60 * 24);
+                
+                // Update strength daily
+                if (daysSinceLastCheck >= 1) {
+                    this.updateStrength();
+                    State.user.lastStrengthCheck = now;
+                    saveState();
+                }
+                
+                // Check strength every hour
+                setInterval(() => {
+                    const currentTime = Date.now();
+                    const daysSince = (currentTime - State.user.lastStrengthCheck) / (1000 * 60 * 60 * 24);
+                    
+                    if (daysSince >= 1) {
+                        this.updateStrength();
+                        State.user.lastStrengthCheck = currentTime;
+                        saveState();
+                    }
+                }, 3600000);
+            },
+
+            renderHistory() {
+                drawHistoryChart();
+                drawOverallRing();
+                renderCalendar();
+            },
+
+            getMaxStamina() {
+                // Base max stamina + strength bonus (10 per strength point)
+                return 100 + (State.user.strength * 10);
+            },
+
+            getStaminaCost(diff) {
+                const baseCost = {
+                    'easy': 10,
+                    'medium': 20,
+                    'hard': 40
+                };
+                
+                const base = baseCost[diff] || 10;
+                
+                // Strength reduces stamina cost by 10% per strength point
+                const strengthReduction = State.user.strength * 0.1;
+                const reduction = Math.min(0.5, strengthReduction);
+                
+                return Math.max(5, Math.floor(base * (1 - reduction)));
+            },
+
+            getHabitXP(diff) {
+                const xpMap = {
+                    'easy': 10,
+                    'medium': 25,
+                    'hard': 50
+                };
+                
+                const baseXP = xpMap[diff] || 10;
+                
+                // Strength gives +5% XP per strength point
+                const strengthBonus = State.user.strength * 0.05;
+                
+                // Recruit bonus (5% per recruit)
+                const recruitBonus = State.user.recruits * 0.05;
+                
+                const totalBonus = strengthBonus + recruitBonus;
+                const finalXP = Math.floor(baseXP * (1 + totalBonus));
+                
+                return finalXP;
+            },
+
+            updateStrength() {
+                const today = getLocalDateString();
+                const yesterday = getYesterdayDateString();
+                
+                // Check if user completed any habits yesterday
+                let completedYesterday = false;
+                State.habits.forEach(habit => {
+                    if (habit.completedDates.includes(yesterday)) {
+                        completedYesterday = true;
+                    }
+                });
+                
+                if (completedYesterday) {
+                    // Increase strength for consistency
+                    State.user.strength = Math.min(100, State.user.strength + 1);
+                    State.user.consecutiveInactiveDays = 0;
+                } else {
+                    // Decrease strength for inactivity
+                    State.user.consecutiveInactiveDays++;
+                    
+                    if (State.user.consecutiveInactiveDays >= 3) {
+                        State.user.strength = Math.max(1, State.user.strength - 1);
+                        State.user.consecutiveInactiveDays = 0;
+                    }
+                }
+            },
+
+            activeRecovery(type) {
+                const now = Date.now();
+                const lastRecovery = State.user.lastRecoveryTime || 0;
+                const hoursSinceLastRecovery = (now - lastRecovery) / (1000 * 60 * 60);
+                
+                if (type === 'easy') {
+                    // Quick Rest: Complete an easy habit to recover stamina
+                    const easyHabit = State.habits.find(h => h.diff === 'easy' && h.days.includes(new Date().getDay()));
+                    
+                    if (easyHabit) {
+                        const todayStr = getLocalDateString();
+                        
+                        if (!easyHabit.completedDates.includes(todayStr)) {
+                            // Complete the easy habit for recovery
+                            easyHabit.completedDates.push(todayStr);
+                            this.recalcStreak(easyHabit);
+                            
+                            // Gain stamina instead of XP
+                            const staminaGain = 15;
+                            State.user.stamina = Math.min(this.getMaxStamina(), State.user.stamina + staminaGain);
+                            
+                            // Update activity log
+                            if (!State.activityLog[todayStr]) {
+                                State.activityLog[todayStr] = 0;
+                            }
+                            State.activityLog[todayStr]++;
+                            
+                            AudioSys.play('recover');
+                            saveState();
+                        } else {
+                            alert("You've already completed an easy habit today for recovery!");
+                        }
+                    } else {
+                        alert("No easy habits scheduled for today!");
+                    }
+                } else if (type === 'meditate') {
+                    // Meditation: Direct stamina recovery (once per 4 hours)
+                    if (hoursSinceLastRecovery < 4) {
+                        const hoursLeft = (4 - hoursSinceLastRecovery).toFixed(1);
+                        alert(`Meditation available in ${hoursLeft} hours`);
+                        return;
+                    }
+                    
+                    const meditationStamina = 20;
+                    State.user.stamina = Math.min(this.getMaxStamina(), State.user.stamina + meditationStamina);
+                    State.user.lastRecoveryTime = now;
+                    
+                    AudioSys.play('recover');
+                    saveState();
+                }
             },
 
             openModal() {
@@ -1770,7 +1844,7 @@
                 
                 const today = new Date();
                 const todayIndex = today.getDay();
-                const todayStr = getLocalDateString(); // FIXED: Use local date string
+                const todayStr = getLocalDateString();
                 
                 // Check if habit is active today
                 if(!habit.days.includes(todayIndex)) {
@@ -1778,10 +1852,10 @@
                     return;
                 }
                 
-                // Check stamina
+                // Check stamina with strength reduction
                 const staminaCost = this.getStaminaCost(habit.diff);
                 if(State.user.stamina < staminaCost && !habit.completedDates.includes(todayStr)) {
-                    alert("Insufficient stamina to complete this quest!");
+                    alert(`Insufficient stamina! Need ${staminaCost} stamina.`);
                     return;
                 }
                 
@@ -1790,47 +1864,54 @@
                     habit.completedDates = habit.completedDates.filter(d => d !== todayStr);
                     this.recalcStreak(habit);
                     const xp = this.getHabitXP(habit.diff);
-                    const bonusXP = Math.floor(xp * (State.user.recruits * 0.05));
-                    State.user.xp = Math.max(0, State.user.xp - xp - bonusXP);
+                    State.user.xp = Math.max(0, State.user.xp - xp);
                     State.user.totalCompleted = Math.max(0, State.user.totalCompleted - 1);
-                    State.user.totalXp = Math.max(0, State.user.totalXp - xp - bonusXP);
-                    State.user.stamina += staminaCost; // Return stamina
+                    State.user.totalXp = Math.max(0, State.user.totalXp - xp);
+                    State.user.stamina += staminaCost;
                     
-                    // Update activity log (FIXED: Use local date string)
+                    // Update activity log
                     if (State.activityLog[todayStr]) {
                         State.activityLog[todayStr]--;
                         if (State.activityLog[todayStr] <= 0) {
                             delete State.activityLog[todayStr];
                         }
                     }
+                    
+                    // Reset sleep bonus availability
+                    State.user.sleepBonusAvailable = true;
                 } else {
                     // Complete habit
                     habit.completedDates.push(todayStr);
                     this.recalcStreak(habit);
                     const xp = this.getHabitXP(habit.diff);
-                    const bonusXP = Math.floor(xp * (State.user.recruits * 0.05)); // 5% bonus per recruit
-                    State.user.xp += (xp + bonusXP);
+                    State.user.xp += xp;
                     State.user.totalCompleted++;
-                    State.user.totalXp += (xp + bonusXP);
+                    State.user.totalXp += xp;
                     State.user.stamina -= staminaCost;
+                    State.user.dailyCompletions++;
                     
                     AudioSys.play('click');
                     this.checkLevelUp();
                     
-                    // Update activity log (FIXED: Use local date string)
+                    // Update activity log
                     if (!State.activityLog[todayStr]) {
                         State.activityLog[todayStr] = 0;
                     }
                     State.activityLog[todayStr]++;
+                    
+                    // Reset sleep bonus when active
+                    State.user.sleepBonusAvailable = false;
                 }
                 
                 saveState();
+                this.renderHistory(); // Update history view
             },
 
             deleteHabit(id) {
                 if(confirm("Delete this quest?")) {
                     State.habits = State.habits.filter(h => h.id !== id);
                     saveState();
+                    this.renderHistory(); // Update history view
                 }
             },
 
@@ -1854,30 +1935,12 @@
                 if (streak > habit.bestStreak) habit.bestStreak = streak;
             },
 
-            getHabitXP(diff) {
-                const xpMap = {
-                    'easy': 10,
-                    'medium': 25,
-                    'hard': 50
-                };
-                return xpMap[diff] || 10;
-            },
-
-            getStaminaCost(diff) {
-                const staminaMap = {
-                    'easy': 10,
-                    'medium': 20,
-                    'hard': 40
-                };
-                return staminaMap[diff] || 10;
-            },
-
             checkLevelUp() {
                 if(State.user.xp >= State.user.xpToNext) {
                     State.user.level++;
                     State.user.xp -= State.user.xpToNext;
                     State.user.xpToNext = Math.floor(State.user.xpToNext * 1.2);
-                    State.user.maxStamina += 10;
+                    State.user.maxStamina = this.getMaxStamina();
                     State.user.stamina = State.user.maxStamina;
                     State.user.strength += 2;
                     
@@ -1915,7 +1978,6 @@
                     AudioSys.play('recruit');
                     saveState();
                     
-                    // Show success message
                     alert(`Recruit trained successfully! You now have ${State.user.recruits} recruits.`);
                 } else {
                     alert("Insufficient XP to train recruit! You need 100 XP.");
@@ -1938,8 +2000,9 @@
                 if(viewId === 'timer') navs[1].classList.add('active');
                 if(viewId === 'history') { 
                     navs[2].classList.add('active'); 
-                    Graph.render(); 
-                    Heatmap.render();
+                    setTimeout(() => {
+                        this.renderHistory(); // Render history when navigated to
+                    }, 100);
                 }
                 if(viewId === 'army') {
                     navs[3].classList.add('active');
@@ -1996,13 +2059,32 @@
                 document.getElementById('total-recruits').innerText = State.user.recruits;
                 document.getElementById('recruits-count').innerText = State.user.recruits;
                 
-                // Update stamina bars
+                // Update stamina
+                const maxStamina = this.getMaxStamina();
                 document.getElementById('current-stamina').innerText = Math.floor(State.user.stamina);
-                document.getElementById('max-stamina').innerText = State.user.maxStamina;
-                document.getElementById('stamina-bar').style.width = `${(State.user.stamina / State.user.maxStamina) * 100}%`;
+                document.getElementById('max-stamina').innerText = maxStamina;
+                document.getElementById('stamina-bar').style.width = `${(State.user.stamina / maxStamina) * 100}%`;
+                
+                // Update stamina recovery info
+                const reductionPercent = Math.min(50, State.user.strength * 10);
+                document.getElementById('strength-bonus').innerText = `-${reductionPercent}% cost`;
                 
                 // Update strength
                 document.getElementById('strength-value').innerText = State.user.strength;
+                const strengthPercent = Math.min(100, State.user.strength);
+                document.getElementById('strength-bar').style.width = `${strengthPercent}%`;
+                
+                // Update strength change indicator
+                const today = getLocalDateString();
+                let todayCompletions = 0;
+                State.habits.forEach(habit => {
+                    if (habit.completedDates.includes(today)) {
+                        todayCompletions++;
+                    }
+                });
+                
+                const strengthChange = todayCompletions > 0 ? `+${todayCompletions} today` : `-${State.user.consecutiveInactiveDays} days inactive`;
+                document.getElementById('strength-change').innerText = strengthChange;
                 
                 // Update recruit button
                 const summonBtn = document.getElementById('summon-btn');
@@ -2017,9 +2099,16 @@
                     trainBtn.disabled = State.user.xp < 100;
                 }
                 
+                // Update recovery buttons
+                const easyBtn = document.getElementById('easy-recovery');
+                if (easyBtn) {
+                    const hasEasyHabit = State.habits.some(h => h.diff === 'easy' && h.days.includes(new Date().getDay()));
+                    easyBtn.disabled = !hasEasyHabit;
+                }
+                
                 // Render today's habits
                 const todayIndex = new Date().getDay();
-                const todayStr = getLocalDateString(); // FIXED: Use local date string
+                const todayStr = getLocalDateString();
                 const listContainer = document.getElementById('habit-list-container');
                 const sidebarList = document.getElementById('sidebar-habit-list');
                 
@@ -2032,6 +2121,8 @@
                 State.habits.forEach(h => {
                     const isTodayActive = h.days.includes(todayIndex);
                     const isDone = h.completedDates.includes(todayStr);
+                    const staminaCost = this.getStaminaCost(h.diff);
+                    const xpValue = this.getHabitXP(h.diff);
                     
                     if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h.streak);
                     
@@ -2062,7 +2153,8 @@
                                     <div class="habit-meta">
                                         <span class="difficulty-badge difficulty-${h.diff}">${h.diff.toUpperCase()}</span>
                                         <span>🔥 ${h.streak}</span>
-                                        <span>⚡ ${this.getStaminaCost(h.diff)} Stamina</span>
+                                        <span>⚡ ${staminaCost} Stamina</span>
+                                        <span>⭐ ${xpValue} XP</span>
                                     </div>
                                 </div>
                             </div>
@@ -2084,7 +2176,7 @@
             }
         };
 
-        // --- TIMER MODULE (Pomodoro & Stopwatch) ---
+        // --- TIMER MODULE ---
         const Timer = {
             mode: 'pomodoro',
             running: false,
@@ -2110,7 +2202,6 @@
                 this.mode = mode;
                 this.pomodoroCycle = 1;
                 
-                // Update UI
                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                 if(mode === 'pomodoro') {
                     document.querySelectorAll('.mode-btn')[0].classList.add('active');
@@ -2156,7 +2247,6 @@
                         this.updateDisplay();
                     }, 100);
                 } else {
-                    // Stopwatch
                     if (this.stopwatchStartTime === 0) {
                         this.stopwatchStartTime = Date.now() - this.stopwatchTime;
                     }
@@ -2232,17 +2322,15 @@
                         this.pomodoroTime = 20 * 60;
                         const timerStatus = document.getElementById('timer-status');
                         if (timerStatus) timerStatus.innerText = 'LONG BREAK';
-                        alert("Cycle Complete! Take a 20-minute break.");
                     } else {
                         this.pomodoroState = 'SHORT BREAK';
                         this.pomodoroTime = 5 * 60;
                         const timerStatus = document.getElementById('timer-status');
                         if (timerStatus) timerStatus.innerText = 'SHORT BREAK';
-                        alert("Focus session complete! Take a 5-minute break.");
                     }
                 } else {
                     if (this.pomodoroState === 'LONG BREAK') {
-                        this.pomodoroCycle = 0; // Reset cycle
+                        this.pomodoroCycle = 0;
                     }
                     
                     this.pomodoroCycle++;
@@ -2250,10 +2338,6 @@
                     this.pomodoroTime = 25 * 60;
                     const timerStatus = document.getElementById('timer-status');
                     if (timerStatus) timerStatus.innerText = 'FOCUS';
-                    
-                    if (this.pomodoroCycle <= this.totalCycles) {
-                        alert("Break over! Back to focus.");
-                    }
                 }
                 
                 const timerCycle = document.getElementById('timer-cycle');
@@ -2275,7 +2359,6 @@
                     const lapNum = this.laps.length;
                     const lapTime = this.formatTime(this.stopwatchTime);
                     
-                    // Calculate difference from previous lap
                     let diffText = '';
                     if (this.laps.length > 1) {
                         const prevLap = this.laps[this.laps.length - 2];
@@ -2315,19 +2398,16 @@
                 if (!timerText || !timerProgress) return;
                 
                 if (this.mode === 'pomodoro') {
-                    // Update timer display
                     const minutes = Math.floor(this.pomodoroTime / 60);
                     const seconds = this.pomodoroTime % 60;
                     timerText.innerText = 
                         `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                     
-                    // Update progress ring
                     const totalTime = 25 * 60;
                     const progress = ((totalTime - this.pomodoroTime) / totalTime) * this.circumference;
                     timerProgress.style.strokeDashoffset = this.circumference - progress;
                     
                 } else {
-                    // Stopwatch
                     timerText.innerText = this.formatTime(this.stopwatchTime);
                     timerProgress.style.strokeDashoffset = 0;
                 }
@@ -2345,192 +2425,6 @@
             }
         };
 
-        // --- GRAPH & HEATMAP ---
-        const Graph = {
-            render() {
-                this.drawBarGraph();
-                this.drawRing();
-            },
-
-            drawBarGraph() {
-                const container = document.getElementById('bar-graph');
-                if (!container) return;
-                
-                container.innerHTML = '';
-                
-                // Generate data for last 30 days (FIXED: Use local dates)
-                const data = [];
-                const labels = [];
-                const today = new Date();
-                
-                for(let i = 29; i >= 0; i--) {
-                    const date = new Date(today);
-                    date.setDate(today.getDate() - i);
-                    const dateStr = getLocalDateString(date);
-                    const dayLabel = date.getDate().toString();
-                    
-                    data.push(State.activityLog[dateStr] || 0);
-                    labels.push(dayLabel);
-                }
-                
-                // Calculate percentage for title
-                const totalTasks = data.reduce((a, b) => a + b, 0);
-                const activeHabits = State.habits.length;
-                const goal = activeHabits * 30;
-                const pct = goal === 0 ? 0 : Math.round((totalTasks / goal) * 100);
-                const graphPct = document.getElementById('graph-pct');
-                if (graphPct) graphPct.innerText = `${pct}%`;
-                
-                // Find max value for scaling
-                const maxValue = Math.max(...data, 1);
-                
-                // Create bars
-                data.forEach((value, index) => {
-                    const barContainer = document.createElement('div');
-                    barContainer.className = 'bar-container';
-                    
-                    const barHeight = (value / maxValue) * 180;
-                    
-                    const bar = document.createElement('div');
-                    bar.className = 'bar';
-                    bar.style.height = `${barHeight}px`;
-                    
-                    const barValue = document.createElement('div');
-                    barValue.className = 'bar-value';
-                    barValue.innerText = value;
-                    
-                    const barLabel = document.createElement('div');
-                    barLabel.className = 'bar-label';
-                    barLabel.innerText = labels[index];
-                    
-                    bar.appendChild(barValue);
-                    barContainer.appendChild(bar);
-                    barContainer.appendChild(barLabel);
-                    container.appendChild(barContainer);
-                });
-            },
-
-            drawRing() {
-                const now = new Date();
-                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-                const daysPassed = now.getDate();
-                
-                // Calculate completed habits this month (FIXED: Use local dates)
-                let completedThisMonth = 0;
-                const currentYear = now.getFullYear();
-                const currentMonth = now.getMonth() + 1;
-                
-                State.habits.forEach(habit => {
-                    habit.completedDates.forEach(dateStr => {
-                        const date = new Date(dateStr + 'T00:00:00');
-                        if (date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth) {
-                            completedThisMonth++;
-                        }
-                    });
-                });
-                
-                const totalPossible = State.habits.length * daysPassed;
-                const percentage = totalPossible === 0 ? 0 : Math.round((completedThisMonth / totalPossible) * 100);
-                
-                const consistencyPct = document.getElementById('consistency-pct');
-                if (consistencyPct) consistencyPct.innerText = `${percentage}%`;
-                
-                const consistencyRing = document.getElementById('consistency-ring');
-                if (consistencyRing) {
-                    const offset = 502 - (percentage / 100) * 502;
-                    consistencyRing.style.strokeDashoffset = offset;
-                }
-            }
-        };
-
-        const Heatmap = {
-            currentDate: new Date(),
-            
-            render() {
-                this.renderMonth();
-            },
-            
-            renderMonth() {
-                const grid = document.getElementById('heatmap-grid');
-                if (!grid) return;
-                
-                // Clear existing cells (keeping day headers)
-                while(grid.children.length > 7) {
-                    grid.removeChild(grid.lastChild);
-                }
-                
-                const year = this.currentDate.getFullYear();
-                const month = this.currentDate.getMonth();
-                const today = new Date();
-                
-                // Update month display
-                const monthNames = ["January", "February", "March", "April", "May", "June",
-                                  "July", "August", "September", "October", "November", "December"];
-                const currentMonthEl = document.getElementById('current-month');
-                if (currentMonthEl) {
-                    currentMonthEl.innerText = `${monthNames[month]} ${year}`;
-                }
-                
-                // Get first day of month and total days
-                const firstDay = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                
-                // Add empty cells for days before the 1st
-                for(let i = 0; i < firstDay; i++) {
-                    const emptyCell = document.createElement('div');
-                    emptyCell.className = 'heat-cell empty';
-                    grid.appendChild(emptyCell);
-                }
-                
-                // Add cells for each day of the month
-                for(let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, month, day);
-                    const dateStr = getLocalDateString(date); // FIXED: Use local date string
-                    const count = State.activityLog[dateStr] || 0;
-                    
-                    // Determine heat level
-                    let level = 0;
-                    if(count >= 4) level = 4;
-                    else if(count >= 3) level = 3;
-                    else if(count >= 2) level = 2;
-                    else if(count >= 1) level = 1;
-                    
-                    const cell = document.createElement('div');
-                    cell.className = 'heat-cell';
-                    if(level > 0) cell.setAttribute('data-lvl', level);
-                    
-                    // Mark today (FIXED: Compare local dates)
-                    const todayStr = getLocalDateString(today);
-                    if(dateStr === todayStr) {
-                        cell.classList.add('today');
-                    }
-                    
-                    // Add day number
-                    const daySpan = document.createElement('span');
-                    daySpan.innerText = day;
-                    cell.appendChild(daySpan);
-                    
-                    // Add tooltip
-                    const tooltip = document.createElement('div');
-                    tooltip.className = 'heat-tooltip';
-                    tooltip.innerText = `${date.toLocaleDateString()}: ${count} quest${count !== 1 ? 's' : ''} completed`;
-                    cell.appendChild(tooltip);
-                    
-                    grid.appendChild(cell);
-                }
-            },
-            
-            prevMonth() {
-                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                this.renderMonth();
-            },
-            
-            nextMonth() {
-                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                this.renderMonth();
-            }
-        };
-
         // --- INITIALIZE APP ---
         document.addEventListener('DOMContentLoaded', function() {
             App.init();
@@ -2542,6 +2436,14 @@
                 sidebar.classList.toggle('open');
             }
         }
+        
+        // Redraw chart on window resize
+        window.addEventListener('resize', function() {
+            if (document.getElementById('history').classList.contains('active')) {
+                App.renderHistory();
+            }
+        });
     </script>
+
 </body>
     </html>
