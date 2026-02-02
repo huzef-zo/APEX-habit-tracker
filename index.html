@@ -165,17 +165,6 @@
             color: var(--danger); 
         }
 
-        /* Player Stats in Sidebar */
-        .player-stats {
-            margin-top: 2rem;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-        }
-        .stat-bar {
-            margin-bottom: 1rem;
-        }
         .stat-label {
             display: flex;
             justify-content: space-between;
@@ -183,19 +172,6 @@
             color: var(--text-dim);
             margin-bottom: 5px;
         }
-        .stat-fill {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .stat-fill-inner {
-            height: 100%;
-            transition: width 0.5s ease;
-        }
-        .stamina-fill { background: linear-gradient(90deg, #00ff9d, #00cc7a); }
-        .strength-fill { background: linear-gradient(90deg, #ffcc00, #ff9900); }
-
         /* Stats Info Tooltip */
         .stat-info {
             font-size: 0.7rem;
@@ -205,59 +181,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        .stat-recovery {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .recovery-icon {
-            color: var(--success);
-            font-size: 0.8rem;
-        }
 
-        /* Recruits Section */
-        .recruits-section {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-        }
-        .recruits-count {
-            text-align: center;
-            font-family: var(--font-display);
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        .recruit-btn { 
-            background: linear-gradient(90deg, var(--primary), var(--primary-glow));
-            color: #000; 
-            border: none; 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-family: var(--font-display);
-            font-size: 0.8rem;
-            transition: all 0.3s;
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-        .recruit-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
-        }
-        .recruit-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-        .recruit-btn:disabled:hover {
-            background: #666;
-            transform: none !important;
-            box-shadow: none !important;
-        }
 
         /* --- MAIN CONTENT --- */
         .main-content { 
@@ -433,59 +357,6 @@
         .difficulty-medium { background: rgba(255, 204, 0, 0.2); color: var(--warning); }
         .difficulty-hard { background: rgba(255, 0, 60, 0.2); color: var(--danger); }
 
-        /* Stamina Info Panel */
-        .stamina-info {
-            background: var(--panel-bg);
-            border: var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .stamina-details {
-            flex: 1;
-        }
-        .stamina-title {
-            font-family: var(--font-display);
-            color: var(--primary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        .stamina-benefits {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-        }
-        .stamina-benefits li {
-            margin-bottom: 3px;
-        }
-        .recovery-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .recovery-btn {
-            background: rgba(0, 255, 157, 0.1);
-            border: 1px solid rgba(0, 255, 157, 0.3);
-            color: var(--success);
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .recovery-btn:hover {
-            background: rgba(0, 255, 157, 0.2);
-            transform: translateY(-2px);
-        }
-        .recovery-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .recovery-btn:disabled:hover {
-            background: rgba(0, 255, 157, 0.1);
-            transform: none;
-        }
 
         /* Floating Action Button */
         #fab { 
@@ -841,52 +712,6 @@
             min-height: 400px; /* Ensure enough height for scrolling */
         }
 
-        /* --- ARMY VIEW --- */
-        .army-stats {
-            background: var(--panel-bg);
-            border: var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .soldier-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .soldier-card {
-            background: #000;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .soldier-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-        }
-
-        .soldier-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .soldier-name {
-            font-family: var(--font-display);
-            color: var(--primary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .soldier-level {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-        }
 
         /* --- RESPONSIVE --- */
         @media(max-width: 768px) {
@@ -949,15 +774,6 @@
                 font-size: 0.9rem;
             }
             
-            .stamina-info {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .recovery-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
         }
         
         @media(min-width: 769px) { 
@@ -1011,9 +827,6 @@
         <div class="modal-box" style="text-align: center;">
             <h1 style="color: var(--primary); font-family: var(--font-display); font-size: 3rem; margin-bottom: 1rem;">LEVEL UP</h1>
             <p style="margin-bottom: 2rem; color: #fff;" id="level-msg">You have reached Level 2</p>
-            <p style="margin-bottom: 2rem; color: var(--primary); font-family: var(--font-display);" id="level-reward">
-                +1 Recruit Added to your Army!
-            </p>
             <button class="btn-primary" onclick="App.closeModal('level-modal')">ACKNOWLEDGE</button>
         </div>
     </div>
@@ -1033,50 +846,7 @@
             <button class="nav-btn active" onclick="App.navigate('dashboard')">🏰 Dashboard</button>
             <button class="nav-btn" onclick="App.navigate('timer')">⏳ Time Chamber</button>
             <button class="nav-btn" onclick="App.navigate('history')">📜 Chronicles</button>
-            <button class="nav-btn" onclick="App.navigate('army')">💪 Recruits</button>
             
-            <!-- Player Stats -->
-            <div class="player-stats">
-                <div class="stat-bar">
-                    <div class="stat-label">
-                        <span>STAMINA</span>
-                        <span id="current-stamina">100</span>/<span id="max-stamina">100</span>
-                    </div>
-                    <div class="stat-fill">
-                        <div class="stat-fill-inner stamina-fill" id="stamina-bar" style="width: 100%;"></div>
-                    </div>
-                    <div class="stat-info">
-                        <span>Recovery: <span class="recovery-icon">⚡</span> <span id="stamina-recovery">12/hour</span></span>
-                        <span id="strength-bonus">-10% cost</span>
-                    </div>
-                </div>
-                
-                <div class="stat-bar">
-                    <div class="stat-label">
-                        <span>STRENGTH</span>
-                        <span id="strength-value">10</span>
-                    </div>
-                    <div class="stat-fill">
-                        <div class="stat-fill-inner strength-fill" id="strength-bar" style="width: 100%;"></div>
-                    </div>
-                    <div class="stat-info">
-                        <span>+5% XP | +10 Max Stamina</span>
-                        <span id="strength-change">+0 today</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Recruits Section -->
-            <div class="recruits-section">
-                <div class="recruits-count">
-                    💪 <span id="recruits-count">0</span> Recruits
-                </div>
-                <div style="text-align: center;">
-                    <button class="recruit-btn" onclick="App.summonRecruit()" id="summon-btn">
-                        Train Recruit (100 XP)
-                    </button>
-                </div>
-            </div>
             
             <div class="sidebar-section-title">Active Quests</div>
             <div id="sidebar-habit-list"></div>
@@ -1095,24 +865,6 @@
                         <span class="xp-text" id="xp-text">0 / 100 XP</span>
                     </div>
                     
-                    <div class="stamina-info">
-                        <div class="stamina-details">
-                            <div class="stamina-title">STAMINA SYSTEM</div>
-                            <div class="stamina-benefits">
-                                <div>• <strong>Passive Recovery:</strong> 12/hour (1 per 5 min)</div>
-                                <div>• <strong>Strength Bonus:</strong> +10 max stamina per strength point</div>
-                                <div>• <strong>Cost Reduction:</strong> -10% stamina cost per strength point</div>
-                            </div>
-                        </div>
-                        <div class="recovery-actions">
-                            <button class="recovery-btn" onclick="App.activeRecovery('easy')" id="easy-recovery">
-                                Quick Rest (5 Stamina)
-                            </button>
-                            <button class="recovery-btn" onclick="App.activeRecovery('meditate')" id="meditate-btn">
-                                Meditate (20 Stamina)
-                            </button>
-                        </div>
-                    </div>
                     
                     <div class="stats-grid">
                         <div class="stat-box">
@@ -1126,10 +878,6 @@
                         <div class="stat-box">
                             <span class="stat-val" id="total-quests">0</span>
                             <span class="stat-lbl">Total Quests</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="stat-val" id="total-recruits">0</span>
-                            <span class="stat-lbl">Recruits</span>
                         </div>
                     </div>
                     
@@ -1223,76 +971,6 @@
                       </div>
                 </section>
                 
-                <!-- ARMY VIEW -->
-                <section id="army" class="view-section">
-                    <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 1.5rem;">💪 RECRUITS</h2>
-                    
-                    <div class="army-stats">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                            <div>
-                                <h3 style="color: var(--text-main); font-family: var(--font-display); margin-bottom: 0.5rem;">
-                                    Recruit Army
-                                </h3>
-                                <p style="color: var(--text-dim); font-size: 0.9rem;">
-                                    Train recruits to gain XP bonuses
-                                </p>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 2rem; color: var(--primary); font-family: var(--font-display);" id="total-recruits-army">
-                                    0
-                                </div>
-                                <div style="color: var(--text-dim); font-size: 0.8rem;">
-                                    Active Recruits
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="soldier-grid" id="recruits-grid">
-                            <!-- Recruits will be generated here -->
-                        </div>
-                        
-                        <div style="margin-top: 2rem; text-align: center;">
-                            <button class="recruit-btn" onclick="App.summonRecruit()" id="train-recruit-btn">
-                                ⚡ Train Recruit (Cost: 100 XP)
-                            </button>
-                            <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.9rem;">
-                                Each recruit provides +5% bonus to all XP gained
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-card" style="margin-top: 2rem;">
-                        <h3 style="color: var(--text-main); font-family: var(--font-display); margin-bottom: 1rem;">
-                            Recruit Bonuses
-                        </h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
-                            <div style="background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(0, 240, 255, 0.3);">
-                                <div style="color: var(--primary); margin-bottom: 0.5rem; font-family: var(--font-display);">
-                                    Tier I: Basic Training
-                                </div>
-                                <div style="color: var(--text-dim); font-size: 0.9rem;">
-                                    1-5 Recruits: +5% XP bonus each
-                                </div>
-                            </div>
-                            <div style="background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(0, 240, 255, 0.3); opacity: 0.5;">
-                                <div style="color: var(--text-dim); margin-bottom: 0.5rem; font-family: var(--font-display);">
-                                    Tier II: Advanced Training
-                                </div>
-                                <div style="color: var(--text-dim); font-size: 0.9rem;">
-                                    6-10 Recruits: +10% XP bonus each (Unlocked at Level 5)
-                                </div>
-                            </div>
-                            <div style="background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(0, 240, 255, 0.3); opacity: 0.5;">
-                                <div style="color: var(--text-dim); margin-bottom: 0.5rem; font-family: var(--font-display);">
-                                    Tier III: Elite Forces
-                                </div>
-                                <div style="color: var(--text-dim); font-size: 0.9rem;">
-                                    11+ Recruits: +15% XP bonus each (Unlocked at Level 10)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
             </div>
         </main>
     </div>
@@ -1340,21 +1018,6 @@
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                     osc.start(now); osc.stop(now + 0.5);
-                } else if (type === 'recruit') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(100, now);
-                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.8);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 1);
-                    osc.start(now); osc.stop(now + 1);
-                } else if (type === 'recover') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(300, now);
-                    osc.frequency.linearRampToValueAtTime(600, now + 0.5);
-                    gain.gain.setValueAtTime(0.1, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 1);
-                    osc.start(now); osc.stop(now + 1);
-                }
             }
         };
 
@@ -1367,19 +1030,11 @@
                 xpToNext: 100, 
                 totalCompleted: 0,
                 totalXp: 0,
-                stamina: 100,
-                maxStamina: 100,
-                strength: 10,
-                recruits: 0,
-                lastStaminaUpdate: Date.now(),
-                lastStrengthCheck: Date.now(),
                 dailyCompletions: 0,
-                consecutiveInactiveDays: 0,
                 sleepBonusAvailable: true
             },
             habits: [],
             activityLog: {},
-            recruits: [],
             timerStats: {
                 pomodoroCompleted: 0,
                 totalFocusTime: 0,
@@ -1537,7 +1192,6 @@
         // --- APP LOGIC ---
         const App = {
             tempDays: [],
-            staminaInterval: null,
 
             init() {
                 // Initialize audio system
@@ -1557,12 +1211,6 @@
                 
                 this.updateDate();
                 setInterval(() => this.updateDate(), 60000);
-                
-                // Initialize stamina regeneration
-                this.initStaminaSystem();
-                
-                // Initialize strength system
-                this.initStrengthSystem();
                 
                 // Set up day selector
                 document.querySelectorAll('.day-btn').forEach(btn => {
@@ -1597,63 +1245,7 @@
                 if (dateEl) dateEl.innerText = dateStr;
             },
 
-            initStaminaSystem() {
-                // Calculate stamina regeneration since last update
-                const now = Date.now();
-                const lastUpdate = State.user.lastStaminaUpdate || now;
-                const minutesPassed = (now - lastUpdate) / (1000 * 60);
-                
-                // Passive recovery: 1 stamina per 5 minutes (12 per hour)
-                const staminaGained = Math.floor(minutesPassed / 5);
-                
-                State.user.stamina = Math.min(
-                    this.getMaxStamina(),
-                    State.user.stamina + staminaGained
-                );
-                
-                State.user.lastStaminaUpdate = now;
-                saveState();
-                
-                // Update stamina every minute
-                this.staminaInterval = setInterval(() => {
-                    const currentTime = Date.now();
-                    const minutesSinceLast = (currentTime - State.user.lastStaminaUpdate) / (1000 * 60);
-                    
-                    if (minutesSinceLast >= 5) {
-                        State.user.stamina = Math.min(
-                            this.getMaxStamina(),
-                            State.user.stamina + 1
-                        );
-                        State.user.lastStaminaUpdate = currentTime;
-                        this.render();
-                    }
-                }, 60000);
-            },
 
-            initStrengthSystem() {
-                const now = Date.now();
-                const lastCheck = State.user.lastStrengthCheck || now;
-                const daysSinceLastCheck = (now - lastCheck) / (1000 * 60 * 60 * 24);
-                
-                // Update strength daily
-                if (daysSinceLastCheck >= 1) {
-                    this.updateStrength();
-                    State.user.lastStrengthCheck = now;
-                    saveState();
-                }
-                
-                // Check strength every hour
-                setInterval(() => {
-                    const currentTime = Date.now();
-                    const daysSince = (currentTime - State.user.lastStrengthCheck) / (1000 * 60 * 60 * 24);
-                    
-                    if (daysSince >= 1) {
-                        this.updateStrength();
-                        State.user.lastStrengthCheck = currentTime;
-                        saveState();
-                    }
-                }, 3600000);
-            },
 
             renderHistory() {
                 drawHistoryChart();
@@ -1661,26 +1253,6 @@
                 renderCalendar();
             },
 
-            getMaxStamina() {
-                // Base max stamina + strength bonus (10 per strength point)
-                return 100 + (State.user.strength * 10);
-            },
-
-            getStaminaCost(diff) {
-                const baseCost = {
-                    'easy': 10,
-                    'medium': 20,
-                    'hard': 40
-                };
-                
-                const base = baseCost[diff] || 10;
-                
-                // Strength reduces stamina cost by 10% per strength point
-                const strengthReduction = State.user.strength * 0.1;
-                const reduction = Math.min(0.5, strengthReduction);
-                
-                return Math.max(5, Math.floor(base * (1 - reduction)));
-            },
 
             getHabitXP(diff) {
                 const xpMap = {
@@ -1689,98 +1261,9 @@
                     'hard': 50
                 };
                 
-                const baseXP = xpMap[diff] || 10;
-                
-                // Strength gives +5% XP per strength point
-                const strengthBonus = State.user.strength * 0.05;
-                
-                // Recruit bonus (5% per recruit)
-                const recruitBonus = State.user.recruits * 0.05;
-                
-                const totalBonus = strengthBonus + recruitBonus;
-                const finalXP = Math.floor(baseXP * (1 + totalBonus));
-                
-                return finalXP;
+                return xpMap[diff] || 10;
             },
 
-            updateStrength() {
-                const today = getLocalDateString();
-                const yesterday = getYesterdayDateString();
-                
-                // Check if user completed any habits yesterday
-                let completedYesterday = false;
-                State.habits.forEach(habit => {
-                    if (habit.completedDates.includes(yesterday)) {
-                        completedYesterday = true;
-                    }
-                });
-                
-                if (completedYesterday) {
-                    // Increase strength for consistency
-                    State.user.strength = Math.min(100, State.user.strength + 1);
-                    State.user.consecutiveInactiveDays = 0;
-                } else {
-                    // Decrease strength for inactivity
-                    State.user.consecutiveInactiveDays++;
-                    
-                    if (State.user.consecutiveInactiveDays >= 3) {
-                        State.user.strength = Math.max(1, State.user.strength - 1);
-                        State.user.consecutiveInactiveDays = 0;
-                    }
-                }
-            },
-
-            activeRecovery(type) {
-                const now = Date.now();
-                const lastRecovery = State.user.lastRecoveryTime || 0;
-                const hoursSinceLastRecovery = (now - lastRecovery) / (1000 * 60 * 60);
-                
-                if (type === 'easy') {
-                    // Quick Rest: Complete an easy habit to recover stamina
-                    const easyHabit = State.habits.find(h => h.diff === 'easy' && h.days.includes(new Date().getDay()));
-                    
-                    if (easyHabit) {
-                        const todayStr = getLocalDateString();
-                        
-                        if (!easyHabit.completedDates.includes(todayStr)) {
-                            // Complete the easy habit for recovery
-                            easyHabit.completedDates.push(todayStr);
-                            this.recalcStreak(easyHabit);
-                            
-                            // Gain stamina instead of XP
-                            const staminaGain = 15;
-                            State.user.stamina = Math.min(this.getMaxStamina(), State.user.stamina + staminaGain);
-                            
-                            // Update activity log
-                            if (!State.activityLog[todayStr]) {
-                                State.activityLog[todayStr] = 0;
-                            }
-                            State.activityLog[todayStr]++;
-                            
-                            AudioSys.play('recover');
-                            saveState();
-                        } else {
-                            alert("You've already completed an easy habit today for recovery!");
-                        }
-                    } else {
-                        alert("No easy habits scheduled for today!");
-                    }
-                } else if (type === 'meditate') {
-                    // Meditation: Direct stamina recovery (once per 4 hours)
-                    if (hoursSinceLastRecovery < 4) {
-                        const hoursLeft = (4 - hoursSinceLastRecovery).toFixed(1);
-                        alert(`Meditation available in ${hoursLeft} hours`);
-                        return;
-                    }
-                    
-                    const meditationStamina = 20;
-                    State.user.stamina = Math.min(this.getMaxStamina(), State.user.stamina + meditationStamina);
-                    State.user.lastRecoveryTime = now;
-                    
-                    AudioSys.play('recover');
-                    saveState();
-                }
-            },
 
             openModal() {
                 this.tempDays = [];
@@ -1852,13 +1335,6 @@
                     return;
                 }
                 
-                // Check stamina with strength reduction
-                const staminaCost = this.getStaminaCost(habit.diff);
-                if(State.user.stamina < staminaCost && !habit.completedDates.includes(todayStr)) {
-                    alert(`Insufficient stamina! Need ${staminaCost} stamina.`);
-                    return;
-                }
-                
                 if (habit.completedDates.includes(todayStr)) {
                     // Undo completion
                     habit.completedDates = habit.completedDates.filter(d => d !== todayStr);
@@ -1867,7 +1343,6 @@
                     State.user.xp = Math.max(0, State.user.xp - xp);
                     State.user.totalCompleted = Math.max(0, State.user.totalCompleted - 1);
                     State.user.totalXp = Math.max(0, State.user.totalXp - xp);
-                    State.user.stamina += staminaCost;
                     
                     // Update activity log
                     if (State.activityLog[todayStr]) {
@@ -1887,7 +1362,6 @@
                     State.user.xp += xp;
                     State.user.totalCompleted++;
                     State.user.totalXp += xp;
-                    State.user.stamina -= staminaCost;
                     State.user.dailyCompletions++;
                     
                     AudioSys.play('click');
@@ -1939,54 +1413,14 @@
                 if(State.user.xp >= State.user.xpToNext) {
                     State.user.level++;
                     State.user.xp -= State.user.xpToNext;
-                    State.user.xpToNext = Math.floor(State.user.xpToNext * 1.2);
-                    State.user.maxStamina = this.getMaxStamina();
-                    State.user.stamina = State.user.maxStamina;
-                    State.user.strength += 2;
-                    
-                    // Add a free recruit on level up
-                    State.user.recruits++;
-                    State.recruits.push({
-                        id: Date.now(),
-                        level: 1,
-                        type: this.getRecruitType(),
-                        recruitedAt: new Date().toISOString()
-                    });
+                    State.user.xpToNext = Math.floor(State.user.xpToNext * 1.5);
                     
                     document.getElementById('level-msg').innerText = `You have reached Level ${State.user.level}`;
-                    document.getElementById('level-reward').innerText = `+1 Recruit Added to your Army!`;
                     document.getElementById('level-modal').classList.add('open');
                     
                     AudioSys.play('levelup');
                     saveState();
                 }
-            },
-
-            summonRecruit() {
-                const cost = 100;
-                if(State.user.xp >= cost) {
-                    State.user.xp -= cost;
-                    State.user.recruits++;
-                    
-                    State.recruits.push({
-                        id: Date.now(),
-                        level: 1,
-                        type: this.getRecruitType(),
-                        recruitedAt: new Date().toISOString()
-                    });
-                    
-                    AudioSys.play('recruit');
-                    saveState();
-                    
-                    alert(`Recruit trained successfully! You now have ${State.user.recruits} recruits.`);
-                } else {
-                    alert("Insufficient XP to train recruit! You need 100 XP.");
-                }
-            },
-
-            getRecruitType() {
-                const types = ['Soldier', 'Scout', 'Engineer', 'Medic', 'Leader'];
-                return types[Math.floor(Math.random() * types.length)];
             },
 
             navigate(viewId) {
@@ -2004,46 +1438,8 @@
                         this.renderHistory(); // Render history when navigated to
                     }, 100);
                 }
-                if(viewId === 'army') {
-                    navs[3].classList.add('active');
-                    this.renderArmy();
-                }
                 
                 document.getElementById('sidebar').classList.remove('open');
-            },
-
-            renderArmy() {
-                const grid = document.getElementById('recruits-grid');
-                if (!grid) return;
-                
-                grid.innerHTML = '';
-                
-                State.recruits.forEach((recruit, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'soldier-card';
-                    card.innerHTML = `
-                        <div class="soldier-icon">💪</div>
-                        <div class="soldier-name">${recruit.type} #${index + 1}</div>
-                        <div class="soldier-level">Level ${recruit.level}</div>
-                    `;
-                    grid.appendChild(card);
-                });
-                
-                // Add empty slots
-                const emptySlots = Math.max(0, 12 - State.recruits.length);
-                for(let i = 0; i < emptySlots; i++) {
-                    const card = document.createElement('div');
-                    card.className = 'soldier-card';
-                    card.style.opacity = '0.3';
-                    card.innerHTML = `
-                        <div class="soldier-icon">⭕</div>
-                        <div class="soldier-name">Empty Slot</div>
-                        <div class="soldier-level">Train to fill</div>
-                    `;
-                    grid.appendChild(card);
-                }
-                
-                document.getElementById('total-recruits-army').innerText = State.user.recruits;
             },
 
             render() {
@@ -2056,55 +1452,8 @@
                 const best = State.habits.reduce((max, h) => Math.max(max, h.bestStreak), 0);
                 document.getElementById('best-streak').innerText = best;
                 document.getElementById('total-quests').innerText = State.user.totalCompleted;
-                document.getElementById('total-recruits').innerText = State.user.recruits;
-                document.getElementById('recruits-count').innerText = State.user.recruits;
                 
-                // Update stamina
-                const maxStamina = this.getMaxStamina();
-                document.getElementById('current-stamina').innerText = Math.floor(State.user.stamina);
-                document.getElementById('max-stamina').innerText = maxStamina;
-                document.getElementById('stamina-bar').style.width = `${(State.user.stamina / maxStamina) * 100}%`;
                 
-                // Update stamina recovery info
-                const reductionPercent = Math.min(50, State.user.strength * 10);
-                document.getElementById('strength-bonus').innerText = `-${reductionPercent}% cost`;
-                
-                // Update strength
-                document.getElementById('strength-value').innerText = State.user.strength;
-                const strengthPercent = Math.min(100, State.user.strength);
-                document.getElementById('strength-bar').style.width = `${strengthPercent}%`;
-                
-                // Update strength change indicator
-                const today = getLocalDateString();
-                let todayCompletions = 0;
-                State.habits.forEach(habit => {
-                    if (habit.completedDates.includes(today)) {
-                        todayCompletions++;
-                    }
-                });
-                
-                const strengthChange = todayCompletions > 0 ? `+${todayCompletions} today` : `-${State.user.consecutiveInactiveDays} days inactive`;
-                document.getElementById('strength-change').innerText = strengthChange;
-                
-                // Update recruit button
-                const summonBtn = document.getElementById('summon-btn');
-                if (summonBtn) {
-                    summonBtn.innerText = `Train Recruit (100 XP)`;
-                    summonBtn.disabled = State.user.xp < 100;
-                }
-                
-                const trainBtn = document.getElementById('train-recruit-btn');
-                if (trainBtn) {
-                    trainBtn.innerHTML = `⚡ Train Recruit (Cost: 100 XP)<br><small>Army Size: ${State.user.recruits}</small>`;
-                    trainBtn.disabled = State.user.xp < 100;
-                }
-                
-                // Update recovery buttons
-                const easyBtn = document.getElementById('easy-recovery');
-                if (easyBtn) {
-                    const hasEasyHabit = State.habits.some(h => h.diff === 'easy' && h.days.includes(new Date().getDay()));
-                    easyBtn.disabled = !hasEasyHabit;
-                }
                 
                 // Render today's habits
                 const todayIndex = new Date().getDay();
@@ -2121,7 +1470,6 @@
                 State.habits.forEach(h => {
                     const isTodayActive = h.days.includes(todayIndex);
                     const isDone = h.completedDates.includes(todayStr);
-                    const staminaCost = this.getStaminaCost(h.diff);
                     const xpValue = this.getHabitXP(h.diff);
                     
                     if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h.streak);
@@ -2153,7 +1501,6 @@
                                     <div class="habit-meta">
                                         <span class="difficulty-badge difficulty-${h.diff}">${h.diff.toUpperCase()}</span>
                                         <span>🔥 ${h.streak}</span>
-                                        <span>⚡ ${staminaCost} Stamina</span>
                                         <span>⭐ ${xpValue} XP</span>
                                     </div>
                                 </div>
