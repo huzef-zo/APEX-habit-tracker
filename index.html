@@ -1043,7 +1043,13 @@
             }
         };
         
-        let State = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+        let State;
+        try {
+            State = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+        } catch (e) {
+            console.error("Failed to load state:", e);
+            State = defaultState;
+        }
 
         function saveState() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(State)); 
@@ -1205,7 +1211,11 @@
                         intro.style.opacity = '0';
                         setTimeout(() => {
                             intro.style.display = 'none';
-                            document.getElementById('app-container').classList.add('visible');
+                            const app = document.getElementById('app-container');
+                            if (app) {
+                                app.classList.add('visible');
+                                app.style.opacity = '1';
+                            }
                         }, 800);
                     }
                 }, 2500);
@@ -1775,7 +1785,20 @@
 
         // --- INITIALIZE APP ---
         document.addEventListener('DOMContentLoaded', function() {
-            App.init();
+            console.log("DOM Content Loaded, initializing App...");
+            try {
+                App.init();
+            } catch (e) {
+                console.error("App initialization failed:", e);
+                // Failsafe: hide intro and show app if init fails
+                const intro = document.getElementById('intro-overlay');
+                if (intro) intro.style.display = 'none';
+                const app = document.getElementById('app-container');
+                if (app) {
+                    app.classList.add('visible');
+                    app.style.opacity = '1';
+                }
+            }
         });
 
         function toggleSidebar() {
