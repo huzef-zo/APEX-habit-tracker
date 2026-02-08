@@ -1076,10 +1076,12 @@
             canvas.height = parent.offsetHeight;
 
             const dataPoints = [];
+            const labels = [];
             for (let i = 29; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
                 const dateStr = getLocalDateString(d);
+                labels.push(d.getDate());
                 const dayIdx = d.getDay();
                 const scheduled = State.habits.filter(h => h.days.includes(dayIdx)).length;
                 if (scheduled === 0) { dataPoints.push(0); continue; }
@@ -1095,25 +1097,26 @@
             const w = canvas.width;
             const h = canvas.height;
             const padding = 20;
+            const bottomPadding = 40;
 
             ctx.clearRect(0,0,w,h);
             ctx.strokeStyle = colorGrid;
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(padding, h - padding);
-            ctx.lineTo(w - padding, h - padding);
+            ctx.moveTo(padding, h - bottomPadding);
+            ctx.lineTo(w - padding, h - bottomPadding);
             ctx.stroke();
 
             if (dataPoints.length > 1) {
                 const stepX = (w - 2*padding) / (dataPoints.length - 1);
                 ctx.beginPath();
-                ctx.moveTo(padding, h - padding);
+                ctx.moveTo(padding, h - bottomPadding);
                 dataPoints.forEach((val, i) => {
                     const x = padding + i * stepX;
-                    const y = (h - padding) - (val / 100) * (h - 2*padding);
+                    const y = (h - bottomPadding) - (val / 100) * (h - padding - bottomPadding);
                     ctx.lineTo(x, y);
                 });
-                ctx.lineTo(padding + (dataPoints.length - 1) * stepX, h - padding);
+                ctx.lineTo(padding + (dataPoints.length - 1) * stepX, h - bottomPadding);
                 ctx.fillStyle = colorFill;
                 ctx.fill();
 
@@ -1122,11 +1125,22 @@
                 ctx.lineWidth = 2;
                 dataPoints.forEach((val, i) => {
                     const x = padding + i * stepX;
-                    const y = (h - padding) - (val / 100) * (h - 2*padding);
+                    const y = (h - bottomPadding) - (val / 100) * (h - padding - bottomPadding);
                     if (i===0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 });
                 ctx.stroke();
+
+                // Draw X-axis labels (Day number)
+                ctx.fillStyle = '#666';
+                ctx.font = '10px var(--font-display)';
+                ctx.textAlign = 'center';
+                labels.forEach((day, i) => {
+                    if (i % 5 === 0 || i === labels.length - 1) {
+                        const x = padding + i * stepX;
+                        ctx.fillText(day, x, h - 10);
+                    }
+                });
             }
         }
 
