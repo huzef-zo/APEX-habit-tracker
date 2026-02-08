@@ -17,12 +17,12 @@
             --warning: #ffcc00;
             --border: 1px solid #333;
             
-            /* Heatmap Colors - GitHub style */
+            /* Heatmap Colors - APEX Cyan style */
             --heat-0: #161b22;
-            --heat-1: #0e4429;
-            --heat-2: #006d32;
-            --heat-3: #26a641;
-            --heat-4: #39d353;
+            --heat-1: #00383d;
+            --heat-2: #006b73;
+            --heat-3: #00a1ad;
+            --heat-4: #00f0ff;
             
             --font-display: 'Courier New', Courier, monospace;
             --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui;
@@ -1178,13 +1178,24 @@
                     if(h.completedDates.includes(dateStr)) completedCount++; 
                 });
                 
-                const hasCompletion = completedCount > 0 && completedCount === scheduledHabits.length;
-                const partial = completedCount > 0 && completedCount < scheduledHabits.length;
+                // Calculate heat level based on completed tasks
+                let heatLevel = 0;
+                if (completedCount > 0) {
+                    // Level 1: 1-2 tasks, Level 2: 3-4, Level 3: 5-6, Level 4: 7+
+                    heatLevel = Math.min(4, Math.ceil(completedCount / 2));
+                }
 
                 const div = document.createElement('div');
                 div.className = `cal-day ${isToday ? 'today' : ''}`;
-                if (hasCompletion) div.classList.add('completed');
-                if (partial) div.style.backgroundColor = 'rgba(0, 240, 255, 0.3)';
+                div.style.backgroundColor = `var(--heat-${heatLevel})`;
+
+                // Adjust text color for better contrast on brighter colors
+                if (heatLevel >= 3) {
+                    div.style.color = '#000';
+                } else if (heatLevel > 0) {
+                    div.style.color = '#fff';
+                }
+
                 div.textContent = dayNum;
                 grid.appendChild(div);
             }
