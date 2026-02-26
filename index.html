@@ -1221,7 +1221,17 @@
             }
         };
         
-        let State = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+        let State;
+        try {
+            State = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+        } catch (e) {
+            State = defaultState;
+        }
+        // Robust state merging
+        State.user = { ...defaultState.user, ...State.user };
+        State.user.stats = { ...defaultState.user.stats, ...State.user.stats };
+        State.timerStats = { ...defaultState.timerStats, ...State.timerStats };
+        if (!Array.isArray(State.habits)) State.habits = [];
 
         function saveState() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(State)); 
@@ -1261,10 +1271,10 @@
                 const dateStr = getLocalDateString(d);
                 labels.push(d.getDate());
                 const dayIdx = d.getDay();
-                const scheduled = State.habits.filter(h => h.days.includes(dayIdx)).length;
+                const scheduled = State.habits.filter(h => (h.days || []).map(Number).includes(dayIdx)).length;
                 if (scheduled === 0) { dataPoints.push(0); continue; }
                 let completed = 0;
-                State.habits.forEach(h => { if (h.days.includes(dayIdx) && h.completedDates.includes(dateStr)) completed++; });
+                State.habits.forEach(h => { if ((h.days || []).map(Number).includes(dayIdx) && h.completedDates.includes(dateStr)) completed++; });
                 dataPoints.push((completed / scheduled) * 100);
             }
 
@@ -1330,7 +1340,7 @@
                 d.setDate(d.getDate() - i);
                 const dateStr = getLocalDateString(d);
                 const dayIdx = d.getDay();
-                const habits = State.habits.filter(h => h.days.includes(dayIdx));
+                const habits = State.habits.filter(h => (h.days || []).map(Number).includes(dayIdx));
                 totalPossible += habits.length;
                 habits.forEach(h => { if(h.completedDates.includes(dateStr)) totalDone++; });
             }
@@ -1364,7 +1374,7 @@
                 const isToday = dateStr === todayStr;
                 const dayIdx = d.getDay();
 
-                const scheduledHabits = State.habits.filter(h => h.days.includes(dayIdx));
+                const scheduledHabits = State.habits.filter(h => (h.days || []).map(Number).includes(dayIdx));
                 let completedCount = 0;
                 scheduledHabits.forEach(h => { 
                     if(h.completedDates.includes(dateStr)) completedCount++; 
@@ -1444,7 +1454,7 @@
                     const yesterdayStr = getLocalDateString(yesterday);
                     const yesterdayIdx = yesterday.getDay();
 
-                    const habitsDueYesterday = State.habits.filter(h => h.days.includes(yesterdayIdx));
+                    const habitsDueYesterday = State.habits.filter(h => (h.days || []).map(Number).includes(yesterdayIdx));
                     const missedHabits = habitsDueYesterday.filter(h => !h.completedDates.includes(yesterdayStr));
 
                     if (missedHabits.length > 0) {
@@ -1763,7 +1773,7 @@
                 document.getElementById('xp-bar').style.width = `${(State.user.xp / State.user.xpToNext) * 100}%`;
                 
                 // Calculate stats
-                const best = State.habits.reduce((max, h) => Math.max(max, h.bestStreak), 0);
+                const best = (State.habits || []).reduce((max, h) => Math.max(max, h.bestStreak || 0), 0);
                 document.getElementById('best-streak').innerText = best;
                 document.getElementById('total-quests').innerText = State.user.totalCompleted;
                 
@@ -1781,9 +1791,9 @@
                 let currentStreakTotal = 0;
                 let hasHabitsToday = false;
                 
-                State.habits.forEach(h => {
-                    const isTodayActive = h.days.map(Number).includes(todayIndex);
-                    const isDone = h.completedDates.includes(todayStr);
+                (State.habits || []).forEach(h => {
+                    const isTodayActive = Array.isArray(h.days) && h.days.map(Number).includes(todayIndex);
+                    const isDone = Array.isArray(h.completedDates) && h.completedDates.includes(todayStr);
                     const xpValue = this.getHabitXP(h);
                     
                     if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h.streak);
@@ -1811,11 +1821,11 @@
                             <div class="habit-left">
                                 <div class="check-btn" onclick="App.toggleHabit(${h.id})"></div>
                                 <div>
-                                    <div class="habit-title">${h.title}</div>
+                                    <div class="habit-title">${h.title || 'Untitled Quest'}</div>
                                     <div class="habit-meta">
-                                        <span class="difficulty-badge difficulty-${h.diff}">${h.diff.toUpperCase()}</span>
-                                        <span style="color: var(--primary); font-weight: bold;">[${h.stat.toUpperCase()}]</span>
-                                        <span>🔥 ${h.streak}</span>
+                                        <span class="difficulty-badge difficulty-${h.diff || 'easy'}">${(h.diff || 'EASY').toUpperCase()}</span>
+                                        <span style="color: var(--primary); font-weight: bold;">[${(h.stat || 'STR').toUpperCase()}]</span>
+                                        <span>🔥 ${h.streak || 0}</span>
                                         <span>⭐ ${xpValue} XP</span>
                                     </div>
                                 </div>
