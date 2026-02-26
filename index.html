@@ -781,9 +781,74 @@
                 display: none; 
             } 
         }
+
+        /* --- SOLO LEVELING STYLE ENHANCEMENTS --- */
+        .system-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(5, 5, 5, 0.9);
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            padding: 1.5rem;
+            border-radius: 8px;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+        }
+        .system-notification.active {
+            transform: translateX(0);
+        }
+        .system-notification-header {
+            color: var(--primary);
+            font-family: var(--font-display);
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+            padding-bottom: 5px;
+        }
+        .system-notification-body {
+            color: #fff;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.3;
+        }
+
+        .holographic-glow {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
+        }
+
+        .stat-up-btn:hover {
+            background: var(--primary) !important;
+            color: #000 !important;
+            box-shadow: 0 0 15px var(--primary);
+        }
     </style>
 </head>
 <body>
+    <div class="scanlines"></div>
+
+    <!-- System Notification -->
+    <div id="system-notification" class="system-notification">
+        <div class="system-notification-header" id="sys-notif-title">System Message</div>
+        <div class="system-notification-body" id="sys-notif-body">Message body text.</div>
+    </div>
+
     <!-- Intro Animation -->
     <div id="intro-overlay">
         <div class="logo-anim">APEX</div>
@@ -801,6 +866,15 @@
                 <option value="easy">Easy (+10 XP)</option>
                 <option value="medium" selected>Medium (+25 XP)</option>
                 <option value="hard">Hard (+50 XP)</option>
+            </select>
+
+            <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Stat Category</label>
+            <select id="habit-stat-cat" class="input-field">
+                <option value="str">Strength (Physical)</option>
+                <option value="int">Intelligence (Learning)</option>
+                <option value="agi">Agility (Speed/Consistency)</option>
+                <option value="vit">Vitality (Health/Endurance)</option>
+                <option value="sns">Sense (Focus/Awareness)</option>
             </select>
             
             <label style="font-size: 0.8rem; color: #666; margin-bottom: 10px; display: block;">Repeat On:</label>
@@ -846,6 +920,7 @@
             <button class="nav-btn active" onclick="App.navigate('dashboard')">🏰 Dashboard</button>
             <button class="nav-btn" onclick="App.navigate('timer')">⏳ Time Chamber</button>
             <button class="nav-btn" onclick="App.navigate('history')">📜 Chronicles</button>
+            <button class="nav-btn" onclick="App.navigate('status')">👤 Status</button>
             
             
             <div class="sidebar-section-title">Active Quests</div>
@@ -970,6 +1045,83 @@
                        </div> 
                       </div>
                 </section>
+
+                <!-- STATUS VIEW -->
+                <section id="status" class="view-section">
+                    <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 2rem; text-align: center;">
+                        👤 PLAYER STATUS
+                    </h2>
+
+                    <div style="background: var(--panel-bg); border: var(--border); border-radius: 12px; padding: 2rem; max-width: 500px; margin: 0 auto;">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <div style="font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;">Current Rank</div>
+                            <div id="status-rank" style="font-size: 4rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);">E</div>
+                            <div id="status-level" style="font-family: var(--font-display); color: var(--text-main);">LEVEL 1</div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 10px; border-bottom: 1px solid #222;">
+                                <span style="font-family: var(--font-display); color: var(--text-dim);">Available Points</span>
+                                <span id="status-points" style="color: var(--warning); font-weight: bold; font-size: 1.2rem;">0</span>
+                            </div>
+
+                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                                <div>
+                                    <div style="font-weight: bold; letter-spacing: 1px;">STRENGTH</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Physical Quest XP</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span id="stat-str" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
+                                    <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                </div>
+                            </div>
+
+                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                                <div>
+                                    <div style="font-weight: bold; letter-spacing: 1px;">INTELLIGENCE</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Learning Quest XP</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span id="stat-int" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
+                                    <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                </div>
+                            </div>
+
+                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                                <div>
+                                    <div style="font-weight: bold; letter-spacing: 1px;">AGILITY</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Streak Bonuses</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span id="stat-agi" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
+                                    <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                </div>
+                            </div>
+
+                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                                <div>
+                                    <div style="font-weight: bold; letter-spacing: 1px;">VITALITY</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Reduces Missed Quest Penalty</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span id="stat-vit" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
+                                    <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                </div>
+                            </div>
+
+                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                                <div>
+                                    <div style="font-weight: bold; letter-spacing: 1px;">SENSE</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Time Chamber XP</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span id="stat-sns" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
+                                    <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
                 
             </div>
         </main>
@@ -1032,7 +1184,10 @@
                 totalCompleted: 0,
                 totalXp: 0,
                 dailyCompletions: 0,
-                sleepBonusAvailable: true
+                sleepBonusAvailable: true,
+                stats: { str: 10, int: 10, agi: 10, vit: 10, sns: 10, points: 0 },
+                rank: 'E',
+                lastCheckInDate: getLocalDateString()
             },
             habits: [],
             activityLog: {},
@@ -1219,6 +1374,75 @@
         const App = {
             tempDays: [],
 
+            showSystemMessage(title, message) {
+                const notif = document.getElementById('system-notification');
+                const titleEl = document.getElementById('sys-notif-title');
+                const bodyEl = document.getElementById('sys-notif-body');
+
+                titleEl.innerText = title;
+                bodyEl.innerText = message;
+
+                notif.classList.add('active');
+                AudioSys.play('complete');
+
+                setTimeout(() => {
+                    notif.classList.remove('active');
+                }, 5000);
+            },
+
+            updateRank() {
+                const lvl = State.user.level;
+                if (lvl >= 51) State.user.rank = 'S';
+                else if (lvl >= 41) State.user.rank = 'A';
+                else if (lvl >= 31) State.user.rank = 'B';
+                else if (lvl >= 21) State.user.rank = 'C';
+                else if (lvl >= 11) State.user.rank = 'D';
+                else State.user.rank = 'E';
+            },
+
+            allocateStat(stat) {
+                if (State.user.stats.points > 0) {
+                    State.user.stats[stat]++;
+                    State.user.stats.points--;
+                    AudioSys.play('click');
+                    saveState();
+                } else {
+                    this.showSystemMessage('INSUFFICIENT POINTS', "You have no available stat points to allocate.");
+                }
+            },
+
+            checkDailyPenalty() {
+                const todayStr = getLocalDateString();
+                const lastCheck = State.user.lastCheckInDate || todayStr;
+
+                if (lastCheck !== todayStr) {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const yesterdayStr = getLocalDateString(yesterday);
+                    const yesterdayIdx = yesterday.getDay();
+
+                    const habitsDueYesterday = State.habits.filter(h => h.days.includes(yesterdayIdx));
+                    const missedHabits = habitsDueYesterday.filter(h => !h.completedDates.includes(yesterdayStr));
+
+                    if (missedHabits.length > 0) {
+                        const penaltyPercent = 0.05 * missedHabits.length;
+                        let penalty = Math.floor(State.user.xp * Math.min(0.25, penaltyPercent));
+
+                        // VIT bonus reduces penalty
+                        const vitBonus = Math.min(0.5, (State.user.stats.vit - 10) * 0.05);
+                        penalty = Math.floor(penalty * (1 - vitBonus));
+
+                        if (penalty > 0) {
+                            State.user.xp = Math.max(0, State.user.xp - penalty);
+                            this.showSystemMessage('PENALTY ZONE', `You missed ${missedHabits.length} quests yesterday. Lost ${penalty} XP.`);
+                        }
+                    }
+
+                    State.user.lastCheckInDate = todayStr;
+                    saveState();
+                }
+            },
+
             init() {
                 // Initialize audio system
                 AudioSys.init();
@@ -1238,6 +1462,8 @@
                 this.updateDate();
                 setInterval(() => this.updateDate(), 60000);
                 
+                this.checkDailyPenalty();
+
                 // Set up day selector
                 document.querySelectorAll('.day-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -1280,14 +1506,31 @@
             },
 
 
-            getHabitXP(diff) {
+            getHabitXP(habit) {
+                const diff = typeof habit === 'string' ? habit : habit.diff;
                 const xpMap = {
                     'easy': 10,
                     'medium': 25,
                     'hard': 50
                 };
                 
-                return xpMap[diff] || 10;
+                let xp = xpMap[diff] || 10;
+
+                // Apply stat bonuses if it's a habit object
+                if (typeof habit === 'object' && habit.stat) {
+                    const statVal = State.user.stats[habit.stat] || 10;
+                    // 2% bonus per point above 10
+                    const multiplier = 1 + (statVal - 10) * 0.02;
+                    xp = Math.floor(xp * multiplier);
+
+                    // AGI bonus for streaks
+                    if (habit.streak > 1) {
+                        const agiBonus = (State.user.stats.agi - 10) * 0.01;
+                        xp = Math.floor(xp * (1 + agiBonus));
+                    }
+                }
+
+                return xp;
             },
 
 
@@ -1320,6 +1563,8 @@
                 const name = document.getElementById('habit-name').value.trim();
                 const diffSelect = document.getElementById('habit-diff');
                 const diff = diffSelect.options[diffSelect.selectedIndex].value;
+                const statSelect = document.getElementById('habit-stat-cat');
+                const stat = statSelect.options[statSelect.selectedIndex].value;
                 
                 if (!name) {
                     alert("Quest name required!");
@@ -1335,6 +1580,7 @@
                     id: Date.now(),
                     title: name,
                     diff: diff,
+                    stat: stat,
                     days: [...this.tempDays].sort(),
                     completedDates: [],
                     streak: 0,
@@ -1365,7 +1611,7 @@
                     // Undo completion
                     habit.completedDates = habit.completedDates.filter(d => d !== todayStr);
                     this.recalcStreak(habit);
-                    const xp = this.getHabitXP(habit.diff);
+                    const xp = this.getHabitXP(habit);
                     State.user.xp = Math.max(0, State.user.xp - xp);
                     State.user.totalCompleted = Math.max(0, State.user.totalCompleted - 1);
                     State.user.totalXp = Math.max(0, State.user.totalXp - xp);
@@ -1384,13 +1630,14 @@
                     // Complete habit
                     habit.completedDates.push(todayStr);
                     this.recalcStreak(habit);
-                    const xp = this.getHabitXP(habit.diff);
+                    const xp = this.getHabitXP(habit);
                     State.user.xp += xp;
                     State.user.totalCompleted++;
                     State.user.totalXp += xp;
                     State.user.dailyCompletions++;
                     
                     AudioSys.play('click');
+                    this.showSystemMessage('QUEST COMPLETE', `You earned ${xp} XP and improved your ${habit.stat.toUpperCase()}!`);
                     this.checkLevelUp();
                     
                     // Update activity log
@@ -1440,6 +1687,8 @@
                     State.user.level++;
                     State.user.xp -= State.user.xpToNext;
                     State.user.xpToNext = Math.floor(State.user.xpToNext * 1.5);
+                    State.user.stats.points += 5;
+                    this.updateRank();
                     
                     document.getElementById('level-msg').innerText = `You have reached Level ${State.user.level}`;
                     document.getElementById('level-modal').classList.add('open');
@@ -1463,6 +1712,10 @@
                     setTimeout(() => {
                         this.renderHistory(); // Render history when navigated to
                     }, 100);
+                }
+                if(viewId === 'status') {
+                    navs[3].classList.add('active');
+                    this.render();
                 }
                 
                 document.getElementById('sidebar').classList.remove('open');
@@ -1496,7 +1749,7 @@
                 State.habits.forEach(h => {
                     const isTodayActive = h.days.includes(todayIndex);
                     const isDone = h.completedDates.includes(todayStr);
-                    const xpValue = this.getHabitXP(h.diff);
+                    const xpValue = this.getHabitXP(h);
                     
                     if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h.streak);
                     
@@ -1526,6 +1779,7 @@
                                     <div class="habit-title">${h.title}</div>
                                     <div class="habit-meta">
                                         <span class="difficulty-badge difficulty-${h.diff}">${h.diff.toUpperCase()}</span>
+                                        <span style="color: var(--primary); font-weight: bold;">[${h.stat.toUpperCase()}]</span>
                                         <span>🔥 ${h.streak}</span>
                                         <span>⭐ ${xpValue} XP</span>
                                     </div>
@@ -1539,6 +1793,24 @@
                 
                 document.getElementById('curr-streak').innerText = currentStreakTotal;
                 
+                // Update status view elements if they exist
+                if (document.getElementById('status-rank')) {
+                    document.getElementById('status-rank').innerText = State.user.rank;
+                    document.getElementById('status-level').innerText = 'LEVEL ' + State.user.level;
+                    document.getElementById('status-points').innerText = State.user.stats.points;
+                    document.getElementById('stat-str').innerText = State.user.stats.str;
+                    document.getElementById('stat-int').innerText = State.user.stats.int;
+                    document.getElementById('stat-agi').innerText = State.user.stats.agi;
+                    document.getElementById('stat-vit').innerText = State.user.stats.vit;
+                    document.getElementById('stat-sns').innerText = State.user.stats.sns;
+
+                    // Show/hide allocation buttons based on points
+                    const buttons = document.querySelectorAll('.stat-up-btn');
+                    buttons.forEach(btn => {
+                        btn.style.display = State.user.stats.points > 0 ? 'block' : 'none';
+                    });
+                }
+
                 if(!hasHabitsToday && listContainer) {
                     listContainer.innerHTML = `
                         <div style="text-align:center; color:#333; padding:2rem;">
