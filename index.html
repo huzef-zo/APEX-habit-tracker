@@ -1221,7 +1221,32 @@
             }
         };
         
-        let State = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+        function deepMerge(target, source) {
+            if (!source) return target;
+            for (const key in source) {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                    if (!target[key]) target[key] = {};
+                    deepMerge(target[key], source[key]);
+                } else {
+                    target[key] = source[key];
+                }
+            }
+            return target;
+        }
+
+        let State;
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                State = deepMerge(JSON.parse(JSON.stringify(defaultState)), parsed);
+            } else {
+                State = defaultState;
+            }
+        } catch (e) {
+            console.error("State corrupted, resetting to default.", e);
+            State = defaultState;
+        }
 
         function saveState() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(State)); 
@@ -1434,6 +1459,24 @@
                 }
             },
 
+            migrateHabits() {
+                if (!Array.isArray(State.habits)) {
+                    State.habits = [];
+                    return;
+                }
+                State.habits.forEach(h => {
+                    if (h.days === undefined || h.days === null) h.days = [];
+                    if (!Array.isArray(h.days)) h.days = [h.days];
+                    if (!Array.isArray(h.completedDates)) h.completedDates = [];
+                    if (typeof h.streak !== 'number') h.streak = 0;
+                    if (typeof h.bestStreak !== 'number') h.bestStreak = 0;
+                    if (!h.diff) h.diff = 'medium';
+                    if (!h.stat) h.stat = 'str';
+                    if (!h.title) h.title = 'Unknown Quest';
+                });
+                saveState();
+            },
+
             checkDailyPenalty() {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -1494,11 +1537,17 @@
                         }, 800);
                     }
                 }, 2500);
+
+                // Run data migration
+                this.migrateHabits();
                 
                 this.updateDate();
                 setInterval(() => this.updateDate(), 60000);
                 
                 this.checkDailyPenalty();
+
+                // Ensure initial render
+                this.render();
 
                 // Set up day selector
                 document.querySelectorAll('.day-btn').forEach(btn => {
@@ -1512,8 +1561,6 @@
                         }
                     });
                 });
-                
-                this.render();
                 
                 // Initialize Timer
                 Timer.init();
@@ -1828,18 +1875,27 @@
                 let hasHabitsToday = false;
                 
                 State.habits.forEach(h => {
-                    const isTodayActive = h.days.map(Number).includes(todayIndex);
-                    const isDone = h.completedDates.includes(todayStr);
+                    // Defensive checks for habit properties (backwards compatibility)
+                    const h_title = h.title || 'Unknown Quest';
+                    const h_days = Array.isArray(h.days) ? h.days.map(Number) :
+                                   (typeof h.days === 'number' ? [h.days] : []);
+                    const h_comp = Array.isArray(h.completedDates) ? h.completedDates : [];
+                    const h_diff = h.diff || 'medium';
+                    const h_stat = h.stat || 'str';
+                    const h_streak = typeof h.streak === 'number' ? h.streak : 0;
+
+                    const isTodayActive = h_days.includes(todayIndex);
+                    const isDone = h_comp.includes(todayStr);
                     const xpValue = this.getHabitXP(h);
                     
-                    if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h.streak);
+                    if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h_streak);
                     
                     // Sidebar: Show all habits
                     if (sidebarList) {
                         const sbItem = document.createElement('div');
                         sbItem.className = 'sidebar-habit-item';
                         sbItem.innerHTML = `
-                            <span>${h.title}</span>
+                            <span>${h_title}</span>
                             <span style="color: ${isTodayActive ? 'var(--primary)' : 'var(--text-dim)'}; font-size: 0.8rem;">
                                 ${isTodayActive ? 'Active' : 'Inactive'}
                             </span>
@@ -1857,11 +1913,11 @@
                             <div class="habit-left">
                                 <div class="check-btn" onclick="App.toggleHabit(${h.id})"></div>
                                 <div>
-                                    <div class="habit-title">${h.title}</div>
+                                    <div class="habit-title">${h_title}</div>
                                     <div class="habit-meta">
-                                        <span class="difficulty-badge difficulty-${h.diff}">${h.diff.toUpperCase()}</span>
-                                        <span style="color: var(--primary); font-weight: bold;">[${h.stat.toUpperCase()}]</span>
-                                        <span>🔥 ${h.streak}</span>
+                                        <span class="difficulty-badge difficulty-${h_diff}">${h_diff.toUpperCase()}</span>
+                                        <span style="color: var(--primary); font-weight: bold;">[${h_stat.toUpperCase()}]</span>
+                                        <span>🔥 ${h_streak}</span>
                                         <span>⭐ ${xpValue} XP</span>
                                     </div>
                                 </div>
