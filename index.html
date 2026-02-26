@@ -1435,35 +1435,48 @@
             },
 
             checkDailyPenalty() {
-                const todayStr = getLocalDateString();
-                const lastCheck = State.user.lastCheckInDate || todayStr;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayStr = getLocalDateString(today);
 
-                if (lastCheck !== todayStr) {
-                    const yesterday = new Date();
-                    yesterday.setDate(yesterday.getDate() - 1);
-                    const yesterdayStr = getLocalDateString(yesterday);
-                    const yesterdayIdx = yesterday.getDay();
+                let lastCheckStr = State.user.lastCheckInDate || todayStr;
+                if (lastCheckStr === todayStr) return;
 
-                    const habitsDueYesterday = State.habits.filter(h => h.days.includes(yesterdayIdx));
-                    const missedHabits = habitsDueYesterday.filter(h => !h.completedDates.includes(yesterdayStr));
+                let checkDate = new Date(lastCheckStr + 'T00:00:00');
+                let totalMissedQuests = 0;
+                let totalPenalty = 0;
 
-                    if (missedHabits.length > 0) {
-                        const penaltyPercent = 0.05 * missedHabits.length;
-                        let penalty = Math.floor(State.user.xp * Math.min(0.25, penaltyPercent));
+                while (getLocalDateString(checkDate) !== todayStr) {
+                    const dateStr = getLocalDateString(checkDate);
+                    const dayIdx = checkDate.getDay();
 
-                        // VIT bonus reduces penalty
+                    const habitsDue = State.habits.filter(h => h.days.map(Number).includes(dayIdx));
+                    const missed = habitsDue.filter(h => !h.completedDates.includes(dateStr));
+
+                    if (missed.length > 0) {
+                        totalMissedQuests += missed.length;
+                        const penaltyPercent = 0.05 * missed.length;
+                        let dailyPenalty = Math.floor(State.user.xp * Math.min(0.25, penaltyPercent));
+
                         const vitBonus = Math.min(0.5, (State.user.stats.vit - 10) * 0.05);
-                        penalty = Math.floor(penalty * (1 - vitBonus));
+                        dailyPenalty = Math.floor(dailyPenalty * (1 - vitBonus));
 
-                        if (penalty > 0) {
-                            State.user.xp = Math.max(0, State.user.xp - penalty);
-                            this.showSystemMessage('PENALTY ZONE', `You missed ${missedHabits.length} quests yesterday. Lost ${penalty} XP.`);
+                        if (dailyPenalty > 0) {
+                            totalPenalty += dailyPenalty;
+                            State.user.xp = Math.max(0, State.user.xp - dailyPenalty);
                         }
                     }
 
-                    State.user.lastCheckInDate = todayStr;
-                    saveState();
+                    checkDate.setDate(checkDate.getDate() + 1);
+                    if (checkDate > today) break;
                 }
+
+                if (totalPenalty > 0) {
+                    this.showSystemMessage('PENALTY ZONE', `You missed ${totalMissedQuests} quests since your last visit. Lost ${totalPenalty} XP.`);
+                }
+
+                State.user.lastCheckInDate = todayStr;
+                saveState();
             },
 
             init() {
@@ -1694,23 +1707,56 @@
             },
 
             recalcStreak(habit) {
-                const dates = habit.completedDates.sort().reverse();
-                const todayStr = getLocalDateString();
-                const yesterdayStr = getYesterdayDateString();
-                let streak = 0;
-                
-                if (dates.length > 0 && (dates[0] === todayStr || dates[0] === yesterdayStr)) {
-                    streak = 1;
-                    for(let i = 0; i < dates.length - 1; i++) {
-                        const d1 = new Date(dates[i] + 'T00:00:00');
-                        const d2 = new Date(dates[i + 1] + 'T00:00:00');
-                        const diff = (d1 - d2) / (1000 * 60 * 60 * 24);
-                        if (diff === 1) streak++;
-                        else break;
-                    }
+                const completedSet = new Set(habit.completedDates);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const sortedDates = habit.completedDates.slice().sort().reverse();
+                if (sortedDates.length === 0) {
+                    habit.streak = 0;
+                    return;
                 }
-                habit.streak = streak;
-                if (streak > habit.bestStreak) habit.bestStreak = streak;
+                
+                const lastCompletedStr = sortedDates[0];
+                const lastCompletedDate = new Date(lastCompletedStr + 'T00:00:00');
+
+                let tempDate = new Date(lastCompletedDate);
+                tempDate.setDate(tempDate.getDate() + 1);
+                let broken = false;
+                while (tempDate < today) {
+                    if (habit.days.map(Number).includes(tempDate.getDay())) {
+                        broken = true;
+                        break;
+                    }
+                    tempDate.setDate(tempDate.getDate() + 1);
+                }
+
+                if (broken) {
+                    habit.streak = 0;
+                } else {
+                    let streak = 1;
+                    let curr = new Date(lastCompletedDate);
+                    curr.setDate(curr.getDate() - 1);
+
+                    while (true) {
+                        const dStr = getLocalDateString(curr);
+                        const dayIdx = curr.getDay();
+                        const isScheduled = habit.days.map(Number).includes(dayIdx);
+
+                        if (isScheduled) {
+                            if (completedSet.has(dStr)) {
+                                streak++;
+                            } else {
+                                break;
+                            }
+                        }
+                        curr.setDate(curr.getDate() - 1);
+                        if (streak > 1000) break;
+                        if (habit.createdAt && curr < new Date(habit.createdAt)) break;
+                    }
+                    habit.streak = streak;
+                    if (streak > habit.bestStreak) habit.bestStreak = streak;
+                }
             },
 
             checkLevelUp() {
@@ -1865,6 +1911,7 @@
             stopwatchTime: 0,
             stopwatchStartTime: 0,
             pomodoroTime: 25 * 60,
+            initialTime: 25 * 60,
             pomodoroState: 'FOCUS',
             pomodoroCycle: 1,
             totalCycles: 4,
@@ -1914,12 +1961,12 @@
                 if (timerProgress) timerProgress.style.stroke = 'var(--primary)';
                 
                 if (this.mode === 'pomodoro') {
-                    const startTime = Date.now() - ((25 * 60 - this.pomodoroTime) * 1000);
+                    const startTime = Date.now() - ((this.initialTime - this.pomodoroTime) * 1000);
                     
                     this.interval = setInterval(() => {
                         const currentTime = Date.now();
                         const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-                        this.pomodoroTime = Math.max(0, (25 * 60) - elapsedSeconds);
+                        this.pomodoroTime = Math.max(0, this.initialTime - elapsedSeconds);
                         
                         if (this.pomodoroTime <= 0) {
                             this.pomodoroComplete();
@@ -1962,6 +2009,7 @@
                 if (this.mode === 'pomodoro') {
                     this.pomodoroState = 'FOCUS';
                     this.pomodoroTime = 25 * 60;
+                    this.initialTime = 25 * 60;
                     this.pomodoroCycle = 1;
                     const timerStatus = document.getElementById('timer-status');
                     if (timerStatus) timerStatus.innerText = 'FOCUS';
@@ -2020,6 +2068,7 @@
                     if (timerStatus) timerStatus.innerText = 'FOCUS';
                 }
                 
+                this.initialTime = this.pomodoroTime;
                 const timerCycle = document.getElementById('timer-cycle');
                 if (timerCycle) timerCycle.innerText = `Cycle: ${this.pomodoroCycle}/${this.totalCycles}`;
                 saveState();
@@ -2083,8 +2132,7 @@
                     timerText.innerText = 
                         `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                     
-                    const totalTime = 25 * 60;
-                    const progress = ((totalTime - this.pomodoroTime) / totalTime) * this.circumference;
+                    const progress = ((this.initialTime - this.pomodoroTime) / this.initialTime) * this.circumference;
                     timerProgress.style.strokeDashoffset = this.circumference - progress;
                     
                 } else {
