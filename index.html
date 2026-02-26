@@ -1444,7 +1444,7 @@
                     const yesterdayStr = getLocalDateString(yesterday);
                     const yesterdayIdx = yesterday.getDay();
 
-                    const habitsDueYesterday = State.habits.filter(h => h.days.includes(yesterdayIdx));
+                    const habitsDueYesterday = State.habits.filter(h => (h.days || []).map(d => parseInt(d)).includes(yesterdayIdx));
                     const missedHabits = habitsDueYesterday.filter(h => !h.completedDates.includes(yesterdayStr));
 
                     if (missedHabits.length > 0) {
@@ -1478,6 +1478,8 @@
                         setTimeout(() => {
                             intro.style.display = 'none';
                             document.getElementById('app-container').classList.add('visible');
+                            // Refresh render once visible
+                            this.render();
                         }, 800);
                     }
                 }, 2500);
@@ -1633,7 +1635,8 @@
                 const todayStr = getLocalDateString();
                 
                 // Check if habit is active today
-                if(!habit.days.includes(todayIndex)) {
+                const hDays = habit.days || [];
+                if(!hDays.map(d => parseInt(d)).includes(todayIndex)) {
                     alert("This quest is not active today!");
                     return;
                 }
@@ -1757,17 +1760,26 @@
             },
 
             render() {
-                // Update level and XP
-                document.getElementById('header-level').innerText = 'LVL ' + State.user.level;
-                document.getElementById('xp-text').innerText = `${State.user.xp} / ${State.user.xpToNext} XP`;
-                document.getElementById('xp-bar').style.width = `${(State.user.xp / State.user.xpToNext) * 100}%`;
+                if (!State || !State.user) return;
+
+                // Safely update level and XP
+                const headerLevel = document.getElementById('header-level');
+                if (headerLevel) headerLevel.innerText = 'LVL ' + (State.user.level || 1);
+                
+                const xpText = document.getElementById('xp-text');
+                if (xpText) xpText.innerText = `${State.user.xp || 0} / ${State.user.xpToNext || 100} XP`;
+
+                const xpBar = document.getElementById('xp-bar');
+                if (xpBar) xpBar.style.width = `${((State.user.xp || 0) / (State.user.xpToNext || 100)) * 100}%`;
                 
                 // Calculate stats
-                const best = State.habits.reduce((max, h) => Math.max(max, h.bestStreak), 0);
-                document.getElementById('best-streak').innerText = best;
-                document.getElementById('total-quests').innerText = State.user.totalCompleted;
+                const habits = State.habits || [];
+                const best = habits.reduce((max, h) => Math.max(max, (h && h.bestStreak) || 0), 0);
+                const bestStreakEl = document.getElementById('best-streak');
+                if (bestStreakEl) bestStreakEl.innerText = best;
                 
-                
+                const totalQuestsEl = document.getElementById('total-quests');
+                if (totalQuestsEl) totalQuestsEl.innerText = State.user.totalCompleted || 0;
                 
                 // Render today's habits
                 const todayIndex = new Date().getDay();
@@ -1781,19 +1793,22 @@
                 let currentStreakTotal = 0;
                 let hasHabitsToday = false;
                 
-                State.habits.forEach(h => {
-                    const isTodayActive = h.days.includes(todayIndex);
-                    const isDone = h.completedDates.includes(todayStr);
+                habits.forEach(h => {
+                    if (!h) return;
+                    const hDays = h.days || [];
+                    const isTodayActive = hDays.includes(todayIndex) || hDays.includes(todayIndex.toString());
+                    const hCompletedDates = h.completedDates || [];
+                    const isDone = hCompletedDates.includes(todayStr);
                     const xpValue = this.getHabitXP(h);
                     
-                    if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h.streak);
+                    if(isDone) currentStreakTotal = Math.max(currentStreakTotal, h.streak || 0);
                     
                     // Sidebar: Show all habits
                     if (sidebarList) {
                         const sbItem = document.createElement('div');
                         sbItem.className = 'sidebar-habit-item';
                         sbItem.innerHTML = `
-                            <span>${h.title}</span>
+                            <span>${h.title || 'Untitled'}</span>
                             <span style="color: ${isTodayActive ? 'var(--primary)' : 'var(--text-dim)'}; font-size: 0.8rem;">
                                 ${isTodayActive ? 'Active' : 'Inactive'}
                             </span>
@@ -1807,15 +1822,17 @@
                         hasHabitsToday = true;
                         const card = document.createElement('div');
                         card.className = `habit-card ${isDone ? 'completed' : ''}`;
+                        const hDiff = h.diff || 'medium';
+                        const hStat = h.stat || 'str';
                         card.innerHTML = `
                             <div class="habit-left">
                                 <div class="check-btn" onclick="App.toggleHabit(${h.id})"></div>
                                 <div>
-                                    <div class="habit-title">${h.title}</div>
+                                    <div class="habit-title">${h.title || 'Untitled'}</div>
                                     <div class="habit-meta">
-                                        <span class="difficulty-badge difficulty-${h.diff}">${h.diff.toUpperCase()}</span>
-                                        <span style="color: var(--primary); font-weight: bold;">[${h.stat.toUpperCase()}]</span>
-                                        <span>🔥 ${h.streak}</span>
+                                        <span class="difficulty-badge difficulty-${hDiff}">${hDiff.toUpperCase()}</span>
+                                        <span style="color: var(--primary); font-weight: bold;">[${hStat.toUpperCase()}]</span>
+                                        <span>🔥 ${h.streak || 0}</span>
                                         <span>⭐ ${xpValue} XP</span>
                                     </div>
                                 </div>
@@ -1826,7 +1843,8 @@
                     }
                 });
                 
-                document.getElementById('curr-streak').innerText = currentStreakTotal;
+                const currStreakEl = document.getElementById('curr-streak');
+                if (currStreakEl) currStreakEl.innerText = currentStreakTotal;
                 
                 // Update status view elements if they exist
                 if (document.getElementById('status-rank')) {
