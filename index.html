@@ -773,7 +773,27 @@
                 min-width: 100px;
                 font-size: 0.9rem;
             }
-            
+
+        }
+
+        .sidebar-close-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 5px;
+        }
+
+        @media(max-width: 768px) {
+            .sidebar-close-btn {
+                display: block;
+            }
+        }
+        .sidebar-close-btn:hover {
+            color: var(--primary);
         }
         
         @media(min-width: 769px) { 
@@ -913,8 +933,11 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <span>APEX</span>
-                <span id="sidebar-date" class="sidebar-date">DATE</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>APEX</span>
+                    <span id="sidebar-date" class="sidebar-date">DATE</span>
+                </div>
+                <button class="sidebar-close-btn" onclick="toggleSidebar()">×</button>
             </div>
             
             <button class="nav-btn active" onclick="App.navigate('dashboard')">🏰 Dashboard</button>
@@ -1494,7 +1517,15 @@
                     day: 'numeric'
                 });
                 const dateEl = document.getElementById('sidebar-date');
-                if (dateEl) dateEl.innerText = dateStr;
+                if (dateEl) {
+                    if (dateEl.innerText !== dateStr && dateEl.innerText !== 'DATE') {
+                        // Day has changed, refresh dashboard
+                        dateEl.innerText = dateStr;
+                        this.render();
+                    } else {
+                        dateEl.innerText = dateStr;
+                    }
+                }
             },
 
 
@@ -1699,13 +1730,19 @@
             },
 
             navigate(viewId) {
+                document.getElementById('sidebar').classList.remove('open');
+
                 document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
                 const viewEl = document.getElementById(viewId);
                 if (viewEl) viewEl.classList.add('active');
                 
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 const navs = document.querySelectorAll('.nav-btn');
-                if(viewId === 'dashboard') navs[0].classList.add('active');
+
+                if(viewId === 'dashboard') {
+                    navs[0].classList.add('active');
+                    this.render();
+                }
                 if(viewId === 'timer') navs[1].classList.add('active');
                 if(viewId === 'history') { 
                     navs[2].classList.add('active'); 
@@ -1715,10 +1752,8 @@
                 }
                 if(viewId === 'status') {
                     navs[3].classList.add('active');
-                    this.render();
+                    setTimeout(() => this.render(), 0);
                 }
-                
-                document.getElementById('sidebar').classList.remove('open');
             },
 
             render() {
