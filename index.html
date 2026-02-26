@@ -1518,7 +1518,7 @@
                 });
                 const dateEl = document.getElementById('sidebar-date');
                 if (dateEl) {
-                    if (dateEl.innerText !== dateStr && dateEl.innerText !== 'DATE') {
+                    if (dateEl.innerText !== dateStr) {
                         // Day has changed, refresh dashboard
                         dateEl.innerText = dateStr;
                         this.render();
@@ -1612,7 +1612,7 @@
                     title: name,
                     diff: diff,
                     stat: stat,
-                    days: [...this.tempDays].sort(),
+                    days: [...this.tempDays].map(Number).sort(),
                     completedDates: [],
                     streak: 0,
                     bestStreak: 0,
@@ -1633,7 +1633,7 @@
                 const todayStr = getLocalDateString();
                 
                 // Check if habit is active today
-                if(!habit.days.includes(todayIndex)) {
+                if(!habit.days.map(Number).includes(todayIndex)) {
                     alert("This quest is not active today!");
                     return;
                 }
@@ -1782,7 +1782,7 @@
                 let hasHabitsToday = false;
                 
                 State.habits.forEach(h => {
-                    const isTodayActive = h.days.includes(todayIndex);
+                    const isTodayActive = h.days.map(Number).includes(todayIndex);
                     const isDone = h.completedDates.includes(todayStr);
                     const xpValue = this.getHabitXP(h);
                     
