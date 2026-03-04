@@ -1750,7 +1750,7 @@
                     habit.completedDates = habit.completedDates.filter(d => d !== todayStr);
                     this.recalcStreak(habit);
                     const xp = this.getHabitXP(habit);
-                    State.user.xp = Math.max(0, State.user.xp - xp);
+                    State.user.xp -= xp;
                     State.user.totalCompleted = Math.max(0, State.user.totalCompleted - 1);
                     State.user.totalXp = Math.max(0, State.user.totalXp - xp);
                     
@@ -1905,7 +1905,7 @@
                 // Update level and XP
                 document.getElementById('header-level').innerText = 'LVL ' + State.user.level;
                 document.getElementById('xp-text').innerText = `${State.user.xp} / ${State.user.xpToNext} XP`;
-                document.getElementById('xp-bar').style.width = `${(State.user.xp / State.user.xpToNext) * 100}%`;
+                document.getElementById('xp-bar').style.width = `${Math.max(0, (State.user.xp / State.user.xpToNext) * 100)}%`;
                 
                 // Calculate stats
                 const best = State.habits.reduce((max, h) => Math.max(max, h.bestStreak), 0);
