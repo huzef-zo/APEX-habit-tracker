@@ -901,11 +901,19 @@
             <select id="habit-type" class="input-field" onchange="App.toggleHabitType()">
                 <option value="repeating">Repeating Quest</option>
                 <option value="one-time">One-time Quest</option>
+                <option value="date-range">Date Range Quest</option>
             </select>
 
             <div id="target-date-container" style="display: none;">
                 <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Target Date</label>
                 <input type="date" id="habit-target-date" class="input-field">
+            </div>
+
+            <div id="date-range-container" style="display: none;">
+                <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Start Date</label>
+                <input type="date" id="habit-start-date" class="input-field">
+                <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">End Date</label>
+                <input type="date" id="habit-end-date" class="input-field">
             </div>
             
             <div id="repeating-days-container">
@@ -1298,8 +1306,7 @@
                 d.setDate(d.getDate() - i);
                 const dateStr = getLocalDateString(d);
                 labels.push(d.getDate());
-                const dayIdx = d.getDay();
-                const habitsScheduled = State.habits.filter(h => h.type === 'one-time' ? h.date === dateStr : h.days.includes(dayIdx));
+                    const habitsScheduled = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 const scheduled = habitsScheduled.length;
                 if (scheduled === 0) { dataPoints.push(0); continue; }
                 let completed = 0;
@@ -1368,8 +1375,7 @@
                 const d = new Date();
                 d.setDate(d.getDate() - i);
                 const dateStr = getLocalDateString(d);
-                const dayIdx = d.getDay();
-                const habits = State.habits.filter(h => h.type === 'one-time' ? h.date === dateStr : h.days.includes(dayIdx));
+                const habits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 totalPossible += habits.length;
                 habits.forEach(h => { if(h.completedDates.includes(dateStr)) totalDone++; });
             }
@@ -1401,9 +1407,8 @@
                 const dateStr = getLocalDateString(d); 
                 const dayNum = d.getDate();
                 const isToday = dateStr === todayStr;
-                const dayIdx = d.getDay();
 
-                const scheduledHabits = State.habits.filter(h => h.type === 'one-time' ? h.date === dateStr : h.days.includes(dayIdx));
+                const scheduledHabits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 let completedCount = 0;
                 scheduledHabits.forEach(h => { 
                     if(h.completedDates.includes(dateStr)) completedCount++; 
@@ -1506,14 +1511,8 @@
 
                 while (getLocalDateString(checkDate) !== todayStr) {
                     const dateStr = getLocalDateString(checkDate);
-                    const dayIdx = checkDate.getDay();
 
-                    const habitsDue = State.habits.filter(h => {
-                        if (h.type === 'one-time') {
-                            return h.date === dateStr;
-                        }
-                        return h.days.map(Number).includes(dayIdx);
-                    });
+                    const habitsDue = State.habits.filter(h => this.isHabitActiveOnDate(h, dateStr));
                     const missed = habitsDue.filter(h => !h.completedDates.includes(dateStr));
 
                     if (missed.length > 0) {
@@ -1644,18 +1643,37 @@
                 return xp;
             },
 
+            isHabitActiveOnDate(habit, dateStr) {
+                if (habit.type === 'one-time') {
+                    return habit.date === dateStr;
+                } else if (habit.type === 'date-range') {
+                    return dateStr >= habit.startDate && dateStr <= habit.endDate;
+                } else {
+                    // Default to repeating
+                    const date = new Date(dateStr + 'T00:00:00');
+                    const dayIdx = date.getDay();
+                    return habit.days.map(Number).includes(dayIdx);
+                }
+            },
 
             toggleHabitType() {
                 const type = document.getElementById('habit-type').value;
                 const targetDateContainer = document.getElementById('target-date-container');
                 const repeatingDaysContainer = document.getElementById('repeating-days-container');
+                const dateRangeContainer = document.getElementById('date-range-container');
 
                 if (type === 'one-time') {
                     targetDateContainer.style.display = 'block';
                     repeatingDaysContainer.style.display = 'none';
+                    dateRangeContainer.style.display = 'none';
+                } else if (type === 'date-range') {
+                    targetDateContainer.style.display = 'none';
+                    repeatingDaysContainer.style.display = 'none';
+                    dateRangeContainer.style.display = 'block';
                 } else {
                     targetDateContainer.style.display = 'none';
                     repeatingDaysContainer.style.display = 'block';
+                    dateRangeContainer.style.display = 'none';
                 }
             },
 
@@ -1666,6 +1684,8 @@
                 document.getElementById('habit-diff').selectedIndex = 1;
                 document.getElementById('habit-type').value = 'repeating';
                 document.getElementById('habit-target-date').value = getLocalDateString();
+                document.getElementById('habit-start-date').value = getLocalDateString();
+                document.getElementById('habit-end-date').value = getLocalDateString();
                 this.toggleHabitType();
                 document.getElementById('add-modal').classList.add('open');
             },
@@ -1695,6 +1715,8 @@
                 const stat = statSelect.options[statSelect.selectedIndex].value;
                 const type = document.getElementById('habit-type').value;
                 const targetDate = document.getElementById('habit-target-date').value;
+                const startDate = document.getElementById('habit-start-date').value;
+                const endDate = document.getElementById('habit-end-date').value;
                 
                 if (!name) {
                     alert("Quest name required!");
@@ -1711,6 +1733,17 @@
                     return;
                 }
 
+                if (type === 'date-range') {
+                    if (!startDate || !endDate) {
+                        alert("Select start and end dates!");
+                        return;
+                    }
+                    if (startDate > endDate) {
+                        alert("Start date cannot be after end date!");
+                        return;
+                    }
+                }
+
                 State.habits.push({
                     id: Date.now(),
                     title: name,
@@ -1718,6 +1751,8 @@
                     stat: stat,
                     type: type,
                     date: type === 'one-time' ? targetDate : null,
+                    startDate: type === 'date-range' ? startDate : null,
+                    endDate: type === 'date-range' ? endDate : null,
                     days: type === 'repeating' ? [...this.tempDays].map(Number).sort() : [],
                     completedDates: [],
                     streak: 0,
@@ -1734,12 +1769,10 @@
                 const habit = State.habits.find(h => h.id === id);
                 if(!habit) return;
                 
-                const today = new Date();
-                const todayIndex = today.getDay();
                 const todayStr = getLocalDateString();
                 
                 // Check if habit is active today
-                const isTodayActive = habit.type === 'one-time' ? (habit.date === todayStr) : habit.days.map(Number).includes(todayIndex);
+                const isTodayActive = this.isHabitActiveOnDate(habit, todayStr);
                 if(!isTodayActive) {
                     alert("This quest is not active today!");
                     return;
@@ -1823,7 +1856,8 @@
                 tempDate.setDate(tempDate.getDate() + 1);
                 let broken = false;
                 while (tempDate < today) {
-                    if (habit.days.map(Number).includes(tempDate.getDay())) {
+                    const dStr = getLocalDateString(tempDate);
+                    if (this.isHabitActiveOnDate(habit, dStr)) {
                         broken = true;
                         break;
                     }
@@ -1839,8 +1873,7 @@
 
                     while (true) {
                         const dStr = getLocalDateString(curr);
-                        const dayIdx = curr.getDay();
-                        const isScheduled = habit.days.map(Number).includes(dayIdx);
+                        const isScheduled = this.isHabitActiveOnDate(habit, dStr);
 
                         if (isScheduled) {
                             if (completedSet.has(dStr)) {
@@ -1929,15 +1962,13 @@
                 State.habits.forEach(h => {
                     // Defensive checks for habit properties (backwards compatibility)
                     const h_title = h.title || 'Unknown Quest';
-                    const h_days = Array.isArray(h.days) ? h.days.map(Number) :
-                                   (typeof h.days === 'number' ? [h.days] : []);
                     const h_comp = Array.isArray(h.completedDates) ? h.completedDates : [];
                     const h_diff = h.diff || 'medium';
                     const h_stat = h.stat || 'str';
                     const h_streak = typeof h.streak === 'number' ? h.streak : 0;
                     const h_type = h.type || 'repeating';
 
-                    const isTodayActive = h_type === 'one-time' ? (h.date === todayStr) : h_days.includes(todayIndex);
+                    const isTodayActive = this.isHabitActiveOnDate(h, todayStr);
                     const isDone = h_comp.includes(todayStr);
                     const xpValue = this.getHabitXP(h);
                     
