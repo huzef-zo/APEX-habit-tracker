@@ -164,6 +164,15 @@
         .sb-del:hover { 
             color: var(--danger); 
         }
+        .sb-edit {
+            color: #444;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-left: 10px;
+        }
+        .sb-edit:hover {
+            color: var(--primary);
+        }
 
         .stat-label {
             display: flex;
@@ -344,6 +353,18 @@
         }
         .delete-btn:hover { 
             color: var(--danger); 
+        }
+        .edit-btn {
+            background: none;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            transition: 0.2s;
+        }
+        .edit-btn:hover {
+            color: var(--primary);
         }
 
         .difficulty-badge {
@@ -878,7 +899,7 @@
     <!-- Add Habit Modal -->
     <div class="modal-overlay" id="add-modal">
         <div class="modal-box">
-            <h3 style="font-family: var(--font-display); margin-bottom: 1rem; color: var(--primary);">NEW QUEST</h3>
+            <h3 id="modal-title" style="font-family: var(--font-display); margin-bottom: 1rem; color: var(--primary);">NEW QUEST</h3>
             <input type="text" id="habit-name" class="input-field" placeholder="Quest Name..." autocomplete="off">
             
             <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Difficulty (XP)</label>
@@ -931,7 +952,7 @@
                 <button style="font-size: 0.8rem; color: var(--primary); background: none; border: none; cursor: pointer; text-decoration: underline; margin-bottom: 1rem; display: block;" onclick="App.toggleEveryday()">Select Every Day</button>
             </div>
             
-            <button class="btn-primary" onclick="App.saveHabit()">Initialize Quest</button>
+            <button id="modal-save-btn" class="btn-primary" onclick="App.saveHabit()">Initialize Quest</button>
             
             <button style="background: none; border: none; color: #666; width: 100%; margin-top: 1rem; cursor: pointer;" onclick="App.closeModal()">Cancel</button>
         </div>
@@ -1440,6 +1461,7 @@
         // --- APP LOGIC ---
         const App = {
             tempDays: [],
+            editingHabitId: null,
 
             showSystemMessage(title, message) {
                 const notif = document.getElementById('system-notification');
@@ -1677,15 +1699,48 @@
                 }
             },
 
-            openModal() {
+            openModal(id = null) {
                 this.tempDays = [];
                 document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
-                document.getElementById('habit-name').value = '';
-                document.getElementById('habit-diff').selectedIndex = 1;
-                document.getElementById('habit-type').value = 'repeating';
-                document.getElementById('habit-target-date').value = getLocalDateString();
-                document.getElementById('habit-start-date').value = getLocalDateString();
-                document.getElementById('habit-end-date').value = getLocalDateString();
+
+                if (id) {
+                    const habit = State.habits.find(h => h.id === id);
+                    if (!habit) return;
+                    this.editingHabitId = id;
+
+                    document.getElementById('habit-name').value = habit.title || '';
+                    document.getElementById('habit-diff').value = habit.diff || 'medium';
+                    document.getElementById('habit-stat-cat').value = habit.stat || 'str';
+                    document.getElementById('habit-type').value = habit.type || 'repeating';
+                    document.getElementById('habit-target-date').value = habit.date || getLocalDateString();
+                    document.getElementById('habit-start-date').value = habit.startDate || getLocalDateString();
+                    document.getElementById('habit-end-date').value = habit.endDate || getLocalDateString();
+
+                    if (habit.type === 'repeating' && habit.days) {
+                        this.tempDays = [...habit.days].map(Number);
+                        document.querySelectorAll('.day-btn').forEach(btn => {
+                            if (this.tempDays.includes(parseInt(btn.dataset.day))) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                    }
+
+                    document.getElementById('modal-title').innerText = "EDIT QUEST";
+                    document.getElementById('modal-save-btn').innerText = "Update Quest";
+                } else {
+                    this.editingHabitId = null;
+                    document.getElementById('habit-name').value = '';
+                    document.getElementById('habit-diff').selectedIndex = 1;
+                    document.getElementById('habit-stat-cat').selectedIndex = 0;
+                    document.getElementById('habit-type').value = 'repeating';
+                    document.getElementById('habit-target-date').value = getLocalDateString();
+                    document.getElementById('habit-start-date').value = getLocalDateString();
+                    document.getElementById('habit-end-date').value = getLocalDateString();
+
+                    document.getElementById('modal-title').innerText = "NEW QUEST";
+                    document.getElementById('modal-save-btn').innerText = "Initialize Quest";
+                }
+
                 this.toggleHabitType();
                 document.getElementById('add-modal').classList.add('open');
             },
@@ -1744,21 +1799,37 @@
                     }
                 }
 
-                State.habits.push({
-                    id: Date.now(),
-                    title: name,
-                    diff: diff,
-                    stat: stat,
-                    type: type,
-                    date: type === 'one-time' ? targetDate : null,
-                    startDate: type === 'date-range' ? startDate : null,
-                    endDate: type === 'date-range' ? endDate : null,
-                    days: type === 'repeating' ? [...this.tempDays].map(Number).sort() : [],
-                    completedDates: [],
-                    streak: 0,
-                    bestStreak: 0,
-                    createdAt: new Date().toISOString()
-                });
+                if (this.editingHabitId) {
+                    const habit = State.habits.find(h => h.id === this.editingHabitId);
+                    if (habit) {
+                        habit.title = name;
+                        habit.diff = diff;
+                        habit.stat = stat;
+                        habit.type = type;
+                        habit.date = type === 'one-time' ? targetDate : null;
+                        habit.startDate = type === 'date-range' ? startDate : null;
+                        habit.endDate = type === 'date-range' ? endDate : null;
+                        habit.days = type === 'repeating' ? [...this.tempDays].map(Number).sort() : [];
+                        this.recalcStreak(habit);
+                    }
+                    this.editingHabitId = null;
+                } else {
+                    State.habits.push({
+                        id: Date.now(),
+                        title: name,
+                        diff: diff,
+                        stat: stat,
+                        type: type,
+                        date: type === 'one-time' ? targetDate : null,
+                        startDate: type === 'date-range' ? startDate : null,
+                        endDate: type === 'date-range' ? endDate : null,
+                        days: type === 'repeating' ? [...this.tempDays].map(Number).sort() : [],
+                        completedDates: [],
+                        streak: 0,
+                        bestStreak: 0,
+                        createdAt: new Date().toISOString()
+                    });
+                }
                 
                 this.closeModal();
                 AudioSys.play('click');
@@ -1983,7 +2054,10 @@
                             <span style="color: ${isTodayActive ? 'var(--primary)' : 'var(--text-dim)'}; font-size: 0.8rem;">
                                 ${isTodayActive ? 'Active' : 'Inactive'}
                             </span>
-                            <span class="sb-del" onclick="App.deleteHabit(${h.id})">×</span>
+                            <div style="display: flex; align-items: center;">
+                                <span class="sb-edit" onclick="App.openModal(${h.id})">✎</span>
+                                <span class="sb-del" onclick="App.deleteHabit(${h.id})" style="margin-left: 10px;">×</span>
+                            </div>
                         `;
                         sidebarList.appendChild(sbItem);
                     }
@@ -2006,7 +2080,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <button class="delete-btn" onclick="App.deleteHabit(${h.id})">×</button>
+                            <div style="display: flex; align-items: center;">
+                                <button class="edit-btn" onclick="App.openModal(${h.id})">✎</button>
+                                <button class="delete-btn" onclick="App.deleteHabit(${h.id})">×</button>
+                            </div>
                         `;
                         listContainer.appendChild(card);
                     }
