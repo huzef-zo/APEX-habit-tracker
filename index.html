@@ -479,205 +479,6 @@
             letter-spacing: 1px; 
         }
 
-        /* --- TIMER --- */
-        .timer-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 60vh;
-            background: var(--panel-bg);
-            border-radius: 15px;
-            border: var(--border);
-            padding: 2rem;
-            margin: 2rem auto;
-            max-width: 600px;
-        }
-
-        .timer-modes {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            background: #000;
-            padding: 0.5rem;
-            border-radius: 20px;
-            border: var(--border);
-        }
-
-        .mode-btn {
-            padding: 0.8rem 1.5rem;
-            border-radius: 15px;
-            border: none;
-            background: transparent;
-            color: #666;
-            cursor: pointer;
-            font-family: var(--font-display);
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            min-width: 120px;
-        }
-
-        .mode-btn:hover {
-            background: rgba(0, 240, 255, 0.1);
-            color: var(--text-main);
-        }
-
-        .mode-btn.active {
-            background: var(--primary);
-            color: #000;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-        }
-
-        .timer-display {
-            font-family: var(--font-display);
-            font-size: 4.5rem;
-            font-weight: 900;
-            font-variant-numeric: tabular-nums;
-            color: var(--text-main);
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
-        }
-
-        .timer-status {
-            font-family: var(--font-display);
-            color: var(--primary);
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .timer-cycle {
-            color: var(--primary);
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .timer-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .timer-btn {
-            padding: 1rem 2rem;
-            background: #000;
-            border: 2px solid #333;
-            color: #fff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: var(--font-display);
-            transition: all 0.3s;
-            min-width: 120px;
-            font-size: 1rem;
-        }
-
-        .timer-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .timer-btn.active {
-            background: var(--primary);
-            color: #000;
-            border-color: var(--primary);
-            font-weight: bold;
-        }
-
-        .timer-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .timer-btn:disabled:hover {
-            border-color: #333;
-            transform: none;
-        }
-
-        /* Timer Progress Circle */
-        .timer-circle {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            margin-bottom: 2rem;
-        }
-
-        .timer-ring-svg {
-            transform: rotate(-90deg);
-            width: 280px;
-            height: 280px;
-        }
-
-        .timer-ring-bg {
-            fill: none;
-            stroke: #222;
-            stroke-width: 8;
-        }
-
-        .timer-ring-progress {
-            fill: none;
-            stroke: var(--primary);
-            stroke-width: 8;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 1s linear;
-            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
-        }
-
-        /* Laps Container (Stopwatch) */
-        .laps-container {
-            width: 100%;
-            max-width: 400px;
-            max-height: 200px;
-            overflow-y: auto;
-            background: #000;
-            border: var(--border);
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            padding: 15px;
-            display: none;
-        }
-
-        .laps-container.active {
-            display: block;
-        }
-
-        .laps-header {
-            font-family: var(--font-display);
-            color: var(--text-dim);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .lap-item {
-            display: flex;
-            justify-content: space-between;
-            font-family: var(--font-display);
-            font-size: 0.9rem;
-            border-bottom: 1px solid #222;
-            padding: 8px 0;
-            color: #888;
-        }
-
-        .lap-item:last-child {
-            border-bottom: none;
-        }
-
-        .lap-num {
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        .lap-time {
-            color: var(--text-main);
-        }
-
-        .lap-diff {
-            color: var(--danger);
-            font-size: 0.8rem;
-        }
 
         /* --- HISTORY VIEW (from index.html) --- */
         .history-grid { 
@@ -769,31 +570,6 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .timer-display {
-                font-size: 3.5rem;
-            }
-            
-            .timer-circle {
-                width: 220px;
-                height: 220px;
-            }
-            
-            .timer-ring-svg {
-                width: 220px;
-                height: 220px;
-            }
-            
-            .mode-btn {
-                padding: 0.6rem 1rem;
-                min-width: 100px;
-                font-size: 0.8rem;
-            }
-            
-            .timer-btn {
-                padding: 0.8rem 1.5rem;
-                min-width: 100px;
-                font-size: 0.9rem;
-            }
 
         }
 
@@ -983,7 +759,6 @@
             </div>
             
             <button class="nav-btn active" onclick="App.navigate('dashboard')">🏰 Dashboard</button>
-            <button class="nav-btn" onclick="App.navigate('timer')">⏳ Time Chamber</button>
             <button class="nav-btn" onclick="App.navigate('history')">📜 Chronicles</button>
             <button class="nav-btn" onclick="App.navigate('status')">👤 Status</button>
             
@@ -1030,46 +805,6 @@
                     <div style="height: 80px;"></div>
                 </section>
                 
-                <!-- TIMER VIEW -->
-                <section id="timer" class="view-section">
-                    <div class="timer-wrapper">
-                        <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 2rem; text-align: center;">
-                            ⏳ TIME CHAMBER
-                        </h2>
-                        
-                        <div class="timer-modes">
-                            <button class="mode-btn active" onclick="Timer.setMode('pomodoro')">Pomodoro</button>
-                            <button class="mode-btn" onclick="Timer.setMode('stopwatch')">Stopwatch</button>
-                        </div>
-                        
-                        <!-- Laps Container (Stopwatch Only) -->
-                        <div id="laps-display" class="laps-container">
-                            <div class="laps-header">LAP TIMES</div>
-                        </div>
-                        
-                        <div class="timer-circle">
-                            <svg class="timer-ring-svg">
-                                <circle class="timer-ring-bg" cx="140" cy="140" r="130"></circle>
-                                <circle class="timer-ring-progress" id="timer-progress" cx="140" cy="140" r="130" stroke-dasharray="817" stroke-dashoffset="0"></circle>
-                            </svg>
-                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                                <div class="timer-display" id="timer-text">25:00</div>
-                                <div class="timer-status" id="timer-status">FOCUS</div>
-                                <div class="timer-cycle" id="timer-cycle">Cycle: 1/4</div>
-                            </div>
-                        </div>
-                        
-                        <div class="timer-controls">
-                            <button class="timer-btn active" id="btn-start" onclick="Timer.toggle()">Start</button>
-                            <button class="timer-btn" id="btn-lap" onclick="Timer.lap()" disabled>Lap</button>
-                            <button class="timer-btn" onclick="Timer.reset()">Reset</button>
-                        </div>
-                        
-                        <div class="timer-info" id="timer-desc">
-                            <span id="mode-description">25 min focus, 5 min break. Repeat 4 cycles → 20 min long break.</span>
-                        </div>
-                    </div>
-                </section>
                 
                 <!-- HISTORY VIEW (Replaced with index.html features) -->
                 <section id="history" class="view-section">
@@ -1177,7 +912,7 @@
                             <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
                                 <div>
                                     <div style="font-weight: bold; letter-spacing: 1px;">SENSE</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Time Chamber XP</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Focus/Awareness Quest XP</div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     <span id="stat-sns" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
@@ -1255,12 +990,7 @@
                 lastCheckInDate: getLocalDateString()
             },
             habits: [],
-            activityLog: {},
-            timerStats: {
-                pomodoroCompleted: 0,
-                totalFocusTime: 0,
-                bestStreak: 0
-            }
+            activityLog: {}
         };
         
         function deepMerge(target, source) {
@@ -1602,9 +1332,6 @@
                         }
                     });
                 });
-                
-                // Initialize Timer
-                Timer.init();
                 
                 // Initialize History components
                 this.renderHistory();
@@ -1992,15 +1719,14 @@
                     navs[0].classList.add('active');
                     this.render();
                 }
-                if(viewId === 'timer') navs[1].classList.add('active');
                 if(viewId === 'history') { 
-                    navs[2].classList.add('active'); 
+                    navs[1].classList.add('active');
                     setTimeout(() => {
                         this.renderHistory(); // Render history when navigated to
                     }, 100);
                 }
                 if(viewId === 'status') {
-                    navs[3].classList.add('active');
+                    navs[2].classList.add('active');
                     setTimeout(() => this.render(), 0);
                 }
             },
@@ -2119,256 +1845,6 @@
             }
         };
 
-        // --- TIMER MODULE ---
-        const Timer = {
-            mode: 'pomodoro',
-            running: false,
-            interval: null,
-            raf: null,
-            stopwatchTime: 0,
-            stopwatchStartTime: 0,
-            pomodoroTime: 25 * 60,
-            initialTime: 25 * 60,
-            pomodoroState: 'FOCUS',
-            pomodoroCycle: 1,
-            totalCycles: 4,
-            laps: [],
-            lapTimes: [],
-            circumference: 2 * Math.PI * 130,
-
-            init() {
-                this.updateDisplay();
-                this.updateModeDescription();
-            },
-
-            setMode(mode) {
-                this.stop();
-                this.mode = mode;
-                this.pomodoroCycle = 1;
-                
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                if(mode === 'pomodoro') {
-                    document.querySelectorAll('.mode-btn')[0].classList.add('active');
-                    document.getElementById('btn-lap').disabled = true;
-                    const lapsDisplay = document.getElementById('laps-display');
-                    if (lapsDisplay) lapsDisplay.classList.remove('active');
-                } else {
-                    document.querySelectorAll('.mode-btn')[1].classList.add('active');
-                    document.getElementById('btn-lap').disabled = false;
-                }
-                
-                this.reset();
-                this.updateModeDescription();
-            },
-
-            toggle() {
-                if (this.running) {
-                    this.pause();
-                } else {
-                    this.start();
-                }
-            },
-
-            start() {
-                this.running = true;
-                const startBtn = document.getElementById('btn-start');
-                if (startBtn) startBtn.innerText = "Pause";
-                
-                const timerProgress = document.getElementById('timer-progress');
-                if (timerProgress) timerProgress.style.stroke = 'var(--primary)';
-                
-                if (this.mode === 'pomodoro') {
-                    const startTime = Date.now() - ((this.initialTime - this.pomodoroTime) * 1000);
-                    
-                    this.interval = setInterval(() => {
-                        const currentTime = Date.now();
-                        const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-                        this.pomodoroTime = Math.max(0, this.initialTime - elapsedSeconds);
-                        
-                        if (this.pomodoroTime <= 0) {
-                            this.pomodoroComplete();
-                        }
-                        this.updateDisplay();
-                    }, 100);
-                } else {
-                    if (this.stopwatchStartTime === 0) {
-                        this.stopwatchStartTime = Date.now() - this.stopwatchTime;
-                    }
-                    
-                    const updateStopwatch = () => {
-                        if (!this.running) return;
-                        this.stopwatchTime = Date.now() - this.stopwatchStartTime;
-                        this.updateDisplay();
-                        this.raf = requestAnimationFrame(updateStopwatch);
-                    };
-                    this.raf = requestAnimationFrame(updateStopwatch);
-                }
-            },
-
-            pause() {
-                clearInterval(this.interval);
-                cancelAnimationFrame(this.raf);
-                this.running = false;
-                const startBtn = document.getElementById('btn-start');
-                if (startBtn) startBtn.innerText = "Resume";
-                
-                const timerProgress = document.getElementById('timer-progress');
-                if (timerProgress) timerProgress.style.stroke = '#333';
-            },
-
-            stop() {
-                this.pause();
-            },
-
-            reset() {
-                this.stop();
-                
-                if (this.mode === 'pomodoro') {
-                    this.pomodoroState = 'FOCUS';
-                    this.pomodoroTime = 25 * 60;
-                    this.initialTime = 25 * 60;
-                    this.pomodoroCycle = 1;
-                    const timerStatus = document.getElementById('timer-status');
-                    if (timerStatus) timerStatus.innerText = 'FOCUS';
-                    
-                    const timerCycle = document.getElementById('timer-cycle');
-                    if (timerCycle) timerCycle.innerText = 'Cycle: 1/4';
-                    
-                    const startBtn = document.getElementById('btn-start');
-                    if (startBtn) startBtn.innerText = "Start";
-                } else {
-                    this.stopwatchTime = 0;
-                    this.stopwatchStartTime = 0;
-                    this.laps = [];
-                    this.lapTimes = [];
-                    const lapsDisplay = document.getElementById('laps-display');
-                    if (lapsDisplay) {
-                        lapsDisplay.innerHTML = '<div class="laps-header">LAP TIMES</div>';
-                    }
-                    const timerStatus = document.getElementById('timer-status');
-                    if (timerStatus) timerStatus.innerText = 'STOPWATCH';
-                    
-                    const startBtn = document.getElementById('btn-start');
-                    if (startBtn) startBtn.innerText = "Start";
-                }
-                this.updateDisplay();
-            },
-
-            pomodoroComplete() {
-                this.stop();
-                AudioSys.play('complete');
-                
-                if (this.pomodoroState === 'FOCUS') {
-                    State.timerStats.pomodoroCompleted++;
-                    State.timerStats.totalFocusTime += 25;
-                    
-                    if (this.pomodoroCycle === this.totalCycles) {
-                        this.pomodoroState = 'LONG BREAK';
-                        this.pomodoroTime = 20 * 60;
-                        const timerStatus = document.getElementById('timer-status');
-                        if (timerStatus) timerStatus.innerText = 'LONG BREAK';
-                    } else {
-                        this.pomodoroState = 'SHORT BREAK';
-                        this.pomodoroTime = 5 * 60;
-                        const timerStatus = document.getElementById('timer-status');
-                        if (timerStatus) timerStatus.innerText = 'SHORT BREAK';
-                    }
-                } else {
-                    if (this.pomodoroState === 'LONG BREAK') {
-                        this.pomodoroCycle = 0;
-                    }
-                    
-                    this.pomodoroCycle++;
-                    this.pomodoroState = 'FOCUS';
-                    this.pomodoroTime = 25 * 60;
-                    const timerStatus = document.getElementById('timer-status');
-                    if (timerStatus) timerStatus.innerText = 'FOCUS';
-                }
-                
-                this.initialTime = this.pomodoroTime;
-                const timerCycle = document.getElementById('timer-cycle');
-                if (timerCycle) timerCycle.innerText = `Cycle: ${this.pomodoroCycle}/${this.totalCycles}`;
-                saveState();
-                this.updateDisplay();
-            },
-
-            lap() {
-                if (this.running && this.mode === 'stopwatch') {
-                    this.laps.push(this.stopwatchTime);
-                    this.lapTimes.push(this.stopwatchTime);
-                    
-                    const container = document.getElementById('laps-display');
-                    if (!container) return;
-                    
-                    container.classList.add('active');
-                    
-                    const lapNum = this.laps.length;
-                    const lapTime = this.formatTime(this.stopwatchTime);
-                    
-                    let diffText = '';
-                    if (this.laps.length > 1) {
-                        const prevLap = this.laps[this.laps.length - 2];
-                        const diff = this.stopwatchTime - prevLap;
-                        diffText = diff > 0 ? `+${this.formatTime(diff, true)}` : this.formatTime(diff, true);
-                    }
-                    
-                    const lapItem = document.createElement('div');
-                    lapItem.className = 'lap-item';
-                    lapItem.innerHTML = `
-                        <span class="lap-num">Lap ${lapNum}</span>
-                        <span class="lap-time">${lapTime}</span>
-                        ${diffText ? `<span class="lap-diff">${diffText}</span>` : ''}
-                    `;
-                    
-                    container.appendChild(lapItem);
-                    container.scrollTop = container.scrollHeight;
-                }
-            },
-
-            formatTime(ms, showMs = false) {
-                const totalSeconds = Math.floor(ms / 1000);
-                const minutes = Math.floor(totalSeconds / 60);
-                const seconds = totalSeconds % 60;
-                const milliseconds = Math.floor((ms % 1000) / 10);
-                
-                if (showMs) {
-                    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
-                }
-                return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            },
-
-            updateDisplay() {
-                const timerText = document.getElementById('timer-text');
-                const timerProgress = document.getElementById('timer-progress');
-                
-                if (!timerText || !timerProgress) return;
-                
-                if (this.mode === 'pomodoro') {
-                    const minutes = Math.floor(this.pomodoroTime / 60);
-                    const seconds = this.pomodoroTime % 60;
-                    timerText.innerText = 
-                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    
-                    const progress = ((this.initialTime - this.pomodoroTime) / this.initialTime) * this.circumference;
-                    timerProgress.style.strokeDashoffset = this.circumference - progress;
-                    
-                } else {
-                    timerText.innerText = this.formatTime(this.stopwatchTime);
-                    timerProgress.style.strokeDashoffset = 0;
-                }
-            },
-
-            updateModeDescription() {
-                const desc = document.getElementById('mode-description');
-                if (!desc) return;
-                
-                if (this.mode === 'pomodoro') {
-                    desc.innerHTML = '<span>25 min focus, 5 min break. Repeat 4 cycles → 20 min long break.</span>';
-                } else {
-                    desc.innerHTML = '<span>Stopwatch with lap timing.</span>';
-                }
-            }
-        };
 
         // --- INITIALIZE APP ---
         document.addEventListener('DOMContentLoaded', function() {
