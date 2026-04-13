@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>APEX | System</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="APEX">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon-192.png">
     <style>
         :root {
             --bg-color: #050505;
@@ -1916,6 +1924,27 @@
                 App.renderHistory();
             }
         });
+    </script>
+
+    <!-- Service Worker Registration (ONLY ONCE) -->
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('✅ SW registered:', reg.scope))
+          .catch(err => console.error('❌ SW failed:', err));
+      });
+    }
+    </script>
+
+    <!-- Optional: Debug Script -->
+    <script>
+    (async () => {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        console.log('🔌 SWs:', regs.length, regs.map(r => r.scope));
+      }
+    })();
     </script>
 
 </body>
