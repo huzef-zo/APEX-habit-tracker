@@ -920,6 +920,15 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #333;">
+                            <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; text-align: center;">System Backup</div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button onclick="App.exportData()" class="btn-primary" style="flex: 1; font-size: 0.8rem; padding: 0.6rem;">Export Data</button>
+                                <button onclick="document.getElementById('import-input').click()" class="btn-primary" style="flex: 1; font-size: 0.8rem; padding: 0.6rem; background: #222; border: 1px solid var(--primary); color: var(--primary);">Import Data</button>
+                            </div>
+                            <input type="file" id="import-input" style="display: none;" accept=".json" onchange="App.importData(event)">
+                        </div>
                     </div>
                 </section>
                 
@@ -1192,6 +1201,49 @@
         const App = {
             tempDays: [],
             editingHabitId: null,
+
+            exportData() {
+                const dataStr = JSON.stringify(State, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `apex_backup_${getLocalDateString()}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                this.showSystemMessage('BACKUP CREATED', 'Your data has been exported successfully.');
+            },
+
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+
+                        // Basic validation
+                        if (!importedData.user || !Array.isArray(importedData.habits)) {
+                            throw new Error('Invalid data structure');
+                        }
+
+                        if (confirm('Importing data will overwrite your current progress. Continue?')) {
+                            State = importedData;
+                            saveState();
+                            this.showSystemMessage('SYSTEM RESTORED', 'Data imported successfully. Reloading...');
+                            setTimeout(() => location.reload(), 1500);
+                        }
+                    } catch (err) {
+                        alert('Error importing data: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+                // Reset input
+                event.target.value = '';
+            },
 
             showSystemMessage(title, message) {
                 const notif = document.getElementById('system-notification');
