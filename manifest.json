@@ -1,0 +1,35 @@
+{
+  "name": "APEX Habit Tracker",
+  "short_name": "APEX",
+  "description": "Track habits, build consistency, level up your life.",
+  "start_url": "/APEX-habit-tracker/",
+  "scope": "/APEX-habit-tracker/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#000000",
+  "theme_color": "#3B82F6",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Add Habit",
+      "short_name": "Add",
+      "description": "Quickly add a new habit",
+      "url": "/APEX-habit-tracker/?action=add",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
