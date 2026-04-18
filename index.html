@@ -825,18 +825,32 @@
                 z-index: 5; 
             }
             .scroll-area { 
-                padding: 4rem 1rem 2rem 1rem; 
+                padding: 3rem 1rem 2rem 1rem;
             }
             
             .rpg-stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
                 padding: 1rem;
             }
             .rpg-stat-card {
                 grid-column: span 1 !important;
             }
             .legacy-stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .system-header {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            .legacy-stat-box {
+                padding: 0.5rem !important;
+            }
+            .legacy-stat-val {
+                font-size: 1.2rem;
+            }
+            .habit-card {
+                padding: 0.8rem;
             }
             
 
