@@ -6,34 +6,41 @@
     <title>APEX | System</title>
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#3B82F6">
+    <meta name="theme-color" content="#0a0a0f">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="APEX">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icon-192.png">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #050505;
-            --panel-bg: #111111;
-            --primary: #00f0ff;
-            --primary-glow: #00aaff;
+            --bg-color: #0a0a0f;
+            --panel-bg: rgba(16, 16, 24, 0.8);
+            --primary: #00f5ff;
+            --primary-glow: #00ffff;
+            --accent-purple: #7b61ff;
             --text-main: #e0e0e0;
-            --text-dim: #666;
-            --danger: #ff003c;
-            --success: #00ff9d;
+            --text-dim: #888;
+            --danger: #ff0055;
+            --success: #00ffaa;
             --warning: #ffcc00;
-            --border: 1px solid #333;
+            --border-color: rgba(0, 245, 255, 0.2);
+            --border: 1px solid var(--border-color);
             
-            /* Heatmap Colors - APEX Cyan style */
-            --heat-0: #161b22;
-            --heat-1: #00383d;
-            --heat-2: #006b73;
-            --heat-3: #00a1ad;
-            --heat-4: #00f0ff;
+            /* Heatmap Colors - Solo Leveling style */
+            --heat-0: #1a1a2e;
+            --heat-1: #0f3460;
+            --heat-2: #16213e;
+            --heat-3: #00f5ff;
+            --heat-4: #7b61ff;
             
-            --font-display: 'Courier New', Courier, monospace;
-            --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui;
+            --font-display: 'Orbitron', sans-serif;
+            --font-system: 'Share Tech Mono', monospace;
+            --font-ui: 'Rajdhani', sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -225,38 +232,102 @@
         }
 
         /* --- DASHBOARD COMPONENTS --- */
+        .system-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(180deg, rgba(0, 245, 255, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            position: relative;
+        }
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+        .logo-underline {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: logo-line 2s infinite ease-in-out;
+        }
+        @keyframes logo-line {
+            0%, 100% { width: 0; opacity: 0; }
+            50% { width: 100%; opacity: 1; }
+        }
+
+        .rank-badge {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+            animation: rank-pulse 2s infinite ease-in-out;
+        }
+        @keyframes rank-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 245, 255, 0.3); }
+            50% { transform: scale(1.1); box-shadow: 0 0 25px rgba(0, 245, 255, 0.5); }
+        }
+
         .xp-section { 
-            margin-bottom: 2rem; 
-            text-align: center; 
+            width: 100%;
+        }
+        .xp-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 0.5rem;
         }
         .level-badge { 
             font-family: var(--font-display); 
             color: var(--primary); 
-            font-size: 0.9rem; 
-            margin-bottom: 0.5rem; 
-            display: block; 
+            font-size: 1.2rem;
+            font-weight: 700;
         }
         .xp-track { 
             width: 100%; 
-            height: 12px; 
-            background: #222; 
-            border-radius: 6px; 
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
             overflow: hidden; 
-            border: var(--border); 
+            border: 1px solid rgba(0, 245, 255, 0.1);
         }
         .xp-fill { 
             height: 100%; 
-            background: linear-gradient(90deg, var(--panel-bg), var(--primary));
+            background: linear-gradient(90deg, var(--primary), var(--accent-purple));
             width: 0%; 
-            transition: width 0.5s ease; 
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px var(--primary);
+            position: relative;
         }
         .xp-text { 
-            font-family: var(--font-display); 
+            font-family: var(--font-system);
             font-size: 0.8rem; 
             color: var(--text-dim); 
-            margin-top: 5px; 
-            display: block; 
         }
 
         .stats-grid { 
@@ -271,19 +342,27 @@
         }
         .stat-box { 
             text-align: center; 
+            padding: 1rem;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .stat-box:hover {
+            border: 1px solid var(--border-color);
+            background: rgba(0, 245, 255, 0.05);
         }
         .stat-val { 
             display: block; 
             font-family: var(--font-display); 
-            font-size: 1.8rem; 
+            font-size: 2.2rem;
             color: var(--text-main); 
-            font-weight: bold; 
+            font-weight: 900;
         }
         .stat-lbl { 
-            font-size: 0.75rem; 
-            color: var(--text-dim); 
+            font-family: var(--font-system);
+            font-size: 0.7rem;
+            color: var(--primary);
             text-transform: uppercase; 
-            letter-spacing: 1px; 
+            letter-spacing: 2px;
         }
         .stat-val.highlight { 
             color: var(--primary); 
@@ -297,22 +376,37 @@
             gap: 1rem; 
         }
         .habit-card { 
-            background: var(--panel-bg); 
-            border: var(--border); 
-            padding: 1.2rem; 
-            border-radius: 8px; 
+            background: rgba(16, 16, 24, 0.6);
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 0;
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
-            transition: 0.2s; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .habit-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--primary);
+            opacity: 0.3;
         }
         .habit-card:hover { 
             transform: translateX(5px); 
             border-color: #444; 
         }
         .habit-card.completed { 
-            border-left: 4px solid var(--success); 
-            background: rgba(0, 255, 157, 0.03); 
+            border-color: var(--success);
+            background: rgba(0, 255, 170, 0.05);
+        }
+        .habit-card.completed::before {
+            background: var(--success);
+            opacity: 1;
+            box-shadow: 0 0 15px var(--success);
         }
         .habit-left { 
             display: flex; 
@@ -431,26 +525,49 @@
         }
         .modal-box { 
             background: var(--panel-bg); 
+            backdrop-filter: blur(20px);
             width: 90%; 
-            max-width: 400px; 
-            padding: 2rem; 
-            border: 1px solid #333; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-            transform: scale(0.9); 
-            transition: transform 0.3s; 
+            max-width: 450px;
+            padding: 2.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            box-shadow: 0 0 40px rgba(0, 245, 255, 0.2);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            clip-path: polygon(
+                0 10px, 10px 0,
+                calc(100% - 10px) 0, 100% 10px,
+                100% calc(100% - 10px), calc(100% - 10px) 100%,
+                10px 100%, 0 calc(100% - 10px)
+            );
+        }
+        .modal-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            pointer-events: none;
         }
         .modal-overlay.open .modal-box { 
-            transform: scale(1); 
+            transform: scale(1) translateY(0);
         }
         .input-field { 
             width: 100%; 
-            padding: 0.8rem; 
-            background: #000; 
-            border: 1px solid #333; 
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 245, 255, 0.2);
             color: #fff; 
-            margin-bottom: 1rem; 
-            border-radius: 4px; 
+            margin-bottom: 1.2rem;
+            border-radius: 0;
+            font-family: var(--font-ui);
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.2);
         }
         .day-selector { 
             display: flex; 
@@ -473,20 +590,70 @@
             background: var(--primary); 
             color: #000; 
             font-weight: bold; 
+            box-shadow: 0 0 15px var(--primary);
         }
         .btn-primary { 
             width: 100%; 
             background: var(--primary); 
             color: #000; 
             border: none; 
-            padding: 1rem; 
-            font-weight: bold; 
-            border-radius: 4px; 
+            padding: 1.2rem;
+            font-family: var(--font-display);
+            font-weight: 900;
+            border-radius: 0;
             cursor: pointer; 
             text-transform: uppercase; 
-            letter-spacing: 1px; 
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover {
+            background: #fff;
+            box-shadow: 0 0 20px #fff;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
         }
 
+        /* --- MICRO-INTERACTIONS --- */
+        .xp-float {
+            position: absolute;
+            color: var(--primary);
+            font-family: var(--font-display);
+            font-weight: 900;
+            pointer-events: none;
+            animation: xp-float-up 1.5s forwards;
+            z-index: 1000;
+            text-shadow: 0 0 10px var(--primary);
+        }
+        @keyframes xp-float-up {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+
+        .screen-flash {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 10001;
+            pointer-events: none;
+            opacity: 0;
+            animation: flash-anim 0.5s ease-out;
+        }
+        @keyframes flash-anim {
+            0% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+
+        .stat-glow-pulse {
+            animation: stat-glow-anim 0.8s ease-out;
+        }
+        @keyframes stat-glow-anim {
+            0% { text-shadow: 0 0 0px var(--primary); color: #fff; }
+            50% { text-shadow: 0 0 20px var(--primary); color: var(--primary); transform: scale(1.2); }
+            100% { text-shadow: 0 0 0px var(--primary); color: #fff; }
+        }
 
         /* --- HISTORY VIEW (from index.html) --- */
         .history-grid { 
@@ -646,16 +813,62 @@
         .scanlines {
             position: fixed;
             inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
             z-index: 9998;
-            opacity: 0.3;
+            opacity: 0.5;
+        }
+
+        /* --- IMMERSIVE EFFECTS --- */
+        #particle-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--border);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .holographic-glow {
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.15), inset 0 0 10px rgba(0, 245, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.3) !important;
+        }
+
+        .system-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .system-shimmer::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 245, 255, 0.05), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 4s infinite linear;
+            pointer-events: none;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .hover-scale {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
         }
 
         .stat-up-btn:hover {
@@ -666,6 +879,7 @@
     </style>
 </head>
 <body>
+    <canvas id="particle-canvas"></canvas>
     <div class="scanlines"></div>
 
     <!-- System Notification -->
@@ -682,25 +896,34 @@
     
     <!-- Add Habit Modal -->
     <div class="modal-overlay" id="add-modal">
-        <div class="modal-box">
-            <h3 id="modal-title" style="font-family: var(--font-display); margin-bottom: 1rem; color: var(--primary);">NEW QUEST</h3>
-            <input type="text" id="habit-name" class="input-field" placeholder="Quest Name..." autocomplete="off">
+        <div class="modal-box system-shimmer">
+            <h3 id="modal-title" style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ NEW QUEST ]</h3>
+            <div style="margin-bottom: 1rem;">
+                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Quest Title</label>
+                <input type="text" id="habit-name" class="input-field" placeholder="Enter quest description..." autocomplete="off">
+            </div>
             
-            <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Difficulty (XP)</label>
-            <select id="habit-diff" class="input-field">
-                <option value="easy">Easy (+10 XP)</option>
-                <option value="medium" selected>Medium (+25 XP)</option>
-                <option value="hard">Hard (+50 XP)</option>
-            </select>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Difficulty</label>
+                    <select id="habit-diff" class="input-field">
+                        <option value="easy">Easy (E-Rank)</option>
+                        <option value="medium" selected>Normal (C-Rank)</option>
+                        <option value="hard">Hard (A-Rank)</option>
+                    </select>
+                </div>
 
-            <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Stat Category</label>
-            <select id="habit-stat-cat" class="input-field">
-                <option value="str">Strength (Physical)</option>
-                <option value="int">Intelligence (Learning)</option>
-                <option value="agi">Agility (Speed/Consistency)</option>
-                <option value="vit">Vitality (Health/Endurance)</option>
-                <option value="sns">Sense (Focus/Awareness)</option>
-            </select>
+                <div>
+                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Attribute</label>
+                    <select id="habit-stat-cat" class="input-field">
+                        <option value="str">💪 STR</option>
+                        <option value="int">🧠 INT</option>
+                        <option value="agi">⚡ AGI</option>
+                        <option value="vit">❤️ VIT</option>
+                        <option value="sns">👁️ SNS</option>
+                    </select>
+                </div>
+            </div>
 
             <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Quest Type</label>
             <select id="habit-type" class="input-field" onchange="App.toggleHabitType()">
@@ -744,10 +967,12 @@
     
     <!-- Level Up Modal -->
     <div class="modal-overlay" id="level-modal">
-        <div class="modal-box" style="text-align: center;">
-            <h1 style="color: var(--primary); font-family: var(--font-display); font-size: 3rem; margin-bottom: 1rem;">LEVEL UP</h1>
-            <p style="margin-bottom: 2rem; color: #fff;" id="level-msg">You have reached Level 2</p>
-            <button class="btn-primary" onclick="App.closeModal('level-modal')">ACKNOWLEDGE</button>
+        <div class="modal-box" style="text-align: center; max-width: 500px; padding: 4rem 2rem;">
+            <div style="font-family: var(--font-display); color: #fff; font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 1rem; opacity: 0.8;">CONGRATULATIONS</div>
+            <h1 style="color: var(--primary); font-family: var(--font-display); font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 0 0 30px var(--primary);">★ LEVEL UP ★</h1>
+            <div style="height: 2px; width: 100px; background: var(--primary); margin: 2rem auto;"></div>
+            <p style="margin-bottom: 3rem; color: #fff; font-family: var(--font-ui); font-size: 1.5rem; letter-spacing: 1px;" id="level-msg">You have reached Level 2</p>
+            <button class="btn-primary" onclick="App.closeModal('level-modal')" style="width: auto; padding: 1.2rem 4rem;">ACKNOWLEDGE</button>
         </div>
     </div>
     
@@ -780,16 +1005,27 @@
             <div class="scroll-area">
                 <!-- DASHBOARD VIEW -->
                 <section id="dashboard" class="view-section active">
-                    <div class="xp-section">
-                        <span class="level-badge" id="header-level">LVL 1</span>
-                        <div class="xp-track">
-                            <div class="xp-fill" id="xp-bar"></div>
+                    <div class="system-header glass-panel">
+                        <div class="header-top">
+                            <div class="logo-container">
+                                <div class="logo-text">APEX</div>
+                                <div class="logo-underline"></div>
+                            </div>
+                            <div class="rank-badge" id="header-rank">E</div>
                         </div>
-                        <span class="xp-text" id="xp-text">0 / 100 XP</span>
+                        <div class="xp-section">
+                            <div class="xp-info">
+                                <span class="level-badge" id="header-level">LVL 1</span>
+                                <span class="xp-text" id="xp-text">0 / 100 XP</span>
+                            </div>
+                            <div class="xp-track">
+                                <div class="xp-fill" id="xp-bar"></div>
+                            </div>
+                        </div>
                     </div>
                     
                     
-                    <div class="stats-grid">
+                    <div class="stats-grid glass-panel">
                         <div class="stat-box">
                             <span class="stat-val highlight" id="best-streak">0</span>
                             <span class="stat-lbl">Best Streak</span>
@@ -801,6 +1037,10 @@
                         <div class="stat-box">
                             <span class="stat-val" id="total-quests">0</span>
                             <span class="stat-lbl">Total Quests</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-val highlight" id="rank-display">E</span>
+                            <span class="stat-lbl">Rank</span>
                         </div>
                     </div>
                     
@@ -856,75 +1096,97 @@
 
                 <!-- STATUS VIEW -->
                 <section id="status" class="view-section">
-                    <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 2rem; text-align: center;">
-                        👤 PLAYER STATUS
+                    <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 2rem; text-align: center; letter-spacing: 4px;">
+                        [ PLAYER STATUS ]
                     </h2>
 
-                    <div style="background: var(--panel-bg); border: var(--border); border-radius: 12px; padding: 2rem; max-width: 500px; margin: 0 auto;">
-                        <div style="text-align: center; margin-bottom: 2rem;">
-                            <div style="font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;">Current Rank</div>
-                            <div id="status-rank" style="font-size: 4rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);">E</div>
-                            <div id="status-level" style="font-family: var(--font-display); color: var(--text-main);">LEVEL 1</div>
+                    <div class="glass-panel system-shimmer" style="padding: 3rem; max-width: 600px; margin: 0 auto; position: relative; border-radius: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
+                            <div style="text-align: left;">
+                                <div style="font-family: var(--font-system); font-size: 0.8rem; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Player Name</div>
+                                <div style="font-family: var(--font-display); font-size: 1.8rem; color: #fff;">SUNG JIN-WOO</div>
+                                <div id="status-level" style="font-family: var(--font-system); color: var(--primary); margin-top: 5px;">LEVEL 1</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-family: var(--font-system); font-size: 0.8rem; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Job</div>
+                                <div style="font-family: var(--font-display); font-size: 1.2rem; color: #fff;">SHADOW MONARCH</div>
+                                <div style="font-family: var(--font-system); color: var(--text-dim); margin-top: 5px;">Rank: <span id="status-rank" style="color: var(--primary); font-weight: 900;">E</span></div>
+                            </div>
                         </div>
 
-                        <div style="margin-bottom: 1.5rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 10px; border-bottom: 1px solid #222;">
-                                <span style="font-family: var(--font-display); color: var(--text-dim);">Available Points</span>
-                                <span id="status-points" style="color: var(--warning); font-weight: bold; font-size: 1.2rem;">0</span>
+                        <div style="margin-bottom: 2.5rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border: 1px solid rgba(0,245,255,0.1);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <span style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Available Points</span>
+                                <span id="status-points" style="color: var(--warning); font-family: var(--font-display); font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px var(--warning);">0</span>
                             </div>
 
-                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
                                 <div>
-                                    <div style="font-weight: bold; letter-spacing: 1px;">STRENGTH</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Physical Quest XP</div>
+                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">STRENGTH</div>
+                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Physical Quest XP</div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <span id="stat-str" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
-                                    <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div id="bar-str" style="background: var(--primary); height: 100%; width: 50%;"></div>
                                 </div>
-                            </div>
-
-                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
-                                <div>
-                                    <div style="font-weight: bold; letter-spacing: 1px;">INTELLIGENCE</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Learning Quest XP</div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <span id="stat-int" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
-                                    <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
+                                    <span id="stat-str" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
+                                    <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
                                 </div>
                             </div>
 
-                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
                                 <div>
-                                    <div style="font-weight: bold; letter-spacing: 1px;">AGILITY</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Streak Bonuses</div>
+                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">INTELLIGENCE</div>
+                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Learning Quest XP</div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <span id="stat-agi" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
-                                    <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div id="bar-int" style="background: var(--primary); height: 100%; width: 50%;"></div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
+                                    <span id="stat-int" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
+                                    <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
                                 </div>
                             </div>
 
-                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
                                 <div>
-                                    <div style="font-weight: bold; letter-spacing: 1px;">VITALITY</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Reduces Missed Quest Penalty</div>
+                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">AGILITY</div>
+                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Streak Bonuses</div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <span id="stat-vit" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
-                                    <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div id="bar-agi" style="background: var(--primary); height: 100%; width: 50%;"></div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
+                                    <span id="stat-agi" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
+                                    <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
                                 </div>
                             </div>
 
-                            <div class="status-stat-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 5px 10px;">
+                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
                                 <div>
-                                    <div style="font-weight: bold; letter-spacing: 1px;">SENSE</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Affects Focus/Awareness Quest XP</div>
+                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">VITALITY</div>
+                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Reduces Missed Quest Penalty</div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <span id="stat-sns" style="font-family: var(--font-display); font-size: 1.2rem; min-width: 30px; text-align: center;">10</span>
-                                    <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 28px; height: 28px; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; border-radius: 4px;">+</button>
+                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div id="bar-vit" style="background: var(--primary); height: 100%; width: 50%;"></div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
+                                    <span id="stat-vit" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
+                                    <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
+                                </div>
+                            </div>
+
+                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
+                                <div>
+                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">SENSE</div>
+                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Focus/Awareness Quest XP</div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div id="bar-sns" style="background: var(--primary); height: 100%; width: 50%;"></div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
+                                    <span id="stat-sns" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
+                                    <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
                                 </div>
                             </div>
                         </div>
@@ -1082,8 +1344,8 @@
                 dataPoints.push((completed / scheduled) * 100);
             }
 
-            const colorLine = '#00f0ff'; // Fixed color for dark theme
-            const colorFill = 'rgba(0, 240, 255, 0.2)';
+            const colorLine = '#00f5ff';
+            const colorFill = 'rgba(0, 245, 255, 0.1)';
             const colorGrid = '#333';
 
             const w = canvas.width;
@@ -1283,6 +1545,14 @@
                 if (State.user.stats.points > 0) {
                     State.user.stats[stat]++;
                     State.user.stats.points--;
+
+                    const el = document.getElementById(`stat-${stat}`);
+                    if (el) {
+                        el.classList.remove('stat-glow-pulse');
+                        void el.offsetWidth; // Trigger reflow
+                        el.classList.add('stat-glow-pulse');
+                    }
+
                     AudioSys.play('click');
                     saveState();
                 } else {
@@ -1347,6 +1617,13 @@
 
                 if (totalPenalty > 0) {
                     this.showSystemMessage('PENALTY ZONE', `You missed ${totalMissedQuests} quests since your last visit. Lost ${totalPenalty} XP.`);
+                } else {
+                    // Normal daily refresh feedback
+                    const flash = document.createElement('div');
+                    flash.className = 'screen-flash';
+                    document.body.appendChild(flash);
+                    setTimeout(() => flash.remove(), 500);
+                    this.showSystemMessage('DAILY QUESTS REFRESHED', 'The system has been updated for the new day.');
                 }
 
                 State.user.lastCheckInDate = todayStr;
@@ -1623,7 +1900,7 @@
                 saveState();
             },
 
-            toggleHabit(id) {
+            toggleHabit(event, id) {
                 const habit = State.habits.find(h => h.id === id);
                 if(!habit) return;
                 
@@ -1669,6 +1946,17 @@
                     this.showSystemMessage('QUEST COMPLETE', `You earned ${xp} XP and improved your ${habit.stat.toUpperCase()}!`);
                     this.checkLevelUp();
                     
+                    // Floating XP animation
+                    const btn = event.currentTarget;
+                    const rect = btn.getBoundingClientRect();
+                    const floatXp = document.createElement('div');
+                    floatXp.className = 'xp-float';
+                    floatXp.innerText = `+${xp} XP`;
+                    floatXp.style.left = (rect.left + rect.width / 2) + 'px';
+                    floatXp.style.top = rect.top + 'px';
+                    document.body.appendChild(floatXp);
+                    setTimeout(() => floatXp.remove(), 1500);
+
                     // Update activity log
                     if (!State.activityLog[todayStr]) {
                         State.activityLog[todayStr] = 0;
@@ -1792,7 +2080,13 @@
             },
 
             render() {
-                // Update level and XP
+                // Update level, XP, and Rank
+                if (document.getElementById('header-rank')) {
+                    document.getElementById('header-rank').innerText = State.user.rank;
+                }
+                if (document.getElementById('rank-display')) {
+                    document.getElementById('rank-display').innerText = State.user.rank;
+                }
                 document.getElementById('header-level').innerText = 'LVL ' + State.user.level;
                 document.getElementById('xp-text').innerText = `${State.user.xp} / ${State.user.xpToNext} XP`;
                 document.getElementById('xp-bar').style.width = `${Math.max(0, (State.user.xp / State.user.xpToNext) * 100)}%`;
@@ -1855,7 +2149,7 @@
                         card.className = `habit-card ${isDone ? 'completed' : ''}`;
                         card.innerHTML = `
                             <div class="habit-left">
-                                <div class="check-btn" onclick="App.toggleHabit(${h.id})"></div>
+                                <div class="check-btn" onclick="App.toggleHabit(event, ${h.id})"></div>
                                 <div>
                                     <div class="habit-title">${h_title}</div>
                                     <div class="habit-meta">
@@ -1888,6 +2182,16 @@
                     document.getElementById('stat-vit').innerText = State.user.stats.vit;
                     document.getElementById('stat-sns').innerText = State.user.stats.sns;
 
+                    // Update stat bars
+                    const maxStatValue = 100; // Arbitrary max for bar calculation
+                    ['str', 'int', 'agi', 'vit', 'sns'].forEach(s => {
+                        const bar = document.getElementById(`bar-${s}`);
+                        if (bar) {
+                            const pct = Math.min(100, (State.user.stats[s] / maxStatValue) * 100);
+                            bar.style.width = pct + '%';
+                        }
+                    });
+
                     // Show/hide allocation buttons based on points
                     const buttons = document.querySelectorAll('.stat-up-btn');
                     buttons.forEach(btn => {
@@ -1897,8 +2201,8 @@
 
                 if(!hasHabitsToday && listContainer) {
                     listContainer.innerHTML = `
-                        <div style="text-align:center; color:#333; padding:2rem;">
-                            No missions scheduled for today.
+                        <div style="text-align:center; color:var(--text-dim); padding:4rem 2rem; font-family: var(--font-system); letter-spacing: 2px;">
+                            [ NO MISSIONS SCHEDULED ]
                         </div>
                     `;
                 }
@@ -1906,8 +2210,53 @@
         };
 
 
+        // --- PARTICLE SYSTEM ---
+        const Particles = {
+            canvas: null,
+            ctx: null,
+            items: [],
+            init() {
+                this.canvas = document.getElementById('particle-canvas');
+                if(!this.canvas) return;
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                for(let i=0; i<50; i++) this.items.push(this.create());
+                this.animate();
+            },
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            },
+            create() {
+                return {
+                    x: Math.random() * this.canvas.width,
+                    y: Math.random() * this.canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speed: Math.random() * 0.5 + 0.1,
+                    opacity: Math.random() * 0.5 + 0.2
+                };
+            },
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.items.forEach(p => {
+                    p.y -= p.speed;
+                    if(p.y < -10) {
+                        p.y = this.canvas.height + 10;
+                        p.x = Math.random() * this.canvas.width;
+                    }
+                    this.ctx.fillStyle = `rgba(0, 245, 255, ${p.opacity})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+                requestAnimationFrame(() => this.animate());
+            }
+        };
+
         // --- INITIALIZE APP ---
         document.addEventListener('DOMContentLoaded', function() {
+            Particles.init();
             App.init();
         });
 
