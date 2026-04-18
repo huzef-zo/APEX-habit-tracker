@@ -14,25 +14,25 @@
     <link rel="apple-touch-icon" href="./icon-192.png">
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --bg-color: #0a0a0f;
-            --panel-bg: rgba(16, 16, 24, 0.8);
+            --panel-bg: rgba(16, 16, 24, 0.85);
             --primary: #00f5ff;
-            --primary-glow: #00ffff;
+            --primary-glow: rgba(0, 245, 255, 0.5);
             --accent-purple: #7b61ff;
             --text-main: #e0e0e0;
             --text-dim: #888;
             --danger: #ff0055;
             --success: #00ffaa;
             --warning: #ffcc00;
-            --border-color: rgba(0, 245, 255, 0.2);
+            --border-color: rgba(0, 245, 255, 0.3);
             --border: 1px solid var(--border-color);
             
             /* Heatmap Colors - Solo Leveling style */
-            --heat-0: #1a1a2e;
+            --heat-0: rgba(26, 26, 46, 0.5);
             --heat-1: #0f3460;
             --heat-2: #16213e;
             --heat-3: #00f5ff;
@@ -41,6 +41,15 @@
             --font-display: 'Orbitron', sans-serif;
             --font-system: 'Share Tech Mono', monospace;
             --font-ui: 'Rajdhani', sans-serif;
+            --font-numbers: 'Roboto Mono', monospace;
+
+            --glow: 0 0 10px var(--primary-glow);
+            --clip-path: polygon(
+                0 10px, 10px 0,
+                calc(100% - 10px) 0, 100% 10px,
+                100% calc(100% - 10px), calc(100% - 10px) 100%,
+                10px 100%, 0 calc(100% - 10px)
+            );
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -427,16 +436,16 @@
             gap: 1rem; 
         }
         .habit-card { 
-            background: rgba(16, 16, 24, 0.6);
-            border: 1px solid rgba(0, 245, 255, 0.1);
+            background: var(--panel-bg);
+            border: var(--border);
             padding: 1.5rem;
-            border-radius: 0;
+            clip-path: var(--clip-path);
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
+            box-shadow: var(--glow);
         }
         .habit-card::before {
             content: '';
@@ -444,11 +453,13 @@
             left: 0; top: 0; bottom: 0;
             width: 4px;
             background: var(--primary);
-            opacity: 0.3;
+            opacity: 0.5;
+            box-shadow: 0 0 10px var(--primary);
         }
         .habit-card:hover { 
             transform: translateX(5px); 
-            border-color: #444; 
+            border-color: var(--primary);
+            background: rgba(0, 245, 255, 0.05);
         }
         .habit-card.completed { 
             border-color: var(--success);
@@ -751,9 +762,34 @@
             margin-top: 1rem; 
             min-height: 200px; /* Ensure calendar grid has minimum height */
         }
-        .cal-day { aspect-ratio: 1; border-radius: 4px; background: var(--bg-color); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--text-dim); position: relative; }
-        .cal-day.today { border: 1px solid var(--primary); color: var(--primary); }
-        .cal-day.completed { background-color: var(--primary); color: #000; }
+        .cal-day {
+            aspect-ratio: 1;
+            background: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            position: relative;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            transition: 0.3s;
+            font-family: var(--font-numbers);
+        }
+        .cal-day.today {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            box-shadow: inset 0 0 10px var(--primary-glow);
+        }
+        .cal-day.completed {
+            background-color: var(--primary) !important;
+            color: #000 !important;
+            box-shadow: 0 0 15px var(--primary);
+        }
+        .cal-day.missed {
+            background-color: rgba(255, 0, 85, 0.2) !important;
+            border: 1px solid var(--danger);
+            color: var(--danger) !important;
+        }
 
         /* Activity Map Container for better scrolling */
         .activity-map-container {
@@ -871,12 +907,21 @@
         .scanlines {
             position: fixed;
             inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 3px 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.15) 50%
+            );
+            background-size: 100% 4px;
             pointer-events: none;
             z-index: 9998;
-            opacity: 0.5;
+            opacity: 0.3;
+        }
+        .scanlines::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 3px 100%;
         }
 
         /* --- IMMERSIVE EFFECTS --- */
@@ -893,7 +938,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: var(--border);
-            border-radius: 4px;
+            clip-path: var(--clip-path);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -1108,53 +1153,19 @@
                             </div>
                         </div>
                     </div>
-                    
-                    
-                    <div class="rpg-stats-grid glass-panel">
-                        <div class="rpg-stat-card">
-                            <div class="rpg-stat-label">
-                                <span>STR</span>
-                                <span id="dash-stat-str">10</span>
-                            </div>
-                            <div class="rpg-stat-bar-bg">
-                                <div class="rpg-stat-bar-fill" id="dash-bar-str"></div>
-                            </div>
+
+                    <div class="legacy-stats-grid" style="margin-bottom: 2rem;">
+                        <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
+                            <span class="legacy-stat-val highlight" id="dash-best-streak" style="color: var(--primary); font-family: var(--font-numbers);">0</span>
+                            <span class="legacy-stat-lbl">Best Streak</span>
                         </div>
-                        <div class="rpg-stat-card">
-                            <div class="rpg-stat-label">
-                                <span>INT</span>
-                                <span id="dash-stat-int">10</span>
-                            </div>
-                            <div class="rpg-stat-bar-bg">
-                                <div class="rpg-stat-bar-fill" id="dash-bar-int"></div>
-                            </div>
+                        <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
+                            <span class="legacy-stat-val" id="dash-curr-streak" style="font-family: var(--font-numbers);">0</span>
+                            <span class="legacy-stat-lbl">Current Streak</span>
                         </div>
-                        <div class="rpg-stat-card">
-                            <div class="rpg-stat-label">
-                                <span>AGI</span>
-                                <span id="dash-stat-agi">10</span>
-                            </div>
-                            <div class="rpg-stat-bar-bg">
-                                <div class="rpg-stat-bar-fill" id="dash-bar-agi"></div>
-                            </div>
-                        </div>
-                        <div class="rpg-stat-card">
-                            <div class="rpg-stat-label">
-                                <span>VIT</span>
-                                <span id="dash-stat-vit">10</span>
-                            </div>
-                            <div class="rpg-stat-bar-bg">
-                                <div class="rpg-stat-bar-fill" id="dash-bar-vit"></div>
-                            </div>
-                        </div>
-                        <div class="rpg-stat-card">
-                            <div class="rpg-stat-label">
-                                <span>SNS</span>
-                                <span id="dash-stat-sns">10</span>
-                            </div>
-                            <div class="rpg-stat-bar-bg">
-                                <div class="rpg-stat-bar-fill" id="dash-bar-sns"></div>
-                            </div>
+                        <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
+                            <span class="legacy-stat-val" id="dash-total-quests" style="font-family: var(--font-numbers);">0</span>
+                            <span class="legacy-stat-lbl">Total Quests</span>
                         </div>
                     </div>
                     
@@ -1168,42 +1179,56 @@
                 </section>
                 
                 
-                <!-- HISTORY VIEW (Replaced with index.html features) -->
+                <!-- HISTORY VIEW -->
                 <section id="history" class="view-section">
-                    <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 1.5rem;">Chronicles</h2>
+                    <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 1.5rem; letter-spacing: 4px;">[ CHRONICLES ]</h2>
                     
                     <div class="history-grid"> 
-                       <div class="card"> 
-                        <div class="stat-label">
-                          Activity Trend (30 Days) 
+                       <div class="glass-panel" style="padding: 1.5rem; position: relative;">
+                        <div class="stat-label" style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase;">
+                          Holographic Activity Trend
                         </div> 
-                        <div class="chart-container"> 
+                        <div class="chart-container" style="margin-top: 1rem;">
                          <canvas id="historyChart"></canvas> 
                         </div> 
+                        <div style="position: absolute; bottom: 10px; right: 10px; font-size: 0.6rem; color: var(--primary); opacity: 0.5; font-family: var(--font-system);">SYSTEM ANALYSIS: ACTIVE</div>
                        </div> 
-                       <div class="card"> 
-                        <div class="stat-label">
-                          Monthly Consistency 
+                       <div class="glass-panel" style="padding: 1.5rem;">
+                        <div class="stat-label" style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase;">
+                          Sync Rate (30D)
                         </div> 
                         <div class="ring-container-large"> 
-                         <svg class="ring-large-svg" viewbox="0 0 200 200"> <circle class="ring-large-bg" cx="100" cy="100" r="80" stroke-width="12" fill="none"></circle> <circle class="ring-large-fill" id="history-ring" cx="100" cy="100" r="80" stroke-width="12" fill="none" stroke-dasharray="502.65" stroke-dashoffset="502.65"></circle> 
+                         <svg class="ring-large-svg" viewbox="0 0 200 200">
+                           <circle class="ring-large-bg" cx="100" cy="100" r="80" stroke-width="8" fill="none" style="stroke: rgba(0,245,255,0.05);"></circle>
+                           <circle class="ring-large-fill" id="history-ring" cx="100" cy="100" r="80" stroke-width="12" fill="none" stroke-dasharray="502.65" stroke-dashoffset="502.65" style="filter: drop-shadow(0 0 8px var(--primary));"></circle>
                          </svg> 
                          <div class="ring-text-center"> 
-                          <div class="ring-percent" id="history-percent">
+                          <div class="ring-percent" id="history-percent" style="font-family: var(--font-numbers); color: var(--primary); text-shadow: 0 0 10px var(--primary);">
                             0% 
                           </div> 
-                          <div class="ring-label">
-                            Completed 
+                          <div class="ring-label" style="font-family: var(--font-system); font-size: 0.7rem; letter-spacing: 2px;">
+                            COMPLETED
                           </div> 
                          </div> 
                         </div> 
                        </div> 
                       </div> 
                       <div class="activity-map-container"> 
-                       <div class="calendar-container"> 
-                        <h3>Activity Map</h3> 
-                        <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem;">Month to date view.</p> 
+                       <div class="glass-panel" style="padding: 2rem; position: relative; margin-bottom: 2rem;">
+                        <h3 style="font-family: var(--font-display); color: var(--primary); letter-spacing: 2px; margin-bottom: 0.5rem;">[ DUNGEON LOG ]</h3>
+                        <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 1.5rem; font-family: var(--font-system); border-bottom: 1px solid rgba(0,245,255,0.1); padding-bottom: 10px;">
+                            TRACKING SYSTEM HISTORY... STATUS: CALIBRATED
+                        </p>
                         <div class="calendar-grid" id="calendar-grid"></div> 
+
+                        <div style="display: flex; gap: 15px; margin-top: 2rem; justify-content: flex-end; align-items: center;">
+                            <span style="font-size: 0.6rem; font-family: var(--font-system); color: var(--text-dim);">DENSITY:</span>
+                            <div style="width: 12px; height: 12px; background: var(--heat-0); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
+                            <div style="width: 12px; height: 12px; background: var(--heat-1); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
+                            <div style="width: 12px; height: 12px; background: var(--heat-2); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
+                            <div style="width: 12px; height: 12px; background: var(--heat-3); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
+                            <div style="width: 12px; height: 12px; background: var(--heat-4); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
+                        </div>
                        </div> 
                       </div>
                 </section>
@@ -1237,21 +1262,21 @@
                         </div>
 
                         <div class="legacy-stats-grid" style="margin-bottom: 2.5rem;">
-                            <div class="legacy-stat-box">
-                                <span class="legacy-stat-val highlight" id="status-best-streak" style="color: var(--primary);">0</span>
+                            <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
+                                <span class="legacy-stat-val highlight" id="status-best-streak" style="color: var(--primary); font-family: var(--font-numbers);">0</span>
                                 <span class="legacy-stat-lbl">Best Streak</span>
                             </div>
-                            <div class="legacy-stat-box">
-                                <span class="legacy-stat-val" id="status-curr-streak">0</span>
+                            <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
+                                <span class="legacy-stat-val" id="status-curr-streak" style="font-family: var(--font-numbers);">0</span>
                                 <span class="legacy-stat-lbl">Current Streak</span>
                             </div>
-                            <div class="legacy-stat-box">
-                                <span class="legacy-stat-val" id="status-total-quests">0</span>
+                            <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
+                                <span class="legacy-stat-val" id="status-total-quests" style="font-family: var(--font-numbers);">0</span>
                                 <span class="legacy-stat-lbl">Total Quests</span>
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 2.5rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border: 1px solid rgba(0,245,255,0.1);">
+                        <div style="margin-bottom: 2.5rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border: 1px solid rgba(0,245,255,0.1); clip-path: var(--clip-path);">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                                 <span style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Attribute Allocation</span>
                                 <div style="text-align: right;">
@@ -1260,73 +1285,66 @@
                                 </div>
                             </div>
 
-                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
-                                <div>
-                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">STRENGTH</div>
-                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Physical Quest XP</div>
+                            <div class="rpg-stats-grid" style="background: none; border: none; padding: 0;">
+                                <div class="rpg-stat-card" style="grid-column: span 3; background: rgba(255,255,255,0.02); padding: 10px; border: 1px solid rgba(0,245,255,0.05);">
+                                    <div class="rpg-stat-label">
+                                        <span style="font-size: 10px;">STR</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span id="stat-str" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="rpg-stat-bar-bg">
+                                        <div class="rpg-stat-bar-fill" id="bar-str"></div>
+                                    </div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
-                                    <div id="bar-str" style="background: var(--primary); height: 100%; width: 50%;"></div>
+                                <div class="rpg-stat-card" style="grid-column: span 3; background: rgba(255,255,255,0.02); padding: 10px; border: 1px solid rgba(0,245,255,0.05);">
+                                    <div class="rpg-stat-label">
+                                        <span style="font-size: 10px;">INT</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span id="stat-int" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="rpg-stat-bar-bg">
+                                        <div class="rpg-stat-bar-fill" id="bar-int"></div>
+                                    </div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
-                                    <span id="stat-str" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
-                                    <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
+                                <div class="rpg-stat-card" style="grid-column: span 3; background: rgba(255,255,255,0.02); padding: 10px; border: 1px solid rgba(0,245,255,0.05);">
+                                    <div class="rpg-stat-label">
+                                        <span style="font-size: 10px;">AGI</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span id="stat-agi" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="rpg-stat-bar-bg">
+                                        <div class="rpg-stat-bar-fill" id="bar-agi"></div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
-                                <div>
-                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">INTELLIGENCE</div>
-                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Learning Quest XP</div>
+                                <div class="rpg-stat-card" style="grid-column: span 3; background: rgba(255,255,255,0.02); padding: 10px; border: 1px solid rgba(0,245,255,0.05);">
+                                    <div class="rpg-stat-label">
+                                        <span style="font-size: 10px;">VIT</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span id="stat-vit" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="rpg-stat-bar-bg">
+                                        <div class="rpg-stat-bar-fill" id="bar-vit"></div>
+                                    </div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
-                                    <div id="bar-int" style="background: var(--primary); height: 100%; width: 50%;"></div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
-                                    <span id="stat-int" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
-                                    <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
-                                </div>
-                            </div>
-
-                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
-                                <div>
-                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">AGILITY</div>
-                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Streak Bonuses</div>
-                                </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
-                                    <div id="bar-agi" style="background: var(--primary); height: 100%; width: 50%;"></div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
-                                    <span id="stat-agi" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
-                                    <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
-                                </div>
-                            </div>
-
-                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
-                                <div>
-                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">VITALITY</div>
-                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Reduces Missed Quest Penalty</div>
-                                </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
-                                    <div id="bar-vit" style="background: var(--primary); height: 100%; width: 50%;"></div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
-                                    <span id="stat-vit" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
-                                    <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
-                                </div>
-                            </div>
-
-                            <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
-                                <div>
-                                    <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">SENSE</div>
-                                    <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Focus/Awareness Quest XP</div>
-                                </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
-                                    <div id="bar-sns" style="background: var(--primary); height: 100%; width: 50%;"></div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
-                                    <span id="stat-sns" style="font-family: var(--font-system); font-size: 1.1rem; color: #fff;">10</span>
-                                    <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 20px; height: 20px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 12px;">+</button>
+                                <div class="rpg-stat-card" style="grid-column: 2 / span 4; background: rgba(255,255,255,0.02); padding: 10px; border: 1px solid rgba(0,245,255,0.05);">
+                                    <div class="rpg-stat-label">
+                                        <span style="font-size: 10px;">SNS</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span id="stat-sns" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="rpg-stat-bar-bg">
+                                        <div class="rpg-stat-bar-fill" id="bar-sns"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1487,8 +1505,7 @@
             }
 
             const colorLine = '#00f5ff';
-            const colorFill = 'rgba(0, 245, 255, 0.1)';
-            const colorGrid = '#333';
+            const colorGrid = 'rgba(0, 245, 255, 0.1)';
 
             const w = canvas.width;
             const h = canvas.height;
@@ -1496,15 +1513,26 @@
             const bottomPadding = 40;
 
             ctx.clearRect(0,0,w,h);
+
+            // Draw Grid Lines
             ctx.strokeStyle = colorGrid;
             ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(padding, h - bottomPadding);
-            ctx.lineTo(w - padding, h - bottomPadding);
-            ctx.stroke();
+            for(let i=0; i<=4; i++) {
+                const y = padding + i * (h - padding - bottomPadding) / 4;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(w - padding, y);
+                ctx.stroke();
+            }
 
             if (dataPoints.length > 1) {
                 const stepX = (w - 2*padding) / (dataPoints.length - 1);
+
+                // Draw Area Gradient
+                const gradient = ctx.createLinearGradient(0, padding, 0, h - bottomPadding);
+                gradient.addColorStop(0, 'rgba(0, 245, 255, 0.2)');
+                gradient.addColorStop(1, 'rgba(123, 97, 255, 0)');
+
                 ctx.beginPath();
                 ctx.moveTo(padding, h - bottomPadding);
                 dataPoints.forEach((val, i) => {
@@ -1513,12 +1541,15 @@
                     ctx.lineTo(x, y);
                 });
                 ctx.lineTo(padding + (dataPoints.length - 1) * stepX, h - bottomPadding);
-                ctx.fillStyle = colorFill;
+                ctx.fillStyle = gradient;
                 ctx.fill();
 
+                // Draw Main Line with Glow
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = colorLine;
                 ctx.beginPath();
                 ctx.strokeStyle = colorLine;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 3;
                 dataPoints.forEach((val, i) => {
                     const x = padding + i * stepX;
                     const y = (h - bottomPadding) - (val / 100) * (h - padding - bottomPadding);
@@ -1526,10 +1557,11 @@
                     else ctx.lineTo(x, y);
                 });
                 ctx.stroke();
+                ctx.shadowBlur = 0; // Reset shadow
 
                 // Draw X-axis labels (Day number)
-                ctx.fillStyle = '#666';
-                ctx.font = '10px var(--font-display)';
+                ctx.fillStyle = 'rgba(0, 245, 255, 0.5)';
+                ctx.font = '10px var(--font-numbers)';
                 ctx.textAlign = 'center';
                 labels.forEach((day, i) => {
                     if (i % 5 === 0 || i === labels.length - 1) {
@@ -1586,22 +1618,22 @@
                     if(h.completedDates.includes(dateStr)) completedCount++; 
                 });
                 
+                const isPast = d < now && dateStr !== todayStr;
+                const isMissed = isPast && scheduledHabits.length > 0 && completedCount === 0;
+
                 // Calculate heat level based on completed tasks
                 let heatLevel = 0;
                 if (completedCount > 0) {
-                    // Level 1: 1-2 tasks, Level 2: 3-4, Level 3: 5-6, Level 4: 7+
                     heatLevel = Math.min(4, Math.ceil(completedCount / 2));
                 }
 
                 const div = document.createElement('div');
-                div.className = `cal-day ${isToday ? 'today' : ''}`;
-                div.style.backgroundColor = `var(--heat-${heatLevel})`;
+                div.className = `cal-day ${isToday ? 'today' : ''} ${completedCount > 0 ? 'completed' : ''} ${isMissed ? 'missed' : ''}`;
 
-                // Adjust text color for better contrast on brighter colors
-                if (heatLevel >= 3) {
-                    div.style.color = '#000';
-                } else if (heatLevel > 0) {
-                    div.style.color = '#fff';
+                if (!isMissed && completedCount === 0) {
+                    div.style.backgroundColor = `var(--heat-${heatLevel})`;
+                } else if (completedCount > 0) {
+                    div.style.backgroundColor = `var(--heat-${heatLevel})`;
                 }
 
                 div.textContent = dayNum;
@@ -2279,20 +2311,16 @@
                 document.getElementById('xp-text').innerText = `${State.user.xp} / ${State.user.xpToNext} XP`;
                 document.getElementById('xp-bar').style.width = `${Math.max(0, (State.user.xp / State.user.xpToNext) * 100)}%`;
                 
-                // Update Dashboard RPG Stats
-                ['str', 'int', 'agi', 'vit', 'sns'].forEach(s => {
-                    const valEl = document.getElementById(`dash-stat-${s}`);
-                    const barEl = document.getElementById(`dash-bar-${s}`);
-                    if (valEl) valEl.innerText = State.user.stats[s];
-                    if (barEl) {
-                        const maxStatValue = 100;
-                        const pct = Math.min(100, (State.user.stats[s] / maxStatValue) * 100);
-                        barEl.style.width = pct + '%';
-                    }
-                });
-
-                // Update Legacy Stats in Status View
+                // Update Summary Stats
                 const best = State.habits.reduce((max, h) => Math.max(max, h.bestStreak), 0);
+
+                // Dashboard Summary
+                if (document.getElementById('dash-best-streak')) {
+                    document.getElementById('dash-best-streak').innerText = best;
+                    document.getElementById('dash-total-quests').innerText = State.user.totalCompleted;
+                }
+
+                // Status View Summary
                 if (document.getElementById('status-best-streak')) {
                     document.getElementById('status-best-streak').innerText = best;
                     document.getElementById('status-total-quests').innerText = State.user.totalCompleted;
@@ -2373,6 +2401,9 @@
                 
                 if (document.getElementById('status-curr-streak')) {
                     document.getElementById('status-curr-streak').innerText = currentStreakTotal;
+                }
+                if (document.getElementById('dash-curr-streak')) {
+                    document.getElementById('dash-curr-streak').innerText = currentStreakTotal;
                 }
                 
                 // Update status view elements if they exist
