@@ -330,39 +330,90 @@
             color: var(--text-dim); 
         }
 
-        .stats-grid { 
+        .rpg-stats-grid {
             display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
+            grid-template-columns: repeat(6, 1fr);
             gap: 1rem; 
             margin-bottom: 2rem; 
             background: var(--panel-bg); 
-            padding: 1.5rem; 
-            border-radius: 8px; 
+            padding: 0.75rem;
+            border-radius: 4px;
             border: var(--border);
         }
-        .stat-box { 
-            text-align: center; 
-            padding: 1rem;
+        .rpg-stat-card {
+            grid-column: span 2;
+            padding: 0.5rem;
             border: 1px solid transparent;
-            transition: 0.3s;
+            transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(0, 0, 0, 0.2);
         }
-        .stat-box:hover {
-            border: 1px solid var(--border-color);
+        .rpg-stat-card:nth-child(4) { grid-column: 2 / span 2; }
+        .rpg-stat-card:nth-child(5) { grid-column: 4 / span 2; }
+
+        .rpg-stat-card:hover {
+            transform: scale(1.05);
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
             background: rgba(0, 245, 255, 0.05);
+            z-index: 1;
         }
-        .stat-val { 
+        .rpg-stat-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .rpg-stat-label span:first-child {
+            font-family: var(--font-system);
+            font-size: 12px;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+        .rpg-stat-label span:last-child {
+            font-family: var(--font-display);
+            font-size: 14px;
+            color: #fff;
+            font-weight: bold;
+        }
+        .rpg-stat-bar-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .rpg-stat-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+        .legacy-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .legacy-stat-box {
+            text-align: center;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 245, 255, 0.1);
+        }
+        .legacy-stat-val {
             display: block; 
             font-family: var(--font-display); 
-            font-size: 2.2rem;
+            font-size: 1.5rem;
             color: var(--text-main); 
-            font-weight: 900;
+            font-weight: bold;
         }
-        .stat-lbl { 
+        .legacy-stat-lbl {
             font-family: var(--font-system);
-            font-size: 0.7rem;
-            color: var(--primary);
+            font-size: 0.6rem;
+            color: var(--text-dim);
             text-transform: uppercase; 
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         .stat-val.highlight { 
             color: var(--primary); 
@@ -741,8 +792,15 @@
                 padding: 4rem 1rem 2rem 1rem; 
             }
             
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .rpg-stats-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            .rpg-stat-card {
+                grid-column: span 1 !important;
+            }
+            .legacy-stats-grid {
+                grid-template-columns: 1fr;
             }
             
 
@@ -965,6 +1023,33 @@
         </div>
     </div>
     
+    <!-- Player Profile Modal -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-box system-shimmer">
+            <h3 style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER REGISTRATION</h3>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name</label>
+                <input type="text" id="profile-name-input" class="input-field" placeholder="Enter Player Name..." maxlength="20" autocomplete="off">
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Job / Class</label>
+                <input type="text" id="profile-job-input" class="input-field" list="job-suggestions" placeholder="Enter Job..." maxlength="25" autocomplete="off">
+                <datalist id="job-suggestions">
+                    <option value="Shadow Monarch">
+                    <option value="Necromancer">
+                    <option value="Assassin">
+                    <option value="Warrior">
+                    <option value="Mage">
+                </datalist>
+            </div>
+
+            <button class="btn-primary" onclick="App.saveProfile()">Confirm Changes</button>
+            <button style="background: none; border: none; color: #666; width: 100%; margin-top: 1rem; cursor: pointer;" onclick="App.closeModal('profile-modal')">Cancel</button>
+        </div>
+    </div>
+
     <!-- Level Up Modal -->
     <div class="modal-overlay" id="level-modal">
         <div class="modal-box" style="text-align: center; max-width: 500px; padding: 4rem 2rem;">
@@ -1025,22 +1110,51 @@
                     </div>
                     
                     
-                    <div class="stats-grid glass-panel">
-                        <div class="stat-box">
-                            <span class="stat-val highlight" id="best-streak">0</span>
-                            <span class="stat-lbl">Best Streak</span>
+                    <div class="rpg-stats-grid glass-panel">
+                        <div class="rpg-stat-card">
+                            <div class="rpg-stat-label">
+                                <span>STR</span>
+                                <span id="dash-stat-str">10</span>
+                            </div>
+                            <div class="rpg-stat-bar-bg">
+                                <div class="rpg-stat-bar-fill" id="dash-bar-str"></div>
+                            </div>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-val" id="curr-streak">0</span>
-                            <span class="stat-lbl">Current Streak</span>
+                        <div class="rpg-stat-card">
+                            <div class="rpg-stat-label">
+                                <span>INT</span>
+                                <span id="dash-stat-int">10</span>
+                            </div>
+                            <div class="rpg-stat-bar-bg">
+                                <div class="rpg-stat-bar-fill" id="dash-bar-int"></div>
+                            </div>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-val" id="total-quests">0</span>
-                            <span class="stat-lbl">Total Quests</span>
+                        <div class="rpg-stat-card">
+                            <div class="rpg-stat-label">
+                                <span>AGI</span>
+                                <span id="dash-stat-agi">10</span>
+                            </div>
+                            <div class="rpg-stat-bar-bg">
+                                <div class="rpg-stat-bar-fill" id="dash-bar-agi"></div>
+                            </div>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-val highlight" id="rank-display">E</span>
-                            <span class="stat-lbl">Rank</span>
+                        <div class="rpg-stat-card">
+                            <div class="rpg-stat-label">
+                                <span>VIT</span>
+                                <span id="dash-stat-vit">10</span>
+                            </div>
+                            <div class="rpg-stat-bar-bg">
+                                <div class="rpg-stat-bar-fill" id="dash-bar-vit"></div>
+                            </div>
+                        </div>
+                        <div class="rpg-stat-card">
+                            <div class="rpg-stat-label">
+                                <span>SNS</span>
+                                <span id="dash-stat-sns">10</span>
+                            </div>
+                            <div class="rpg-stat-bar-bg">
+                                <div class="rpg-stat-bar-fill" id="dash-bar-sns"></div>
+                            </div>
                         </div>
                     </div>
                     
@@ -1101,23 +1215,49 @@
                     </h2>
 
                     <div class="glass-panel system-shimmer" style="padding: 3rem; max-width: 600px; margin: 0 auto; position: relative; border-radius: 0;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
-                            <div style="text-align: left;">
-                                <div style="font-family: var(--font-system); font-size: 0.8rem; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Player Name</div>
-                                <div style="font-family: var(--font-display); font-size: 1.8rem; color: #fff;">SUNG JIN-WOO</div>
-                                <div id="status-level" style="font-family: var(--font-system); color: var(--primary); margin-top: 5px;">LEVEL 1</div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(0, 245, 255, 0.1); padding-bottom: 2rem; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 200px; text-align: left;">
+                                <div style="font-family: var(--font-system); font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Player Identity</div>
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 5px;">
+                                    <span id="status-player-name" style="font-family: var(--font-display); font-size: 1.8rem; color: #fff; transition: 0.3s; line-height: 1.2;">SUNG JIN-WOO</span>
+                                    <span onclick="App.openProfileModal()" style="cursor: pointer; font-size: 1.2rem; color: var(--text-dim); transition: 0.2s; line-height: 1;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-dim)'">✎</span>
+                                </div>
+                                <div id="status-level" style="font-family: var(--font-system); color: var(--primary); font-size: 1.1rem; letter-spacing: 1px;">LEVEL 1</div>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-family: var(--font-system); font-size: 0.8rem; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Job</div>
-                                <div style="font-family: var(--font-display); font-size: 1.2rem; color: #fff;">SHADOW MONARCH</div>
-                                <div style="font-family: var(--font-system); color: var(--text-dim); margin-top: 5px;">Rank: <span id="status-rank" style="color: var(--primary); font-weight: 900;">E</span></div>
+                            <div style="text-align: right; min-width: 150px; display: flex; flex-direction: column; align-items: flex-end;">
+                                <div style="font-family: var(--font-system); font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Class / Job</div>
+                                <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-bottom: 5px;">
+                                    <span onclick="App.openProfileModal()" style="cursor: pointer; font-size: 1rem; color: var(--text-dim); transition: 0.2s; line-height: 1;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-dim)'">✎</span>
+                                    <span id="status-player-job" style="font-family: var(--font-display); font-size: 1.2rem; color: #fff; transition: 0.3s; line-height: 1.2;">SHADOW MONARCH</span>
+                                </div>
+                                <div style="font-family: var(--font-system); color: var(--text-dim); font-size: 1rem;">
+                                    Rank: <span id="status-rank" style="color: var(--primary); font-weight: 900; font-size: 1.2rem; text-shadow: 0 0 10px var(--primary);">E</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="legacy-stats-grid" style="margin-bottom: 2.5rem;">
+                            <div class="legacy-stat-box">
+                                <span class="legacy-stat-val highlight" id="status-best-streak" style="color: var(--primary);">0</span>
+                                <span class="legacy-stat-lbl">Best Streak</span>
+                            </div>
+                            <div class="legacy-stat-box">
+                                <span class="legacy-stat-val" id="status-curr-streak">0</span>
+                                <span class="legacy-stat-lbl">Current Streak</span>
+                            </div>
+                            <div class="legacy-stat-box">
+                                <span class="legacy-stat-val" id="status-total-quests">0</span>
+                                <span class="legacy-stat-lbl">Total Quests</span>
                             </div>
                         </div>
 
                         <div style="margin-bottom: 2.5rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border: 1px solid rgba(0,245,255,0.1);">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                                <span style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Available Points</span>
-                                <span id="status-points" style="color: var(--warning); font-family: var(--font-display); font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px var(--warning);">0</span>
+                                <span style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Attribute Allocation</span>
+                                <div style="text-align: right;">
+                                    <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 2px;">Available Points</span>
+                                    <span id="status-points" style="color: var(--warning); font-family: var(--font-display); font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px var(--warning);">0</span>
+                                </div>
                             </div>
 
                             <div class="status-stat-item" style="display: grid; grid-template-columns: 1fr 100px 50px; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
@@ -1125,7 +1265,7 @@
                                     <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">STRENGTH</div>
                                     <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Physical Quest XP</div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
                                     <div id="bar-str" style="background: var(--primary); height: 100%; width: 50%;"></div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
@@ -1139,7 +1279,7 @@
                                     <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">INTELLIGENCE</div>
                                     <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Learning Quest XP</div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
                                     <div id="bar-int" style="background: var(--primary); height: 100%; width: 50%;"></div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
@@ -1153,7 +1293,7 @@
                                     <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">AGILITY</div>
                                     <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Streak Bonuses</div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
                                     <div id="bar-agi" style="background: var(--primary); height: 100%; width: 50%;"></div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
@@ -1167,7 +1307,7 @@
                                     <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">VITALITY</div>
                                     <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Reduces Missed Quest Penalty</div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
                                     <div id="bar-vit" style="background: var(--primary); height: 100%; width: 50%;"></div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
@@ -1181,7 +1321,7 @@
                                     <div style="font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 1px; color: #fff;">SENSE</div>
                                     <div style="font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-ui);">Affects Focus/Awareness Quest XP</div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: rgba(255,255,255,0.05); height: 4px; border-radius: 2px; overflow: hidden;">
                                     <div id="bar-sns" style="background: var(--primary); height: 100%; width: 50%;"></div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
@@ -1257,6 +1397,8 @@
         const STORAGE_KEY = 'apex_final_fixed';
         const defaultState = {
             user: { 
+                name: "SUNG JIN-WOO",
+                job: "SHADOW MONARCH",
                 level: 1, 
                 xp: 0, 
                 xpToNext: 100, 
@@ -1649,6 +1791,10 @@
                 // Run data migration
                 this.migrateHabits();
                 
+                // Player Identity Migration
+                if (!State.user.name) State.user.name = "SUNG JIN-WOO";
+                if (!State.user.job) State.user.job = "SHADOW MONARCH";
+
                 this.updateDate();
                 setInterval(() => this.updateDate(), 60000);
                 
@@ -1811,6 +1957,48 @@
 
             closeModal(id = 'add-modal') { 
                 document.getElementById(id).classList.remove('open'); 
+            },
+
+            openProfileModal() {
+                document.getElementById('profile-name-input').value = State.user.name;
+                document.getElementById('profile-job-input').value = State.user.job;
+                document.getElementById('profile-modal').classList.add('open');
+            },
+
+            saveProfile() {
+                const newName = document.getElementById('profile-name-input').value.trim();
+                const newJob = document.getElementById('profile-job-input').value.trim();
+
+                if (!newName || !newJob) {
+                    alert("Name and Job cannot be empty.");
+                    return;
+                }
+
+                const updatedName = newName !== State.user.name;
+                const updatedJob = newJob !== State.user.job;
+
+                State.user.name = newName;
+                State.user.job = newJob;
+
+                saveState();
+                this.closeModal('profile-modal');
+                this.showSystemMessage('PLAYER DATA UPDATED', 'Registration data has been updated in the system.');
+
+                // Animation feedback
+                if (updatedName) {
+                    const el = document.getElementById('status-player-name');
+                    if (el) {
+                        el.classList.add('stat-glow-pulse');
+                        setTimeout(() => el.classList.remove('stat-glow-pulse'), 1000);
+                    }
+                }
+                if (updatedJob) {
+                    const el = document.getElementById('status-player-job');
+                    if (el) {
+                        el.classList.add('stat-glow-pulse');
+                        setTimeout(() => el.classList.remove('stat-glow-pulse'), 1000);
+                    }
+                }
             },
 
             toggleEveryday() {
@@ -2091,10 +2279,24 @@
                 document.getElementById('xp-text').innerText = `${State.user.xp} / ${State.user.xpToNext} XP`;
                 document.getElementById('xp-bar').style.width = `${Math.max(0, (State.user.xp / State.user.xpToNext) * 100)}%`;
                 
-                // Calculate stats
+                // Update Dashboard RPG Stats
+                ['str', 'int', 'agi', 'vit', 'sns'].forEach(s => {
+                    const valEl = document.getElementById(`dash-stat-${s}`);
+                    const barEl = document.getElementById(`dash-bar-${s}`);
+                    if (valEl) valEl.innerText = State.user.stats[s];
+                    if (barEl) {
+                        const maxStatValue = 100;
+                        const pct = Math.min(100, (State.user.stats[s] / maxStatValue) * 100);
+                        barEl.style.width = pct + '%';
+                    }
+                });
+
+                // Update Legacy Stats in Status View
                 const best = State.habits.reduce((max, h) => Math.max(max, h.bestStreak), 0);
-                document.getElementById('best-streak').innerText = best;
-                document.getElementById('total-quests').innerText = State.user.totalCompleted;
+                if (document.getElementById('status-best-streak')) {
+                    document.getElementById('status-best-streak').innerText = best;
+                    document.getElementById('status-total-quests').innerText = State.user.totalCompleted;
+                }
                 
                 
                 
@@ -2169,12 +2371,16 @@
                     }
                 });
                 
-                document.getElementById('curr-streak').innerText = currentStreakTotal;
+                if (document.getElementById('status-curr-streak')) {
+                    document.getElementById('status-curr-streak').innerText = currentStreakTotal;
+                }
                 
                 // Update status view elements if they exist
                 if (document.getElementById('status-rank')) {
                     document.getElementById('status-rank').innerText = State.user.rank;
                     document.getElementById('status-level').innerText = 'LEVEL ' + State.user.level;
+                    document.getElementById('status-player-name').innerText = State.user.name;
+                    document.getElementById('status-player-job').innerText = State.user.job;
                     document.getElementById('status-points').innerText = State.user.stats.points;
                     document.getElementById('stat-str').innerText = State.user.stats.str;
                     document.getElementById('stat-int').innerText = State.user.stats.int;
