@@ -1159,8 +1159,8 @@
                         </div>
                         <div class="xp-section">
                             <div class="xp-info">
-                                <span class="level-badge" id="header-level">LVL 1</span>
-                                <span class="xp-text" id="xp-text">0 / 100 XP</span>
+                                <span class="level-badge" id="header-level" data-target="dash-level">LVL 1</span>
+                                <span class="xp-text" id="xp-text" data-target="dash-xp">0 / 100 XP</span>
                             </div>
                             <div class="xp-track">
                                 <div class="xp-fill" id="xp-bar"></div>
@@ -1261,7 +1261,7 @@
                                     <span id="status-player-name" style="font-family: var(--font-display); font-size: 1.8rem; color: #fff; transition: 0.3s; line-height: 1.2;">SUNG JIN-WOO</span>
                                     <span onclick="App.openProfileModal()" style="cursor: pointer; font-size: 1.2rem; color: var(--text-dim); transition: 0.2s; line-height: 1;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-dim)'">✎</span>
                                 </div>
-                                <div id="status-level" style="font-family: var(--font-system); color: var(--primary); font-size: 1.1rem; letter-spacing: 1px;">LEVEL 1</div>
+                                <div id="status-level" data-target="status-level" style="font-family: var(--font-system); color: var(--primary); font-size: 1.1rem; letter-spacing: 1px;">LEVEL 1</div>
                             </div>
                             <div style="text-align: right; min-width: 150px; display: flex; flex-direction: column; align-items: flex-end;">
                                 <div style="font-family: var(--font-system); font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Class / Job</div>
@@ -1270,7 +1270,7 @@
                                     <span id="status-player-job" style="font-family: var(--font-display); font-size: 1.2rem; color: #fff; transition: 0.3s; line-height: 1.2;">SHADOW MONARCH</span>
                                 </div>
                                 <div style="font-family: var(--font-system); color: var(--text-dim); font-size: 1rem;">
-                                    Rank: <span id="status-rank" style="color: var(--primary); font-weight: 900; font-size: 1.2rem; text-shadow: 0 0 10px var(--primary);">E</span>
+                                    Rank: <span id="status-rank" data-target="status-rank" style="color: var(--primary); font-weight: 900; font-size: 1.2rem; text-shadow: 0 0 10px var(--primary);">E</span>
                                 </div>
                             </div>
                         </div>
@@ -2524,6 +2524,259 @@
                 App.renderHistory();
             }
         });
+
+        /**
+         * APEX Progression System
+         * Handles tiered XP scaling, player state persistence, and UI synchronization.
+         */
+        window.APEX = {
+            TIERS: [
+                { min: 1, max: 10, base: 80, growth: 1.45, rank: 'E' },
+                { min: 11, max: 20, base: 140, growth: 1.40, rank: 'D' },
+                { min: 21, max: 35, base: 220, growth: 1.35, rank: 'C' },
+                { min: 36, max: 50, base: 350, growth: 1.30, rank: 'B' },
+                { min: 51, max: 70, base: 600, growth: 1.25, rank: 'A' },
+                { min: 71, max: 90, base: 1100, growth: 1.20, rank: 'S' }
+            ],
+            playerState: {
+                level: 1,
+                currentXp: 0,
+                rank: 'E',
+                streak: 0,
+                totalQuests: 0,
+                attributes: { STR: 10, INT: 10, AGI: 10, VIT: 10, SNS: 10 },
+                availablePoints: 0
+            },
+
+            init() {
+                const saved = localStorage.getItem('apex_player_data');
+                if (saved) {
+                    try {
+                        this.playerState = JSON.parse(saved);
+                    } catch (e) { console.error("Failed to load player data", e); }
+                }
+                this.syncUI();
+                this.hookIntoApp();
+            },
+
+            save() {
+                localStorage.setItem('apex_player_data', JSON.stringify(this.playerState));
+            },
+
+            getXpRequired(level) {
+                const tier = this.TIERS.find(t => level >= t.min && level <= t.max) || this.TIERS[this.TIERS.length - 1];
+                // Formula: floor(base * growth ^ (level - tier_start))
+                return Math.floor(tier.base * Math.pow(tier.growth, level - tier.min));
+            },
+
+            getTotalXpForLevel(lvl) {
+                let total = 0;
+                for (let i = 1; i < lvl; i++) {
+                    total += this.getXpRequired(i);
+                }
+                return total;
+            },
+
+            getRankFromXp(xp) {
+                let lvl = 1;
+                let cumulative = 0;
+                while (lvl < 90) {
+                    let req = this.getXpRequired(lvl);
+                    if (xp < cumulative + req) break;
+                    cumulative += req;
+                    lvl++;
+                }
+                const tier = this.TIERS.find(t => lvl >= t.min && lvl <= t.max) || this.TIERS[this.TIERS.length - 1];
+                return tier.rank;
+            },
+
+            addXp(amount) {
+                this.playerState.currentXp += amount;
+                while (this.playerState.level < 90 && this.playerState.currentXp >= this.getXpRequired(this.playerState.level)) {
+                    this.levelUp();
+                }
+                this.save();
+                this.syncUI();
+            },
+
+            levelUp() {
+                this.playerState.currentXp -= this.getXpRequired(this.playerState.level);
+                this.playerState.level++;
+                const tier = this.TIERS.find(t => this.playerState.level >= t.min && this.playerState.level <= t.max) || this.TIERS[this.TIERS.length - 1];
+                this.playerState.rank = tier.rank;
+                this.playerState.availablePoints += 5;
+
+                if (window.AudioSys) window.AudioSys.play('levelup');
+
+                const levelModal = document.getElementById('level-modal');
+                if (levelModal) {
+                    const msg = document.getElementById('level-msg');
+                    if (msg) msg.innerText = `You have reached Level ${this.playerState.level}`;
+                    levelModal.classList.add('open');
+                }
+            },
+
+            updateStreak(direction) {
+                if (direction === 'up') {
+                    this.playerState.streak++;
+                    this.playerState.totalQuests++;
+                } else if (direction === 'reset') {
+                    this.playerState.streak = 0;
+                }
+                this.save();
+                this.syncUI();
+            },
+
+            completeQuest(difficulty) {
+                // E-Rank (+50), C-Rank (+150), A-Rank (+400)
+                const rewards = { 'easy': 50, 'medium': 150, 'hard': 400 };
+                const amount = rewards[difficulty] || 150;
+                this.addXp(amount);
+                this.updateStreak('up');
+            },
+
+            syncUI() {
+                const p = this.playerState;
+                const req = this.getXpRequired(p.level);
+
+                // Level & Rank Binding
+                const dashLvl = document.querySelector('[data-target="dash-level"]');
+                if (dashLvl) dashLvl.innerText = `LVL ${p.level}`;
+
+                const dashXp = document.querySelector('[data-target="dash-xp"]');
+                if (dashXp) dashXp.innerText = `${p.currentXp} / ${req} XP`;
+
+                const statusLvl = document.querySelector('[data-target="status-level"]');
+                if (statusLvl) statusLvl.innerText = `LEVEL ${p.level}`;
+
+                const statusRank = document.querySelector('[data-target="status-rank"]');
+                if (statusRank) statusRank.innerText = p.rank;
+
+                const headerRank = document.getElementById('header-rank');
+                if (headerRank) headerRank.innerText = p.rank;
+
+                // Progress Bar
+                const xpBar = document.getElementById('xp-bar');
+                if (xpBar) xpBar.style.width = `${Math.min(100, (p.currentXp / req) * 100)}%`;
+
+                // Stats & Points
+                const ptsEl = document.getElementById('status-points');
+                if (ptsEl) ptsEl.innerText = p.availablePoints;
+
+                for (const [key, val] of Object.entries(p.attributes)) {
+                    const el = document.getElementById(`stat-${key.toLowerCase()}`);
+                    if (el) el.innerText = val;
+                    const bar = document.getElementById(`bar-${key.toLowerCase()}`);
+                    if (bar) bar.style.width = `${Math.min(100, (val / 100) * 100)}%`;
+                }
+
+                // Streaks
+                ['dash', 'status'].forEach(v => {
+                    const s = document.getElementById(`${v}-curr-streak`);
+                    if (s) s.innerText = p.streak;
+                    const t = document.getElementById(`${v}-total-quests`);
+                    if (t) t.innerText = p.totalQuests;
+                    const b = document.getElementById(`${v}-best-streak`);
+                    if (b) {
+                        const currentBest = parseInt(b.innerText) || 0;
+                        if (p.streak > currentBest) b.innerText = p.streak;
+                    }
+                });
+
+                // Point Allocation Buttons
+                document.querySelectorAll('.stat-up-btn').forEach(btn => {
+                    btn.style.display = p.availablePoints > 0 ? 'flex' : 'none';
+                });
+            },
+
+            hookIntoApp() {
+                if (typeof App === 'undefined') return;
+
+                // Override rewards to match APEX requirements
+                App.getHabitXP = (habit) => {
+                    const diff = typeof habit === 'string' ? habit : habit.diff;
+                    const rewards = { 'easy': 50, 'medium': 150, 'hard': 400 };
+                    return rewards[diff] || 150;
+                };
+
+                // Override toggleHabit to use APEX progression
+                const originalToggle = App.toggleHabit.bind(App);
+                App.toggleHabit = (event, id) => {
+                    const habit = State.habits.find(h => h.id === id);
+                    if (!habit) return;
+                    const todayStr = getLocalDateString();
+                    const wasCompleted = habit.completedDates.includes(todayStr);
+
+                    // originalToggle adds XP to State.user.xp which we will sync from APEX
+                    originalToggle(event, id);
+
+                    const isCompletedNow = habit.completedDates.includes(todayStr);
+                    if (!wasCompleted && isCompletedNow) {
+                        this.completeQuest(habit.diff);
+                    } else if (wasCompleted && !isCompletedNow) {
+                        // Undo
+                        const rewards = { 'easy': 50, 'medium': 150, 'hard': 400 };
+                        const amount = rewards[habit.diff] || 150;
+                        this.playerState.currentXp = Math.max(0, this.playerState.currentXp - amount);
+                        this.playerState.streak = Math.max(0, this.playerState.streak - 1);
+                        this.playerState.totalQuests = Math.max(0, this.playerState.totalQuests - 1);
+                        this.save();
+                        this.syncUI();
+                    }
+
+                    // Force State.user to stay in sync with APEX to avoid confusion
+                    State.user.level = this.playerState.level;
+                    State.user.xp = this.playerState.currentXp;
+                    State.user.xpToNext = this.getXpRequired(this.playerState.level);
+                    State.user.rank = this.playerState.rank;
+                    saveState();
+                };
+
+                // Override allocateStat
+                App.allocateStat = (stat) => {
+                    if (this.playerState.availablePoints > 0) {
+                        this.playerState.attributes[stat.toUpperCase()]++;
+                        this.playerState.availablePoints--;
+
+                        // Sync with legacy state stats
+                        if (State.user.stats) {
+                            State.user.stats[stat.toLowerCase()] = this.playerState.attributes[stat.toUpperCase()];
+                            State.user.stats.points = this.playerState.availablePoints;
+                        }
+
+                        this.save();
+                        saveState();
+                        this.syncUI();
+
+                        if (window.AudioSys) window.AudioSys.play('click');
+                        const el = document.getElementById(`stat-${stat.toLowerCase()}`);
+                        if (el) {
+                            el.classList.add('stat-glow-pulse');
+                            setTimeout(() => el.classList.remove('stat-glow-pulse'), 800);
+                        }
+                    }
+                };
+
+                // Disable legacy level check
+                App.checkLevelUp = () => {};
+
+                // Inject sync into render
+                const originalRender = App.render.bind(App);
+                App.render = () => {
+                    // Update legacy state from APEX before render
+                    State.user.level = this.playerState.level;
+                    State.user.xp = this.playerState.currentXp;
+                    State.user.xpToNext = this.getXpRequired(this.playerState.level);
+                    State.user.rank = this.playerState.rank;
+
+                    originalRender();
+                    this.syncUI();
+                };
+            }
+        };
+
+        // Initialize APEX
+        APEX.init();
     </script>
 
     <!-- Service Worker Registration (ONLY ONCE) -->
