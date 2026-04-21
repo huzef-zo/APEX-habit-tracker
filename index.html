@@ -993,6 +993,30 @@
             color: #000 !important;
             box-shadow: 0 0 15px var(--primary);
         }
+
+        /* Centering plus buttons */
+        .rpg-stat-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .stat-up-btn {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 20px !important;
+            height: 20px !important;
+            padding: 0 !important;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .stat-up-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
     </style>
 </head>
 <body>
@@ -1170,15 +1194,15 @@
 
                     <div class="legacy-stats-grid" style="margin-bottom: 2rem;">
                         <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
-                            <span class="legacy-stat-val highlight" id="dash-best-streak" style="color: var(--primary); font-family: var(--font-numbers);">0</span>
+                            <span class="legacy-stat-val highlight" id="dash-best-streak" data-target="best-streak" style="color: var(--primary); font-family: var(--font-numbers);">0</span>
                             <span class="legacy-stat-lbl">Best Streak</span>
                         </div>
                         <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
-                            <span class="legacy-stat-val" id="dash-curr-streak" style="font-family: var(--font-numbers);">0</span>
+                            <span class="legacy-stat-val" id="dash-curr-streak" data-target="current-streak" style="font-family: var(--font-numbers);">0</span>
                             <span class="legacy-stat-lbl">Current Streak</span>
                         </div>
                         <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
-                            <span class="legacy-stat-val" id="dash-total-quests" style="font-family: var(--font-numbers);">0</span>
+                            <span class="legacy-stat-val" id="dash-total-quests" data-target="total-quests" style="font-family: var(--font-numbers);">0</span>
                             <span class="legacy-stat-lbl">Total Quests</span>
                         </div>
                     </div>
@@ -1277,25 +1301,28 @@
 
                         <div class="legacy-stats-grid" style="margin-bottom: 2.5rem;">
                             <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
-                                <span class="legacy-stat-val highlight" id="status-best-streak" style="color: var(--primary); font-family: var(--font-numbers);">0</span>
+                                <span class="legacy-stat-val highlight" id="status-best-streak" data-target="best-streak" style="color: var(--primary); font-family: var(--font-numbers);">0</span>
                                 <span class="legacy-stat-lbl">Best Streak</span>
                             </div>
                             <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
-                                <span class="legacy-stat-val" id="status-curr-streak" style="font-family: var(--font-numbers);">0</span>
+                                <span class="legacy-stat-val" id="status-curr-streak" data-target="current-streak" style="font-family: var(--font-numbers);">0</span>
                                 <span class="legacy-stat-lbl">Current Streak</span>
                             </div>
                             <div class="legacy-stat-box glass-panel" style="padding: 1rem;">
-                                <span class="legacy-stat-val" id="status-total-quests" style="font-family: var(--font-numbers);">0</span>
+                                <span class="legacy-stat-val" id="status-total-quests" data-target="total-quests" style="font-family: var(--font-numbers);">0</span>
                                 <span class="legacy-stat-lbl">Total Quests</span>
                             </div>
                         </div>
 
                         <div style="margin-bottom: 2.5rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border: 1px solid rgba(0,245,255,0.1); clip-path: var(--clip-path);">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                                <span style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Attribute Allocation</span>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <span style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Attribute Allocation</span>
+                                    <span style="font-family: var(--font-system); font-size: 0.6rem; color: var(--text-dim);" id="overflow-pool-display" title="Capped stats redirect points here.">Overflow: 0</span>
+                                </div>
                                 <div style="text-align: right;">
                                     <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 2px;">Available Points</span>
-                                    <span id="status-points" style="color: var(--warning); font-family: var(--font-display); font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px var(--warning);">0</span>
+                                    <span id="status-points" data-target="available-points" style="color: var(--warning); font-family: var(--font-display); font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px var(--warning);">0</span>
                                 </div>
                             </div>
 
@@ -1304,7 +1331,7 @@
                                     <div class="rpg-stat-label">
                                         <span style="font-size: 10px;">STR</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span id="stat-str" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <span id="stat-str" data-attr="STR" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
                                             <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
                                         </div>
                                     </div>
@@ -1316,7 +1343,7 @@
                                     <div class="rpg-stat-label">
                                         <span style="font-size: 10px;">INT</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span id="stat-int" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <span id="stat-int" data-attr="INT" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
                                             <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
                                         </div>
                                     </div>
@@ -1328,7 +1355,7 @@
                                     <div class="rpg-stat-label">
                                         <span style="font-size: 10px;">AGI</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span id="stat-agi" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <span id="stat-agi" data-attr="AGI" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
                                             <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
                                         </div>
                                     </div>
@@ -1340,7 +1367,7 @@
                                     <div class="rpg-stat-label">
                                         <span style="font-size: 10px;">VIT</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span id="stat-vit" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <span id="stat-vit" data-attr="VIT" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
                                             <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
                                         </div>
                                     </div>
@@ -1352,7 +1379,7 @@
                                     <div class="rpg-stat-label">
                                         <span style="font-size: 10px;">SNS</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span id="stat-sns" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
+                                            <span id="stat-sns" data-attr="SNS" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
                                             <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
                                         </div>
                                     </div>
@@ -2526,7 +2553,7 @@
         });
 
         /**
-         * APEX Progression System
+         * APEX Progression System (RELOADED)
          * Handles tiered XP scaling, player state persistence, and UI synchronization.
          */
         window.APEX = {
@@ -2538,6 +2565,9 @@
                 { min: 51, max: 70, base: 600, growth: 1.25, rank: 'A' },
                 { min: 71, max: 90, base: 1100, growth: 1.20, rank: 'S' }
             ],
+            REWARDS: { 'easy': 40, 'medium': 120, 'hard': 300 },
+            MULTIPLIERS: { 'E': 1.0, 'D': 1.4, 'C': 1.9, 'B': 2.5, 'A': 3.2, 'S': 4.0 },
+
             playerState: {
                 level: 1,
                 currentXp: 0,
@@ -2545,15 +2575,17 @@
                 streak: 0,
                 totalQuests: 0,
                 attributes: { STR: 10, INT: 10, AGI: 10, VIT: 10, SNS: 10 },
-                availablePoints: 0
+                availablePoints: 0,
+                overflowPool: 0
             },
 
             init() {
                 const saved = localStorage.getItem('apex_player_data');
                 if (saved) {
                     try {
-                        this.playerState = JSON.parse(saved);
-                    } catch (e) { console.error("Failed to load player data", e); }
+                        const parsed = JSON.parse(saved);
+                        this.playerState = { ...this.playerState, ...parsed };
+                    } catch (e) { console.warn("[SYSTEM] Failed to load player data", e); }
                 }
                 this.syncUI();
                 this.hookIntoApp();
@@ -2565,7 +2597,6 @@
 
             getXpRequired(level) {
                 const tier = this.TIERS.find(t => level >= t.min && level <= t.max) || this.TIERS[this.TIERS.length - 1];
-                // Formula: floor(base * growth ^ (level - tier_start))
                 return Math.floor(tier.base * Math.pow(tier.growth, level - tier.min));
             },
 
@@ -2588,6 +2619,12 @@
                 }
                 const tier = this.TIERS.find(t => lvl >= t.min && lvl <= t.max) || this.TIERS[this.TIERS.length - 1];
                 return tier.rank;
+            },
+
+            getQuestXp(difficulty, rank) {
+                const base = this.REWARDS[difficulty] || 120;
+                const mult = this.MULTIPLIERS[rank] || 1.0;
+                return Math.floor(base * mult);
             },
 
             addXp(amount) {
@@ -2628,78 +2665,117 @@
             },
 
             completeQuest(difficulty) {
-                // E-Rank (+50), C-Rank (+150), A-Rank (+400)
-                const rewards = { 'easy': 50, 'medium': 150, 'hard': 400 };
-                const amount = rewards[difficulty] || 150;
+                const amount = this.getQuestXp(difficulty, this.playerState.rank);
                 this.addXp(amount);
                 this.updateStreak('up');
+            },
+
+            allocateAttribute(stat) {
+                const key = stat.toUpperCase();
+                if (this.playerState.availablePoints <= 0) return;
+
+                if (this.playerState.attributes[key] >= 999) {
+                    this.playerState.availablePoints--;
+                    this.playerState.overflowPool++;
+                    if (typeof App !== 'undefined') {
+                        App.showSystemMessage('CAP REACHED', `${key} is MAXED. Point converted to Overflow Pool.`);
+                    }
+                } else {
+                    this.playerState.attributes[key]++;
+                    this.playerState.availablePoints--;
+                }
+
+                // Sync legacy State.user.stats
+                if (typeof State !== 'undefined' && State.user && State.user.stats) {
+                    State.user.stats[stat.toLowerCase()] = this.playerState.attributes[key];
+                    State.user.stats.points = this.playerState.availablePoints;
+                }
+
+                this.save();
+                if (typeof saveState === 'function') saveState();
+                this.syncUI();
+
+                if (window.AudioSys) window.AudioSys.play('click');
+                const el = document.getElementById(`stat-${stat.toLowerCase()}`);
+                if (el) {
+                    el.classList.add('stat-glow-pulse');
+                    setTimeout(() => el.classList.remove('stat-glow-pulse'), 800);
+                }
             },
 
             syncUI() {
                 const p = this.playerState;
                 const req = this.getXpRequired(p.level);
 
-                // Level & Rank Binding
-                const dashLvl = document.querySelector('[data-target="dash-level"]');
-                if (dashLvl) dashLvl.innerText = `LVL ${p.level}`;
+                // UI Selectors (Robust)
+                const bindings = [
+                    { sel: '[data-target="dash-level"]', val: `LVL ${p.level}` },
+                    { sel: '[data-target="dash-xp"]', val: `${p.currentXp} / ${req} XP` },
+                    { sel: '[data-target="status-level"]', val: `LEVEL ${p.level}` },
+                    { sel: '[data-target="status-rank"]', val: p.rank },
+                    { sel: '#header-rank', val: p.rank },
+                    { sel: '[data-target="available-points"]', val: p.availablePoints },
+                    { sel: '#overflow-pool-display', val: `Overflow: ${p.overflowPool}` }
+                ];
 
-                const dashXp = document.querySelector('[data-target="dash-xp"]');
-                if (dashXp) dashXp.innerText = `${p.currentXp} / ${req} XP`;
-
-                const statusLvl = document.querySelector('[data-target="status-level"]');
-                if (statusLvl) statusLvl.innerText = `LEVEL ${p.level}`;
-
-                const statusRank = document.querySelector('[data-target="status-rank"]');
-                if (statusRank) statusRank.innerText = p.rank;
-
-                const headerRank = document.getElementById('header-rank');
-                if (headerRank) headerRank.innerText = p.rank;
-
-                // Progress Bar
-                const xpBar = document.getElementById('xp-bar');
-                if (xpBar) xpBar.style.width = `${Math.min(100, (p.currentXp / req) * 100)}%`;
-
-                // Stats & Points
-                const ptsEl = document.getElementById('status-points');
-                if (ptsEl) ptsEl.innerText = p.availablePoints;
-
-                for (const [key, val] of Object.entries(p.attributes)) {
-                    const el = document.getElementById(`stat-${key.toLowerCase()}`);
-                    if (el) el.innerText = val;
-                    const bar = document.getElementById(`bar-${key.toLowerCase()}`);
-                    if (bar) bar.style.width = `${Math.min(100, (val / 100) * 100)}%`;
-                }
-
-                // Streaks
-                ['dash', 'status'].forEach(v => {
-                    const s = document.getElementById(`${v}-curr-streak`);
-                    if (s) s.innerText = p.streak;
-                    const t = document.getElementById(`${v}-total-quests`);
-                    if (t) t.innerText = p.totalQuests;
-                    const b = document.getElementById(`${v}-best-streak`);
-                    if (b) {
-                        const currentBest = parseInt(b.innerText) || 0;
-                        if (p.streak > currentBest) b.innerText = p.streak;
-                    }
+                bindings.forEach(b => {
+                    const el = document.querySelector(b.sel);
+                    if (el) el.innerText = b.val;
                 });
 
-                // Point Allocation Buttons
-                document.querySelectorAll('.stat-up-btn').forEach(btn => {
-                    btn.style.display = p.availablePoints > 0 ? 'flex' : 'none';
+                // XP Bar
+                const xpBar = document.getElementById('xp-bar');
+                if (xpBar) xpBar.style.width = `${Math.min(100, Math.max(0, (p.currentXp / req) * 100))}%`;
+
+                // Attributes
+                for (const [key, val] of Object.entries(p.attributes)) {
+                    const el = document.querySelector(`[data-attr="${key}"]`) || document.getElementById(`stat-${key.toLowerCase()}`);
+                    if (el) el.innerText = val;
+
+                    const bar = document.getElementById(`bar-${key.toLowerCase()}`);
+                    if (bar) bar.style.width = `${Math.min(100, (val / 100) * 100)}%`;
+
+                    // Cap handling for buttons
+                    const btn = document.querySelector(`button[onclick*="allocateStat('${key.toLowerCase()}')"]`) ||
+                                document.querySelector(`button[onclick*="allocateAttribute('${key.toLowerCase()}')"]`);
+                    if (btn) {
+                        if (val >= 999) {
+                            btn.classList.add('disabled');
+                            btn.title = `${key} is MAXED. Points will go to Overflow.`;
+                        } else {
+                            btn.classList.remove('disabled');
+                            btn.title = "";
+                        }
+                        btn.style.display = p.availablePoints > 0 ? 'flex' : 'none';
+                    }
+                }
+
+                // Streaks & Quests
+                const streakBindings = [
+                    { sel: '[data-target="current-streak"]', val: p.streak },
+                    { sel: '[data-target="total-quests"]', val: p.totalQuests },
+                    { sel: '[data-target="best-streak"]', val: (bestEl) => {
+                        const currentBest = parseInt(bestEl.innerText) || 0;
+                        if (p.streak > currentBest) bestEl.innerText = p.streak;
+                    }}
+                ];
+
+                streakBindings.forEach(b => {
+                    document.querySelectorAll(b.sel).forEach(el => {
+                        if (typeof b.val === 'function') b.val(el);
+                        else el.innerText = b.val;
+                    });
                 });
             },
 
             hookIntoApp() {
                 if (typeof App === 'undefined') return;
 
-                // Override rewards to match APEX requirements
                 App.getHabitXP = (habit) => {
                     const diff = typeof habit === 'string' ? habit : habit.diff;
-                    const rewards = { 'easy': 50, 'medium': 150, 'hard': 400 };
-                    return rewards[diff] || 150;
+                    return this.getQuestXp(diff, this.playerState.rank);
                 };
 
-                // Override toggleHabit to use APEX progression
                 const originalToggle = App.toggleHabit.bind(App);
                 App.toggleHabit = (event, id) => {
                     const habit = State.habits.find(h => h.id === id);
@@ -2707,16 +2783,13 @@
                     const todayStr = getLocalDateString();
                     const wasCompleted = habit.completedDates.includes(todayStr);
 
-                    // originalToggle adds XP to State.user.xp which we will sync from APEX
                     originalToggle(event, id);
 
                     const isCompletedNow = habit.completedDates.includes(todayStr);
                     if (!wasCompleted && isCompletedNow) {
                         this.completeQuest(habit.diff);
                     } else if (wasCompleted && !isCompletedNow) {
-                        // Undo
-                        const rewards = { 'easy': 50, 'medium': 150, 'hard': 400 };
-                        const amount = rewards[habit.diff] || 150;
+                        const amount = this.getQuestXp(habit.diff, this.playerState.rank);
                         this.playerState.currentXp = Math.max(0, this.playerState.currentXp - amount);
                         this.playerState.streak = Math.max(0, this.playerState.streak - 1);
                         this.playerState.totalQuests = Math.max(0, this.playerState.totalQuests - 1);
@@ -2724,7 +2797,6 @@
                         this.syncUI();
                     }
 
-                    // Force State.user to stay in sync with APEX to avoid confusion
                     State.user.level = this.playerState.level;
                     State.user.xp = this.playerState.currentXp;
                     State.user.xpToNext = this.getXpRequired(this.playerState.level);
@@ -2732,43 +2804,17 @@
                     saveState();
                 };
 
-                // Override allocateStat
-                App.allocateStat = (stat) => {
-                    if (this.playerState.availablePoints > 0) {
-                        this.playerState.attributes[stat.toUpperCase()]++;
-                        this.playerState.availablePoints--;
-
-                        // Sync with legacy state stats
-                        if (State.user.stats) {
-                            State.user.stats[stat.toLowerCase()] = this.playerState.attributes[stat.toUpperCase()];
-                            State.user.stats.points = this.playerState.availablePoints;
-                        }
-
-                        this.save();
-                        saveState();
-                        this.syncUI();
-
-                        if (window.AudioSys) window.AudioSys.play('click');
-                        const el = document.getElementById(`stat-${stat.toLowerCase()}`);
-                        if (el) {
-                            el.classList.add('stat-glow-pulse');
-                            setTimeout(() => el.classList.remove('stat-glow-pulse'), 800);
-                        }
-                    }
-                };
-
-                // Disable legacy level check
+                App.allocateStat = (stat) => this.allocateAttribute(stat);
                 App.checkLevelUp = () => {};
 
-                // Inject sync into render
                 const originalRender = App.render.bind(App);
                 App.render = () => {
-                    // Update legacy state from APEX before render
-                    State.user.level = this.playerState.level;
-                    State.user.xp = this.playerState.currentXp;
-                    State.user.xpToNext = this.getXpRequired(this.playerState.level);
-                    State.user.rank = this.playerState.rank;
-
+                    if (typeof State !== 'undefined' && State.user) {
+                        State.user.level = this.playerState.level;
+                        State.user.xp = this.playerState.currentXp;
+                        State.user.xpToNext = this.getXpRequired(this.playerState.level);
+                        State.user.rank = this.playerState.rank;
+                    }
                     originalRender();
                     this.syncUI();
                 };
