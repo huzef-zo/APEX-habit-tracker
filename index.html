@@ -1823,7 +1823,11 @@
 
                         if (dailyPenalty > 0) {
                             totalPenalty += dailyPenalty;
-                            State.user.xp = Math.max(0, State.user.xp - dailyPenalty);
+                            if (window.APEX) {
+                                window.APEX.addXp(-dailyPenalty);
+                            } else {
+                                State.user.xp = Math.max(0, State.user.xp - dailyPenalty);
+                            }
                         }
                     }
 
@@ -2633,6 +2637,9 @@
                 while (this.playerState.level < 90 && this.playerState.currentXp >= this.getXpRequired(this.playerState.level)) {
                     this.levelUp();
                 }
+                while (this.playerState.level > 1 && this.playerState.currentXp < 0) {
+                    this.levelDown();
+                }
                 this.save();
                 this.syncUI();
             },
@@ -2654,10 +2661,25 @@
                 }
             },
 
+            levelDown() {
+                if (this.playerState.level <= 1) return;
+                this.playerState.level--;
+                this.playerState.currentXp += this.getXpRequired(this.playerState.level);
+                const tier = this.TIERS.find(t => this.playerState.level >= t.min && this.playerState.level <= t.max) || this.TIERS[this.TIERS.length - 1];
+                this.playerState.rank = tier.rank;
+                this.playerState.availablePoints -= 5;
+                if (typeof App !== 'undefined') {
+                    App.showSystemMessage('LEVEL REDUCED', `You have regressed to Level ${this.playerState.level}.`);
+                }
+            },
+
             updateStreak(direction) {
                 if (direction === 'up') {
                     this.playerState.streak++;
                     this.playerState.totalQuests++;
+                } else if (direction === 'down') {
+                    this.playerState.streak = Math.max(0, this.playerState.streak - 1);
+                    this.playerState.totalQuests = Math.max(0, this.playerState.totalQuests - 1);
                 } else if (direction === 'reset') {
                     this.playerState.streak = 0;
                 }
@@ -2669,6 +2691,12 @@
                 const amount = this.getQuestXp(difficulty, this.playerState.rank);
                 this.addXp(amount);
                 this.updateStreak('up');
+            },
+
+            uncompleteQuest(difficulty) {
+                const amount = this.getQuestXp(difficulty, this.playerState.rank);
+                this.addXp(-amount);
+                this.updateStreak('down');
             },
 
             allocateAttribute(stat) {
@@ -2790,12 +2818,7 @@
                     if (!wasCompleted && isCompletedNow) {
                         this.completeQuest(habit.diff);
                     } else if (wasCompleted && !isCompletedNow) {
-                        const amount = this.getQuestXp(habit.diff, this.playerState.rank);
-                        this.playerState.currentXp = Math.max(0, this.playerState.currentXp - amount);
-                        this.playerState.streak = Math.max(0, this.playerState.streak - 1);
-                        this.playerState.totalQuests = Math.max(0, this.playerState.totalQuests - 1);
-                        this.save();
-                        this.syncUI();
+                        this.uncompleteQuest(habit.diff);
                     }
 
                     State.user.level = this.playerState.level;
@@ -2815,6 +2838,9 @@
                         State.user.xp = this.playerState.currentXp;
                         State.user.xpToNext = this.getXpRequired(this.playerState.level);
                         State.user.rank = this.playerState.rank;
+                        if (State.user.stats) {
+                            State.user.stats.points = this.playerState.availablePoints;
+                        }
                     }
                     originalRender();
                     this.syncUI();
