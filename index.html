@@ -1232,7 +1232,7 @@
                        </div> 
                        <div class="glass-panel" style="padding: 1.5rem;">
                         <div class="stat-label" style="font-family: var(--font-system); color: var(--primary); text-transform: uppercase;">
-                          Sync Rate (30D)
+                          Monthly Sync Rate
                         </div> 
                         <div class="ring-container-large"> 
                          <svg class="ring-large-svg" viewbox="0 0 200 200">
@@ -1615,9 +1615,13 @@
         function drawOverallRing() {
             let totalPossible = 0;
             let totalDone = 0;
-            for (let i = 0; i < 30; i++) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const today = now.getDate();
+
+            for (let i = 1; i <= today; i++) {
+                const d = new Date(year, month, i);
                 const dateStr = getLocalDateString(d);
                 const habits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 totalPossible += habits.length;
@@ -1689,7 +1693,11 @@
             editingHabitId: null,
 
             exportData() {
-                const dataStr = JSON.stringify(State, null, 2);
+                const bundle = {
+                    appState: State,
+                    playerState: window.APEX ? window.APEX.playerState : null
+                };
+                const dataStr = JSON.stringify(bundle, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -1709,16 +1717,41 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
-                        const importedData = JSON.parse(e.target.result);
+                        const imported = JSON.parse(e.target.result);
+                        let newState, newPlayerState;
 
-                        // Basic validation
-                        if (!importedData.user || !Array.isArray(importedData.habits)) {
-                            throw new Error('Invalid data structure');
+                        if (imported.appState && imported.playerState) {
+                            newState = imported.appState;
+                            newPlayerState = imported.playerState;
+                        } else {
+                            // Backward compatibility for old export format
+                            newState = imported;
+                            if (!newState.user || !Array.isArray(newState.habits)) {
+                                throw new Error('Invalid data structure');
+                            }
+                            // Reconstruct playerState from State.user
+                            newPlayerState = {
+                                level: newState.user.level || 1,
+                                currentXp: newState.user.xp || 0,
+                                rank: newState.user.rank || 'E',
+                                streak: 0,
+                                totalQuests: newState.user.totalCompleted || 0,
+                                attributes: {
+                                    STR: newState.user.stats?.str || 10,
+                                    INT: newState.user.stats?.int || 10,
+                                    AGI: newState.user.stats?.agi || 10,
+                                    VIT: newState.user.stats?.vit || 10,
+                                    SNS: newState.user.stats?.sns || 10
+                                },
+                                availablePoints: newState.user.stats?.points || 0,
+                                overflowPool: newState.user.stats?.overflowPool || 0
+                            };
                         }
 
                         if (confirm('Importing data will overwrite your current progress. Continue?')) {
-                            State = importedData;
-                            saveState();
+                            State = newState;
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(State));
+                            localStorage.setItem('apex_player_data', JSON.stringify(newPlayerState));
                             this.showSystemMessage('SYSTEM RESTORED', 'Data imported successfully. Reloading...');
                             setTimeout(() => location.reload(), 1500);
                         }
