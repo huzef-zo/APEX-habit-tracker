@@ -1879,6 +1879,13 @@
                     this.showSystemMessage('DAILY QUESTS REFRESHED', 'The system has been updated for the new day.');
                 }
 
+                // Reset daily counters
+                State.user.dailyCompletions = 0;
+                if (window.APEX && window.APEX.playerState) {
+                    window.APEX.playerState.dailyCompletions = 0;
+                    window.APEX.save();
+                }
+
                 State.user.lastCheckInDate = todayStr;
                 saveState();
             },
@@ -2216,10 +2223,6 @@
                     // Undo completion
                     habit.completedDates = habit.completedDates.filter(d => d !== todayStr);
                     this.recalcStreak(habit);
-                    const xp = this.getHabitXP(habit);
-                    State.user.xp -= xp;
-                    State.user.totalCompleted = Math.max(0, State.user.totalCompleted - 1);
-                    State.user.totalXp = Math.max(0, State.user.totalXp - xp);
                     
                     // Update activity log
                     if (State.activityLog[todayStr]) {
@@ -2235,22 +2238,17 @@
                     // Complete habit
                     habit.completedDates.push(todayStr);
                     this.recalcStreak(habit);
-                    const xp = this.getHabitXP(habit);
-                    State.user.xp += xp;
-                    State.user.totalCompleted++;
-                    State.user.totalXp += xp;
-                    State.user.dailyCompletions++;
+                    const xpValue = this.getHabitXP(habit);
                     
                     AudioSys.play('click');
-                    this.showSystemMessage('QUEST COMPLETE', `You earned ${xp} XP and improved your ${habit.stat.toUpperCase()}!`);
-                    this.checkLevelUp();
+                    this.showSystemMessage('QUEST COMPLETE', `You earned ${xpValue} XP and improved your ${habit.stat.toUpperCase()}!`);
                     
                     // Floating XP animation
                     const btn = event.currentTarget;
                     const rect = btn.getBoundingClientRect();
                     const floatXp = document.createElement('div');
                     floatXp.className = 'xp-float';
-                    floatXp.innerText = `+${xp} XP`;
+                    floatXp.innerText = `+${xpValue} XP`;
                     floatXp.style.left = (rect.left + rect.width / 2) + 'px';
                     floatXp.style.top = rect.top + 'px';
                     document.body.appendChild(floatXp);
@@ -2390,21 +2388,6 @@
                 document.getElementById('xp-text').innerText = `${State.user.xp} / ${State.user.xpToNext} XP`;
                 document.getElementById('xp-bar').style.width = `${Math.max(0, (State.user.xp / State.user.xpToNext) * 100)}%`;
                 
-                // Update Summary Stats
-                const best = State.habits.reduce((max, h) => Math.max(max, h.bestStreak), 0);
-
-                // Dashboard Summary
-                if (document.getElementById('dash-best-streak')) {
-                    document.getElementById('dash-best-streak').innerText = best;
-                    document.getElementById('dash-total-quests').innerText = State.user.totalCompleted;
-                }
-
-                // Status View Summary
-                if (document.getElementById('status-best-streak')) {
-                    document.getElementById('status-best-streak').innerText = best;
-                    document.getElementById('status-total-quests').innerText = State.user.totalCompleted;
-                }
-                
                 
                 
                 // Render today's habits
@@ -2478,12 +2461,6 @@
                     }
                 });
                 
-                if (document.getElementById('status-curr-streak')) {
-                    document.getElementById('status-curr-streak').innerText = currentStreakTotal;
-                }
-                if (document.getElementById('dash-curr-streak')) {
-                    document.getElementById('dash-curr-streak').innerText = currentStreakTotal;
-                }
                 
                 // Update status view elements if they exist
                 if (document.getElementById('status-rank')) {
@@ -2611,7 +2588,9 @@
                 currentXp: 0,
                 rank: 'E',
                 streak: 0,
+                bestStreak: 0,
                 totalQuests: 0,
+                dailyCompletions: 0,
                 attributes: { STR: 10, INT: 10, AGI: 10, VIT: 10, SNS: 10 },
                 availablePoints: 0,
                 overflowPool: 0
@@ -2708,13 +2687,23 @@
 
             updateStreak(direction) {
                 if (direction === 'up') {
-                    this.playerState.streak++;
                     this.playerState.totalQuests++;
                 } else if (direction === 'down') {
-                    this.playerState.streak = Math.max(0, this.playerState.streak - 1);
                     this.playerState.totalQuests = Math.max(0, this.playerState.totalQuests - 1);
-                } else if (direction === 'reset') {
-                    this.playerState.streak = 0;
+                }
+
+                // Recalculate global streak based on habits
+                const todayStr = getLocalDateString();
+                const currentStreakTotal = State.habits.reduce((max, h) => {
+                    if (h.completedDates.includes(todayStr)) {
+                        return Math.max(max, h.streak || 0);
+                    }
+                    return max;
+                }, 0);
+
+                this.playerState.streak = currentStreakTotal;
+                if (this.playerState.streak > this.playerState.bestStreak) {
+                    this.playerState.bestStreak = this.playerState.streak;
                 }
                 this.save();
                 this.syncUI();
@@ -2723,12 +2712,14 @@
             completeQuest(difficulty) {
                 const amount = this.getQuestXp(difficulty, this.playerState.rank);
                 this.addXp(amount);
+                this.playerState.dailyCompletions++;
                 this.updateStreak('up');
             },
 
             uncompleteQuest(difficulty) {
                 const amount = this.getQuestXp(difficulty, this.playerState.rank);
                 this.addXp(-amount);
+                this.playerState.dailyCompletions = Math.max(0, this.playerState.dailyCompletions - 1);
                 this.updateStreak('down');
             },
 
@@ -2816,10 +2807,7 @@
                 const streakBindings = [
                     { sel: '[data-target="current-streak"]', val: p.streak },
                     { sel: '[data-target="total-quests"]', val: p.totalQuests },
-                    { sel: '[data-target="best-streak"]', val: (bestEl) => {
-                        const currentBest = parseInt(bestEl.innerText) || 0;
-                        if (p.streak > currentBest) bestEl.innerText = p.streak;
-                    }}
+                    { sel: '[data-target="best-streak"]', val: p.bestStreak }
                 ];
 
                 streakBindings.forEach(b => {
@@ -2858,6 +2846,11 @@
                     State.user.xp = this.playerState.currentXp;
                     State.user.xpToNext = this.getXpRequired(this.playerState.level);
                     State.user.rank = this.playerState.rank;
+                    State.user.totalCompleted = this.playerState.totalQuests;
+                    State.user.totalXp = this.getTotalXpForLevel(this.playerState.level) + this.playerState.currentXp;
+                    State.user.dailyCompletions = this.playerState.dailyCompletions;
+                    State.user.streak = this.playerState.streak;
+                    State.user.bestStreak = this.playerState.bestStreak;
                     saveState();
                 };
 
@@ -2871,6 +2864,11 @@
                         State.user.xp = this.playerState.currentXp;
                         State.user.xpToNext = this.getXpRequired(this.playerState.level);
                         State.user.rank = this.playerState.rank;
+                        State.user.totalCompleted = this.playerState.totalQuests;
+                        State.user.totalXp = this.getTotalXpForLevel(this.playerState.level) + this.playerState.currentXp;
+                        State.user.dailyCompletions = this.playerState.dailyCompletions;
+                        State.user.streak = this.playerState.streak;
+                        State.user.bestStreak = this.playerState.bestStreak;
                         if (State.user.stats) {
                             State.user.stats.points = this.playerState.availablePoints;
                         }
