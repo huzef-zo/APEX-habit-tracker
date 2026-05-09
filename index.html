@@ -2224,6 +2224,12 @@
                     habit.completedDates = habit.completedDates.filter(d => d !== todayStr);
                     this.recalcStreak(habit);
                     
+                    // Legacy Fallback Progression
+                    if (!window.APEX || !window.APEX.playerState) {
+                        const xpValue = this.getHabitXP(habit);
+                        State.user.xp = Math.max(0, State.user.xp - xpValue);
+                    }
+
                     // Update activity log
                     if (State.activityLog[todayStr]) {
                         State.activityLog[todayStr]--;
@@ -2262,6 +2268,12 @@
                     
                     // Reset sleep bonus when active
                     State.user.sleepBonusAvailable = false;
+
+                    // Legacy Fallback Progression
+                    if (!window.APEX || !window.APEX.playerState) {
+                        State.user.xp += xpValue;
+                        this.checkLevelUp();
+                    }
                 }
                 
                 saveState();
@@ -2855,7 +2867,13 @@
                 };
 
                 App.allocateStat = (stat) => this.allocateAttribute(stat);
-                App.checkLevelUp = () => {};
+                App.checkLevelUp = () => {
+                    if (window.APEX && window.APEX.playerState) {
+                        while (APEX.playerState.currentXp >= APEX.getXpRequired(APEX.playerState.level) && APEX.playerState.level < 90) {
+                            APEX.levelUp();
+                        }
+                    }
+                };
 
                 const originalRender = App.render.bind(App);
                 App.render = () => {
@@ -2880,7 +2898,11 @@
         };
 
         // Initialize APEX
-        APEX.init();
+        try {
+            APEX.init();
+        } catch (e) {
+            console.error("[CRITICAL] APEX System failed to initialize. Falling back to legacy logic.", e);
+        }
     </script>
 
     <!-- Service Worker Registration (ONLY ONCE) -->
