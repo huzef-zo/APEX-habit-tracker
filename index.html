@@ -2691,7 +2691,17 @@
                 this.playerState.currentXp += this.getXpRequired(this.playerState.level);
                 const tier = this.TIERS.find(t => this.playerState.level >= t.min && this.playerState.level <= t.max) || this.TIERS[this.TIERS.length - 1];
                 this.playerState.rank = tier.rank;
-                this.playerState.availablePoints -= 5;
+
+                // Deduct 5 points, using overflow pool if availablePoints is insufficient
+                const pointsToDeduct = 5;
+                if (this.playerState.availablePoints >= pointsToDeduct) {
+                    this.playerState.availablePoints -= pointsToDeduct;
+                } else {
+                    const remainder = pointsToDeduct - this.playerState.availablePoints;
+                    this.playerState.availablePoints = 0;
+                    this.playerState.overflowPool = Math.max(0, this.playerState.overflowPool - remainder);
+                }
+
                 if (typeof App !== 'undefined') {
                     App.showSystemMessage('LEVEL REDUCED', `You have regressed to Level ${this.playerState.level}.`);
                 }
