@@ -3869,8 +3869,8 @@
             // Hook toggleHabit to trigger shadow extraction
             const originalToggleHabit = App.toggleHabit ? App.toggleHabit.bind(App) : null;
             if (originalToggleHabit) {
-                App.toggleHabit = function(habitId) {
-                    originalToggleHabit(habitId);
+                App.toggleHabit = function(event, habitId) {
+                    originalToggleHabit(event, habitId);
                     const habit = State.habits.find(h => h.id === habitId);
                     if (habit) {
                         const todayStr = getLocalDateString();
