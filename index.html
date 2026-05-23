@@ -3853,6 +3853,7 @@
                     if (armyView) armyView.classList.remove('active');
 
                     if (view === 'army') {
+                        document.getElementById('sidebar').classList.remove('open');
                         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
                         if (armyView) armyView.classList.add('active');
                         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
