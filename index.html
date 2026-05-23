@@ -1247,6 +1247,71 @@
             cursor: pointer;
         }
 
+        /* Power Rating Display */
+        #power-rating {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: rgba(123, 97, 255, 0.15);
+            border: 1px solid var(--accent-purple);
+            padding: 0.8rem 1.2rem;
+            border-radius: 4px;
+            font-family: var(--font-system);
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            z-index: 40;
+            text-align: center;
+        }
+
+        #power-rating-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        /* Journal View */
+        #journal {
+            display: none;
+        }
+
+        #journal.active {
+            display: block;
+        }
+
+        .journal-entry {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+
+        .journal-date {
+            font-family: var(--font-system);
+            font-size: 0.75rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .journal-reflection {
+            font-family: var(--font-ui);
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        /* Awakening Mode */
+        body.awakening {
+            background: linear-gradient(135deg, #1a0505 0%, #2a0f1f 100%);
+        }
+
+        body.awakening .primary {
+            color: #ffd700 !important;
+        }
+
     </style>
 </head>
 <body>
@@ -3827,8 +3892,106 @@
             }
         }
 
-        // ==================== EXPANSION OBJECT ====================
-        window.APEX_EXPANSION = {
+        // ==================== PHASE 2: SKILLS & ATTRIBUTES ====================
+        const SKILLS = {
+            str_tier1: { name: 'Power Strike', attribute: 'STR', threshold: 25, type: 'passive', desc: '+15% XP on Hard quests', effect: { type: 'xp_hard', value: 0.15 } },
+            int_tier1: { name: 'Keen Mind', attribute: 'INT', threshold: 25, type: 'passive', desc: '+5% shadow extraction', effect: { type: 'shadow_extract', value: 0.05 } },
+            agi_tier1: { name: 'Swift Action', attribute: 'AGI', threshold: 25, type: 'passive', desc: 'Streaks survive 1 miss/month', effect: { type: 'streak_save', value: 1 } },
+            vit_tier1: { name: 'Iron Body', attribute: 'VIT', threshold: 25, type: 'passive', desc: '-10% daily penalty', effect: { type: 'penalty_reduce', value: 0.10 } },
+            sns_tier1: { name: 'Perception', attribute: 'SNS', threshold: 25, type: 'passive', desc: '+3 bonus XP per quest', effect: { type: 'bonus_xp', value: 3 } },
+        };
+
+        function checkSkillUnlocks() {
+            if (!APEX || !APEX.playerState) return;
+            const attrs = APEX.playerState.attributes;
+            for (const [skillId, skillDef] of Object.entries(SKILLS)) {
+                const attrVal = attrs[skillDef.attribute];
+                if (attrVal >= skillDef.threshold && !expansionState.skills[skillId]) {
+                    expansionState.skills[skillId] = { unlocked: true, cooldownUntil: null };
+                    saveExpansion();
+                }
+            }
+        }
+
+        function renderSkillBar() {
+            const bar = document.getElementById('skill-bar');
+            if (!bar) {
+                const scrollArea = document.querySelector('.scroll-area');
+                if (scrollArea && scrollArea.parentElement) {
+                    const newBar = document.createElement('div');
+                    newBar.id = 'skill-bar';
+                    scrollArea.parentElement.appendChild(newBar);
+                }
+                return;
+            }
+
+            const unlockedCount = Object.values(expansionState.skills).filter(s => s.unlocked).length;
+            if (unlockedCount === 0) {
+                bar.style.display = 'none';
+                return;
+            }
+            bar.style.display = 'flex';
+        }
+
+        // ==================== PHASE 3: AWAKENING & POWER RATING ====================
+        function checkAwakening() {
+            if (expansionState.awakeningActive) return;
+            if (expansionState.awakeningCooldownUntil && new Date(expansionState.awakeningCooldownUntil) > new Date()) return;
+            if (expansionState.perfectStreak < 7) return;
+
+            activateAwakening();
+        }
+
+        function activateAwakening() {
+            expansionState.awakeningActive = true;
+            expansionState.awakeningCount++;
+            expansionState.awakeningActivatedAt = new Date().toISOString();
+
+            document.documentElement.style.setProperty('--primary', '#ffd700');
+            document.body.style.backgroundColor = '#1a0505';
+
+            if (App) App.showSystemMessage('AWAKENING', 'The System recognizes your resolve. All limits removed for 24 hours.');
+
+            setTimeout(() => deactivateAwakening(), 86400000);
+            saveExpansion();
+        }
+
+        function deactivateAwakening() {
+            expansionState.awakeningActive = false;
+            expansionState.awakeningCooldownUntil = new Date(Date.now() + 14 * 86400000).toISOString();
+
+            document.documentElement.style.setProperty('--primary', '#00f5ff');
+            document.body.style.backgroundColor = '#0a0a0f';
+
+            if (App) App.showSystemMessage('AWAKENING ENDED', 'Power returns to normal. Next awakening available in 14 days.');
+            saveExpansion();
+        }
+
+        function calculatePowerRating() {
+            if (!APEX || !APEX.playerState) return 0;
+            const ps = APEX.playerState;
+            const es = expansionState;
+            const tierValues = { E: 10, D: 25, C: 50 };
+
+            const attrSum = Object.values(ps.attributes).reduce((s, v) => s + v, 0);
+            const levelBonus = ps.level * 10;
+            const shadowPower = es.shadows.reduce((sum, s) => sum + (tierValues[s.tier] || 10), 0);
+            const titleBonus = es.titles.length * 50;
+
+            expansionState.powerRating = attrSum + levelBonus + shadowPower + titleBonus;
+            expansionState.powerRatingUpdatedAt = new Date().toISOString();
+            saveExpansion();
+            return expansionState.powerRating;
+        }
+
+        // ==================== COMBO DISPLAY UPDATE ====================
+        function renderComboDisplayEnhanced() {
+            renderComboDisplay();
+            calculatePowerRating();
+            checkSkillUnlocks();
+            renderSkillBar();
+        }
+
             init() {
                 loadExpansion();
                 checkDailyReset();
@@ -3844,10 +4007,14 @@
 
                 updateDailyTimer();
                 checkAchievements();
+                checkSkillUnlocks();
+                checkAwakening();
                 renderArmyView();
-                renderComboDisplay();
+                renderComboDisplayEnhanced();
+                renderSkillBar();
 
                 setInterval(updateDailyTimer, 1000);
+                setInterval(checkAwakening, 300000);
 
                 console.log("[EXPANSION] APEX System Expansion initialized successfully");
             },
@@ -3857,12 +4024,87 @@
             dismissShadow,
             navigate: (view) => {
                 if (App && App.navigate) App.navigate(view);
-            }
+            },
+            activateAwakening,
+            deactivateAwakening,
+            checkSkillUnlocks,
+            calculatePowerRating
         };
+
+        // ==================== EXPORT/IMPORT COMPATIBILITY ====================
+        function hookExportImport() {
+            const originalExport = App.exportData ? App.exportData.bind(App) : null;
+            if (originalExport) {
+                App.exportData = function() {
+                    const bundle = {
+                        appState: State,
+                        playerState: window.APEX ? window.APEX.playerState : null,
+                        expansionState: expansionState
+                    };
+                    const dataStr = JSON.stringify(bundle, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `apex_backup_${getLocalDateString()}.json`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    if (App) App.showSystemMessage('BACKUP CREATED', 'Your data (including expansion) has been exported successfully.');
+                };
+            }
+
+            const originalImport = App.importData ? App.importData.bind(App) : null;
+            if (originalImport) {
+                App.importData = function(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const imported = JSON.parse(e.target.result);
+                            let newState, newPlayerState, newExpansionState;
+
+                            if (imported.appState && imported.playerState) {
+                                newState = imported.appState;
+                                newPlayerState = imported.playerState;
+                                newExpansionState = imported.expansionState || null;
+                            } else {
+                                newState = imported;
+                                newExpansionState = null;
+                            }
+
+                            if (confirm('Importing data will overwrite your current progress. Continue?')) {
+                                State = newState;
+                                localStorage.setItem('apex_final_fixed', JSON.stringify(State));
+                                if (APEX && newPlayerState) {
+                                    APEX.playerState = { ...APEX.playerState, ...newPlayerState };
+                                    APEX.save();
+                                }
+                                if (newExpansionState) {
+                                    expansionState = { ...EXPANSION_DEFAULTS, ...newExpansionState };
+                                    expansionState.notificationPrefs = { ...EXPANSION_DEFAULTS.notificationPrefs, ...(newExpansionState.notificationPrefs || {}) };
+                                    saveExpansion();
+                                }
+                                if (App) App.showSystemMessage('SYSTEM RESTORED', 'Data imported successfully. Reloading...');
+                                setTimeout(() => location.reload(), 1500);
+                            }
+                        } catch (err) {
+                            alert('Error importing data: ' + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                    event.target.value = '';
+                };
+            }
+        }
 
         // Initialize on DOM ready
         document.addEventListener('DOMContentLoaded', () => {
             try {
+                hookExportImport();
                 APEX_EXPANSION.init();
             } catch (e) {
                 console.error("[EXPANSION] Failed to initialize", e);
