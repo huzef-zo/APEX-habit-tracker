@@ -1457,7 +1457,7 @@
             <button class="nav-btn active" onclick="App.navigate('dashboard')">🏰 Dashboard</button>
             <button class="nav-btn" onclick="App.navigate('history')">📜 Chronicles</button>
             <button class="nav-btn" onclick="App.navigate('status')">👤 Status</button>
-            
+            <button class="nav-btn" id="nav-guide-btn" onclick="App.navigate('guide')">⚙️ System Guide</button>
             
             <div class="sidebar-section-title">Active Quests</div>
             <div id="sidebar-habit-list"></div>
@@ -1693,6 +1693,58 @@
                             </div>
                             <input type="file" id="import-input" style="display: none;" accept=".json" onchange="App.importData(event)">
                         </div>
+                    </div>
+                </section>
+
+                <!-- GUIDE VIEW -->
+                <section id="guide" class="view-section">
+                    <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 2rem; text-align: center; letter-spacing: 4px;">
+                        [ SYSTEM GUIDE ]
+                    </h2>
+
+                    <div class="glass-panel system-shimmer" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 1rem;">⚔️ LEVELING SYSTEM</h3>
+                        <p style="margin-bottom: 1rem; color: var(--text-main);">The System monitors your progress from Level 1 to 90. XP requirements increase polynomially across tiers.</p>
+                        <ul style="list-style: none; color: var(--text-dim); font-size: 0.9rem;">
+                            <li style="margin-bottom: 0.5rem;">• Each level up grants <span style="color: var(--warning);">5 Attribute Points</span>.</li>
+                            <li style="margin-bottom: 0.5rem;">• Attributes (STR, INT, AGI, VIT, SNS) are capped at 999.</li>
+                            <li style="margin-bottom: 0.5rem;">• Points allocated beyond the cap are stored in the <span style="color: var(--primary);">Overflow Pool</span>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-panel" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 1rem;">🏆 RANKING SYSTEM</h3>
+                        <p style="margin-bottom: 1rem; color: var(--text-main);">Your Player Rank is determined by your current level:</p>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-family: var(--font-numbers); color: var(--primary);">
+                            <div class="glass-panel" style="padding: 0.5rem; text-align: center;">E-Rank: Lvl 1-10</div>
+                            <div class="glass-panel" style="padding: 0.5rem; text-align: center;">D-Rank: Lvl 11-20</div>
+                            <div class="glass-panel" style="padding: 0.5rem; text-align: center;">C-Rank: Lvl 21-35</div>
+                            <div class="glass-panel" style="padding: 0.5rem; text-align: center;">B-Rank: Lvl 36-50</div>
+                            <div class="glass-panel" style="padding: 0.5rem; text-align: center;">A-Rank: Lvl 51-70</div>
+                            <div class="glass-panel" style="padding: 0.5rem; text-align: center;">S-Rank: Lvl 71-90</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel" style="padding: 2rem; margin-bottom: 1.5rem; border-color: var(--danger) !important;">
+                        <h3 style="font-family: var(--font-display); color: var(--danger); margin-bottom: 1rem;">⚠️ PENALTY SYSTEM</h3>
+                        <p style="margin-bottom: 1rem; color: var(--text-main);">Failure to complete missions results in severe system penalties.</p>
+                        <ul style="list-style: none; color: var(--text-dim); font-size: 0.9rem;">
+                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--danger);">Normal Quests:</span> 5% XP penalty per missed quest.</li>
+                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--danger);">Mandatory Quests:</span> 10% XP penalty per missed quest.</li>
+                            <li style="margin-bottom: 0.5rem;">• Total daily penalty is capped at 25% of current XP.</li>
+                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--success);">VIT Attribute:</span> Reduces XP loss by up to 50%.</li>
+                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--danger);">CRITICAL STATE:</span> 3 consecutive days of missing mandatory quests halves all future XP gains until recovery.</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-panel" style="padding: 2rem; margin-bottom: 1.5rem; border-color: var(--accent-purple) !important;">
+                        <h3 style="font-family: var(--font-display); color: var(--accent-purple); margin-bottom: 1rem;">👥 SHADOW RECRUITMENT</h3>
+                        <p style="margin-bottom: 1rem; color: var(--text-main);">Extract the shadows of defeated challenges to build your army.</p>
+                        <ul style="list-style: none; color: var(--text-dim); font-size: 0.9rem;">
+                            <li style="margin-bottom: 0.5rem;">• Extraction Chance: <span style="color: var(--success);">10% (Easy)</span>, <span style="color: var(--warning);">25% (Medium)</span>, <span style="color: var(--danger);">50% (Hard)</span>.</li>
+                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--primary);">INT Attribute:</span> Increases extraction success chance.</li>
+                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--accent-purple);">Army Capacity:</span> 1 Shadow per 5 levels (1 + floor(Level/5)).</li>
+                        </ul>
                     </div>
                 </section>
                 
@@ -2665,21 +2717,22 @@
                 const viewEl = document.getElementById(viewId);
                 if (viewEl) viewEl.classList.add('active');
                 
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                const navs = document.querySelectorAll('.nav-btn');
+                document.querySelectorAll('.nav-btn').forEach(b => {
+                    b.classList.remove('active');
+                    if (b.getAttribute('onclick')?.includes(`'${viewId}'`)) {
+                        b.classList.add('active');
+                    }
+                });
 
                 if(viewId === 'dashboard') {
-                    navs[0].classList.add('active');
                     this.render();
                 }
                 if(viewId === 'history') { 
-                    navs[1].classList.add('active');
                     setTimeout(() => {
                         this.renderHistory(); // Render history when navigated to
                     }, 100);
                 }
                 if(viewId === 'status') {
-                    navs[2].classList.add('active');
                     setTimeout(() => this.render(), 0);
                 }
             },
@@ -3856,9 +3909,13 @@
                         document.getElementById('sidebar').classList.remove('open');
                         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
                         if (armyView) armyView.classList.add('active');
-                        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                        const armyBtn = document.getElementById('nav-army-btn');
-                        if (armyBtn) armyBtn.classList.add('active');
+
+                        document.querySelectorAll('.nav-btn').forEach(b => {
+                            b.classList.remove('active');
+                            if (b.getAttribute('onclick')?.includes("'army'") || b.id === 'nav-army-btn') {
+                                b.classList.add('active');
+                            }
+                        });
                         renderArmyView();
                     } else {
                         originalNavigate(view);
