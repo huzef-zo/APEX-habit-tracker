@@ -52,9 +52,9 @@ A high-performance habit tracking application inspired by the "Solo Leveling" ae
 
 ### 👥 Shadow Recruitment
 - **Extraction:** Completed quests have a chance to yield shadows:
-  - **Easy:** 10%
-  - **Medium:** 25%
-  - **Hard:** 50%
+  - **Easy:** 5%
+  - **Medium:** 12%
+  - **Hard:** 25%
 - **Intelligence Bonus:** Each point in INT above 10 increases extraction chance by 1%.
 - **Army Capacity:** You can hold `1 + floor(Level / 5)` shadows.
 
