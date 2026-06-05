@@ -1741,7 +1741,7 @@
                         <h3 style="font-family: var(--font-display); color: var(--accent-purple); margin-bottom: 1rem;">👥 SHADOW RECRUITMENT</h3>
                         <p style="margin-bottom: 1rem; color: var(--text-main);">Extract the shadows of defeated challenges to build your army.</p>
                         <ul style="list-style: none; color: var(--text-dim); font-size: 0.9rem;">
-                            <li style="margin-bottom: 0.5rem;">• Extraction Chance: <span style="color: var(--success);">10% (Easy)</span>, <span style="color: var(--warning);">25% (Medium)</span>, <span style="color: var(--danger);">50% (Hard)</span>.</li>
+                            <li style="margin-bottom: 0.5rem;">• Extraction Chance: <span style="color: var(--success);">5% (Easy)</span>, <span style="color: var(--warning);">12% (Medium)</span>, <span style="color: var(--danger);">25% (Hard)</span>.</li>
                             <li style="margin-bottom: 0.5rem;">• <span style="color: var(--primary);">INT Attribute:</span> Increases extraction success chance.</li>
                             <li style="margin-bottom: 0.5rem;">• <span style="color: var(--accent-purple);">Army Capacity:</span> 1 Shadow per 5 levels (1 + floor(Level/5)).</li>
                         </ul>
@@ -3346,7 +3346,7 @@
             perfect_month:    { name: 'Perfect Month', category: 'consistency', desc: '30 consecutive Perfect Days', check: (ps, es) => es.perfectStreak >= 30, reward: { type: 'xp', value: 2000 }, title: 'Perfectionist' },
             comeback_king:    { name: 'Comeback King', category: 'endurance', desc: 'Recover from CRITICAL STATE', check: (ps, es) => (es.criticalRecoveries || 0) >= 1, reward: { type: 'title' }, title: 'Comeback King' },
             shadow_monarch:   { name: 'Shadow Monarch', category: 'legendary', desc: 'Reach Level 90', check: (ps, es) => ps.level >= 90, reward: { type: 'title' }, title: 'Shadow Monarch' },
-            army_commander:   { name: 'Army Commander', category: 'legendary', desc: 'Fill shadow army to capacity', check: (ps, es) => es.shadows.length >= Math.floor(ps.level / 5) + 1, reward: { type: 'xp', value: 10000 }, title: 'Army Commander' },
+            army_commander:   { name: 'Army Commander', category: 'legendary', desc: 'Fill a shadow army of at least 5 shadows', check: (ps, es) => es.shadows.length >= 5 && es.shadows.length >= Math.floor(ps.level / 5) + 1, reward: { type: 'xp', value: 2000 }, title: 'Army Commander' },
         };
 
         const TITLE_BONUSES = {
@@ -3453,8 +3453,8 @@
                 return;
             }
 
-            const baseChance = { easy: 0.10, medium: 0.25, hard: 0.50 };
-            let chance = baseChance[habit.diff] || 0.10;
+            const baseChance = { easy: 0.05, medium: 0.12, hard: 0.25 };
+            let chance = baseChance[habit.diff] || 0.05;
 
             if (APEX && APEX.playerState) {
                 const intBonus = Math.min(20, Math.max(0, APEX.playerState.attributes.INT - 10));
