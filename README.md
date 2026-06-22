@@ -13,7 +13,7 @@ A high-performance habit tracking application inspired by the "Solo Leveling" ae
 - **Attribute Association:** Link quests to specific RPG attributes (STR, INT, AGI, VIT, SNS) to influence your player growth.
 
 ### 📈 RPG Progression System
-- **Leveling:** Progress from Level 1 to 90 through a tiered polynomial XP curve.
+- **Leveling:** Progress from Level 1 to 90 through a tiered linear XP curve.
 - **Rank Advancement:** Advance your player rank: **E → D → C → B → A → S**.
 - **Attribute Allocation:** Earn points on level-up to increase your stats. Features an **Overflow Pool** for maxed-out attributes.
 - **Level Regression:** Missed daily quests can lead to level-downs and attribute point deductions, maintaining high stakes for consistency.
