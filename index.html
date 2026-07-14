@@ -2344,7 +2344,7 @@ Cause: "${payload.cause}"`;
                     return JSON.parse(content);
                 }
             } catch (e) {
-                print("[SYSTEM] AI Call failed. Falling back to local Mock AI.", e);
+                console.error("[SYSTEM] AI Call failed. Falling back to local Mock AI.", e);
                 return callMockAI(promptType, payload, e.message);
             }
         }
