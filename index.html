@@ -2843,6 +2843,18 @@ Cause: "${payload.cause}"`;
                             State.hunter.streak++;
                         }
 
+                        // Check if this was a recovery quest to lift critical state
+                        const isRecovery = quest.isRecovery || quest.type === 'recovery';
+                        if (isRecovery && typeof expansionState !== 'undefined') {
+                            expansionState.criticalState = false;
+                            expansionState.consecutiveMisses = 0;
+                            expansionState.pendingRecoveryQuest = null;
+                            if (expansionState.criticalRecoveries === undefined) expansionState.criticalRecoveries = 0;
+                            expansionState.criticalRecoveries++;
+                            if (typeof saveExpansion === 'function') saveExpansion();
+                            if (App) App.showSystemMessage('CRITICAL STATE LIFTED', 'Recovery Quest completed. Full power restored.');
+                        }
+
                         if (window.AudioSys) window.AudioSys.play('complete');
 
                         if (typeof attemptShadowExtraction === 'function') {
@@ -3583,15 +3595,17 @@ Cause: "${payload.cause}"`;
                     this.showSystemMessage('QUEST COMPLETE', `You earned ${xpValue} XP and improved your ${habit.stat.toUpperCase()}!`);
                     
                     // Floating XP animation
-                    const btn = event.currentTarget;
-                    const rect = btn.getBoundingClientRect();
-                    const floatXp = document.createElement('div');
-                    floatXp.className = 'xp-float';
-                    floatXp.innerText = `+${xpValue} XP`;
-                    floatXp.style.left = (rect.left + rect.width / 2) + 'px';
-                    floatXp.style.top = rect.top + 'px';
-                    document.body.appendChild(floatXp);
-                    setTimeout(() => floatXp.remove(), 1500);
+                    if (event && event.currentTarget) {
+                        const btn = event.currentTarget;
+                        const rect = btn.getBoundingClientRect();
+                        const floatXp = document.createElement('div');
+                        floatXp.className = 'xp-float';
+                        floatXp.innerText = `+${xpValue} XP`;
+                        floatXp.style.left = (rect.left + rect.width / 2) + 'px';
+                        floatXp.style.top = rect.top + 'px';
+                        document.body.appendChild(floatXp);
+                        setTimeout(() => floatXp.remove(), 1500);
+                    }
 
                     // Update activity log
                     if (!State.activityLog[todayStr]) {
@@ -5279,6 +5293,44 @@ Cause: "${payload.cause}"`;
                             } else {
                                 newState = imported;
                                 newExpansionState = null;
+                                if (newState && newState.user) {
+                                    newPlayerState = {
+                                        level: newState.user.level || 1,
+                                        currentXp: newState.user.xp || 0,
+                                        rank: newState.user.rank || 'E',
+                                        streak: newState.user.streak || 0,
+                                        totalQuests: newState.user.totalCompleted || 0,
+                                        attributes: {
+                                            STR: newState.user.stats?.str || 10,
+                                            INT: newState.user.stats?.int || 10,
+                                            AGI: newState.user.stats?.agi || 10,
+                                            VIT: newState.user.stats?.vit || 10,
+                                            SNS: newState.user.stats?.sns || 10
+                                        },
+                                        availablePoints: newState.user.stats?.points || 0,
+                                        overflowPool: newState.user.stats?.overflowPool || 0
+                                    };
+                                    newState.hunter = {
+                                        rank: newState.user.rank || 'E',
+                                        level: newState.user.level || 1,
+                                        xp: newState.user.xp || 0,
+                                        xp_to_next: newState.user.xpToNext || 100,
+                                        stats: {
+                                            STR: newState.user.stats?.str || 10,
+                                            VIT: newState.user.stats?.vit || 10,
+                                            AGI: newState.user.stats?.agi || 10,
+                                            INT: newState.user.stats?.int || 10,
+                                            PER: newState.user.stats?.sns || 10,
+                                            points: newState.user.stats?.points || 0,
+                                            overflowPool: newState.user.stats?.overflowPool || 0
+                                        },
+                                        penalty_state: { active: false, tier: 0, started_at: null, cause: "" },
+                                        streak: newState.user.streak || 0,
+                                        quest_log: [],
+                                        titles: [],
+                                        goals: "Software engineering, technical growth, consistency"
+                                    };
+                                }
                             }
 
                             if (confirm('Importing data will overwrite your current progress. Continue?')) {
