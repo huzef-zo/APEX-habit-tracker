@@ -2699,6 +2699,7 @@ Cause: "${payload.cause}"`;
         const App = {
             tempDays: [],
             editingHabitId: null,
+            _dayIdxCache: {}, // Performance cache for date string to day index mapping to avoid redundant Date parsing
 
             toggleAPIFields() {
                 const provider = document.getElementById('ai-provider').value;
@@ -3345,9 +3346,19 @@ Cause: "${payload.cause}"`;
                     return dateStr >= habit.startDate && dateStr <= habit.endDate;
                 } else {
                     // Default to repeating
-                    const date = new Date(dateStr + 'T00:00:00');
-                    const dayIdx = date.getDay();
-                    return habit.days.map(Number).includes(dayIdx);
+                    // Use a highly optimized date-to-day index cache on App to avoid redundant Date parsing and creation
+                    const cache = (typeof App !== 'undefined' && App._dayIdxCache) || {};
+                    let dayIdx = cache[dateStr];
+                    if (dayIdx === undefined) {
+                        const date = new Date(dateStr + 'T00:00:00');
+                        dayIdx = date.getDay();
+                        if (typeof App !== 'undefined' && App._dayIdxCache) {
+                            App._dayIdxCache[dateStr] = dayIdx;
+                        }
+                    }
+                    if (!habit.days) return false;
+                    // Optimization: check directly with a fast includes check to avoid mapping to numbers on every call
+                    return habit.days.includes(dayIdx) || habit.days.includes(String(dayIdx));
                 }
             },
 
