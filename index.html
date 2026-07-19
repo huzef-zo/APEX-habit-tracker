@@ -2513,6 +2513,16 @@ Cause: "${payload.cause}"`;
         }
 
         // --- UTILITY FUNCTIONS ---
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function getLocalDateString(date = new Date()) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -2700,6 +2710,7 @@ Cause: "${payload.cause}"`;
             tempDays: [],
             editingHabitId: null,
             _dayIdxCache: {}, // Performance cache for date string to day index mapping to avoid redundant Date parsing
+            escapeHTML: escapeHTML,
 
             toggleAPIFields() {
                 const provider = document.getElementById('ai-provider').value;
@@ -3013,7 +3024,7 @@ Cause: "${payload.cause}"`;
                     const generatedDate = new Date(State.weeklyReport.generatedAt).toLocaleDateString();
                     reportBox.innerHTML = `
                         <div style="border-left: 2px solid var(--primary); padding-left: 12px; margin-bottom: 1rem; color: #fff;">
-                            "${State.weeklyReport.text}"
+                            "${this.escapeHTML(State.weeklyReport.text)}"
                         </div>
                         <div style="font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-system);">
                             Report Compiled on: ${generatedDate}
@@ -3791,7 +3802,7 @@ Cause: "${payload.cause}"`;
                                     ⚠️ SYSTEM PENALTY ACTIVE [TIER ${tier}]
                                 </div>
                                 <div style="font-size: 0.9rem; color: #fff; font-family: var(--font-ui); line-height: 1.4; margin-bottom: 8px;">
-                                    <strong>Trigger Cause:</strong> "${cause}"<br>
+                                    <strong>Trigger Cause:</strong> "${this.escapeHTML(cause)}"<br>
                                     <strong>Consequences:</strong> ${penaltyConsequences}
                                 </div>
                                 <div style="font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-system);">
@@ -3818,8 +3829,8 @@ Cause: "${payload.cause}"`;
                 // Render generated quests
                 todayQuests.forEach(q => {
                     hasQuestsToday = true;
-                    const q_title = q.title || 'Untitled System Mission';
-                    const q_desc = q.description || 'System task evaluation.';
+                    const q_title = this.escapeHTML(q.title || 'Untitled System Mission');
+                    const q_desc = this.escapeHTML(q.description || 'System task evaluation.');
                     const q_diff = q.difficulty || 'medium';
                     const q_status = q.status || 'pending';
                     const q_stat = Object.keys(q.stat_targets || { STR: 1 })[0] || 'STR';
@@ -3853,7 +3864,7 @@ Cause: "${payload.cause}"`;
                         ${(q_status === 'pending' || q_status === 'rejected') ? `
                             <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
                                 <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase;">Submit Log Evidence</label>
-                                <textarea id="log-text-${q.id}" class="input-field" rows="2" placeholder="Describe your activity in detail. The System is highly skeptical of lazy summaries..." style="margin-bottom: 0.5rem; resize: vertical; font-family: var(--font-ui);">${q.submission?.log_text || ''}</textarea>
+                                <textarea id="log-text-${q.id}" class="input-field" rows="2" placeholder="Describe your activity in detail. The System is highly skeptical of lazy summaries..." style="margin-bottom: 0.5rem; resize: vertical; font-family: var(--font-ui);">${this.escapeHTML(q.submission?.log_text || '')}</textarea>
                                 <button onclick="App.submitQuestLog('${q.id}')" class="btn-primary" style="font-size: 0.75rem; padding: 0.5rem 1rem; width: auto; align-self: flex-start;">Submit Evidence</button>
                             </div>
                         ` : ''}
@@ -3875,7 +3886,7 @@ Cause: "${payload.cause}"`;
                                     ${q.verdict.verified ? `<span style="color: var(--success);">Deltas: ${Object.entries(q.verdict.stat_deltas || {}).filter(([k,v]) => v > 0).map(([k,v]) => `+${v} ${k}`).join(', ')}</span>` : ''}
                                 </div>
                                 <div style="color: #fff; font-style: italic; line-height: 1.4; border-left: 2px solid ${q.verdict.verified ? 'var(--success)' : 'var(--danger)'}; padding-left: 8px; margin-top: 4px; font-family: var(--font-ui);">
-                                    "${q.verdict.system_message}"
+                                    "${this.escapeHTML(q.verdict.system_message)}"
                                 </div>
                                 ${!q.verdict.verified ? `
                                     <button onclick="App.reopenQuest('${q.id}')" class="btn-primary" style="font-size: 0.7rem; padding: 0.4rem 0.8rem; width: auto; align-self: flex-start; background: #222; border: 1px solid var(--danger); color: var(--danger); margin-top: 0.5rem;">Retry Quest</button>
@@ -3888,7 +3899,7 @@ Cause: "${payload.cause}"`;
 
                 // Render custom user-created habits/quests
                 State.habits.forEach(h => {
-                    const h_title = h.title || 'Unknown Quest';
+                    const h_title = this.escapeHTML(h.title || 'Unknown Quest');
                     const h_comp = Array.isArray(h.completedDates) ? h.completedDates : [];
                     const h_diff = h.diff || 'medium';
                     const h_stat = h.stat || 'str';
@@ -3952,7 +3963,7 @@ Cause: "${payload.cause}"`;
                             ${(h_status === 'pending' || h_status === 'rejected') ? `
                                 <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
                                     <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase;">Submit Log Evidence</label>
-                                    <textarea id="log-text-${h.id}" class="input-field" rows="2" placeholder="Describe your activity in detail. The System is highly skeptical of lazy summaries..." style="margin-bottom: 0.5rem; resize: vertical; font-family: var(--font-ui);">${h.submission?.log_text || ''}</textarea>
+                                    <textarea id="log-text-${h.id}" class="input-field" rows="2" placeholder="Describe your activity in detail. The System is highly skeptical of lazy summaries..." style="margin-bottom: 0.5rem; resize: vertical; font-family: var(--font-ui);">${this.escapeHTML(h.submission?.log_text || '')}</textarea>
                                     <button onclick="App.submitQuestLog('${h.id}')" class="btn-primary" style="font-size: 0.75rem; padding: 0.5rem 1rem; width: auto; align-self: flex-start;">Submit Evidence</button>
                                 </div>
                             ` : ''}
@@ -3973,7 +3984,7 @@ Cause: "${payload.cause}"`;
                                         <span style="color: var(--primary);">XP: ${h.verdict.verified ? '+' + h.verdict.xp_awarded : '0'}</span>
                                     </div>
                                     <div style="color: #fff; font-style: italic; line-height: 1.4; border-left: 2px solid ${h.verdict.verified ? 'var(--success)' : 'var(--danger)'}; padding-left: 8px; margin-top: 4px; font-family: var(--font-ui);">
-                                        "${h.verdict.system_message}"
+                                        "${this.escapeHTML(h.verdict.system_message)}"
                                     </div>
                                     ${!h.verdict.verified ? `
                                         <button onclick="App.reopenQuest('${h.id}')" class="btn-primary" style="font-size: 0.7rem; padding: 0.4rem 0.8rem; width: auto; align-self: flex-start; background: #222; border: 1px solid var(--danger); color: var(--danger); margin-top: 0.5rem;">Retry Quest</button>
@@ -4875,7 +4886,7 @@ Cause: "${payload.cause}"`;
                         <span style="font-size: 1.2rem;">${attrIcons[shadow.attribute] || '👁️'}</span>
                         <span style="font-family: var(--font-system); font-size: 0.6rem; color: var(--text-dim);">${shadow.tier}-RANK</span>
                     </div>
-                    <div style="font-family: var(--font-display); font-size: 0.85rem; color: #fff; margin-bottom: 0.3rem;">${shadow.name}</div>
+                    <div style="font-family: var(--font-display); font-size: 0.85rem; color: #fff; margin-bottom: 0.3rem;">${escapeHTML(shadow.name)}</div>
                     <div style="font-family: var(--font-system); font-size: 0.65rem; color: ${attrColors[shadow.attribute]}; text-transform: uppercase;">${shadow.attribute.toUpperCase()}</div>
                     <button onclick="APEX_EXPANSION.dismissShadow(${shadow.id})" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: #444; cursor: pointer; font-size: 1rem;" aria-label="Dismiss shadow" title="Dismiss shadow">✕</button>
                 `;
