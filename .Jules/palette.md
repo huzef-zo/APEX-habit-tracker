@@ -1,0 +1,3 @@
+## 2025-07-18 - Keyboard Activation on Custom Interactive Elements
+**Learning:** Adding `role="button"` and `tabindex="0"` to standard interactive elements like `<span>` satisfies screen reader support but fails native keyboard activation (Enter/Space key presses). To ensure full accessibility without altering CSS styles, explicit `onkeydown` event handlers must be attached to manually trigger the click action when Enter or Space is pressed.
+**Action:** Always include `onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"` alongside `role="button"` and `tabindex="0"` on non-native interactive components.
