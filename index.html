@@ -1152,61 +1152,6 @@
             letter-spacing: 1px;
         }
 
-        /* Shadow Extraction Modal */
-        .shadow-extract-modal .modal-box {
-            border-color: var(--accent-purple) !important;
-            box-shadow: 0 0 50px rgba(123, 97, 255, 0.4) !important;
-        }
-
-        .extract-btn {
-            background: var(--accent-purple);
-            color: #fff;
-            border: none;
-            padding: 1rem 2rem;
-            font-family: var(--font-display);
-            font-weight: 900;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin: 0.5rem;
-        }
-
-        .extract-btn:hover {
-            box-shadow: 0 0 20px var(--accent-purple);
-            background: #9b7fff;
-        }
-
-        .dismiss-btn {
-            background: none;
-            border: 1px solid #555;
-            color: #888;
-            padding: 1rem 2rem;
-            font-family: var(--font-display);
-            cursor: pointer;
-            transition: 0.3s;
-            margin: 0.5rem;
-        }
-
-        .dismiss-btn:hover {
-            border-color: #888;
-            color: #aaa;
-        }
-
-        /* Army View */
-        #army {
-            display: none;
-        }
-
-        #army.active {
-            display: block;
-        }
-
-        #army-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1rem;
-        }
-
         /* Combo Display */
         #combo-display {
             position: fixed;
@@ -1841,15 +1786,6 @@
                         </ul>
                     </div>
 
-                    <div class="glass-panel" style="padding: 2rem; margin-bottom: 1.5rem; border-color: var(--accent-purple) !important;">
-                        <h3 style="font-family: var(--font-display); color: var(--accent-purple); margin-bottom: 1rem;">👥 SHADOW RECRUITMENT</h3>
-                        <p style="margin-bottom: 1rem; color: var(--text-main);">Extract the shadows of defeated challenges to build your army.</p>
-                        <ul style="list-style: none; color: var(--text-dim); font-size: 0.9rem;">
-                            <li style="margin-bottom: 0.5rem;">• Extraction Chance: <span style="color: var(--success);">5% (Easy)</span>, <span style="color: var(--warning);">12% (Medium)</span>, <span style="color: var(--danger);">25% (Hard)</span>.</li>
-                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--primary);">INT Attribute:</span> Increases extraction success chance.</li>
-                            <li style="margin-bottom: 0.5rem;">• <span style="color: var(--accent-purple);">Army Capacity:</span> 1 Shadow per 5 levels (1 + floor(Level/5)).</li>
-                        </ul>
-                    </div>
                 </section>
                 
             </div>
@@ -2857,16 +2793,6 @@ Cause: "${payload.cause}"`;
                         }
 
                         if (window.AudioSys) window.AudioSys.play('complete');
-
-                        if (typeof attemptShadowExtraction === 'function') {
-                            const mappedHabit = {
-                                id: quest.id,
-                                title: quest.title,
-                                diff: quest.difficulty || quest.diff || 'medium',
-                                stat: (quest.stat || Object.keys(quest.stat_targets || { STR: 1 })[0] || 'str').toLowerCase()
-                            };
-                            attemptShadowExtraction(mappedHabit);
-                        }
 
                         // Run AI/Game side effects
                         if (typeof incrementCombo === 'function') incrementCombo();
@@ -4448,8 +4374,6 @@ Cause: "${payload.cause}"`;
             achievements: [],
             titles: [],
             equippedTitle: null,
-            shadows: [],
-            armyCap: 1,
             skills: {},
             comboCount: 0,
             comboDate: null,
@@ -4516,7 +4440,6 @@ Cause: "${payload.cause}"`;
             perfect_month:    { name: 'Perfect Month', category: 'consistency', desc: '30 consecutive Perfect Days', check: (ps, es) => es.perfectStreak >= 30, reward: { type: 'xp', value: 2000 }, title: 'Perfectionist' },
             comeback_king:    { name: 'Comeback King', category: 'endurance', desc: 'Recover from CRITICAL STATE', check: (ps, es) => (es.criticalRecoveries || 0) >= 1, reward: { type: 'title' }, title: 'Comeback King' },
             shadow_monarch:   { name: 'Shadow Monarch', category: 'legendary', desc: 'Reach Level 90', check: (ps, es) => ps.level >= 90, reward: { type: 'title' }, title: 'Shadow Monarch' },
-            army_commander:   { name: 'Army Commander', category: 'legendary', desc: 'Fill a shadow army of at least 5 shadows', check: (ps, es) => es.shadows.length >= 5 && es.shadows.length >= Math.floor(ps.level / 5) + 1, reward: { type: 'xp', value: 2000 }, title: 'Army Commander' },
         };
 
         const TITLE_BONUSES = {
@@ -4528,8 +4451,7 @@ Cause: "${payload.cause}"`;
             'perfectionist':  { name: 'Perfectionist', bonus: { type: 'perfect_bonus', value: 0.25, desc: '+25% Perfect Day bonus' } },
             'comeback_king':  { name: 'Comeback King', bonus: { type: 'recovery_boost', value: 0.50, desc: '+50% XP during CRITICAL STATE recovery' } },
             'wolf_slayer':    { name: 'Wolf Slayer', bonus: { type: 'xp_hard', value: 0.10, desc: '+10% XP on Hard quests' } },
-            'shadow_monarch': { name: 'Shadow Monarch', bonus: { type: 'shadow_extra', value: 2, desc: '+2 shadow army capacity' } },
-            'army_commander': { name: 'Army Commander', bonus: { type: 'shadow_power', value: 0.10, desc: '+10% shadow passive bonuses' } },
+            'shadow_monarch': { name: 'Shadow Monarch', bonus: { type: 'none', value: 0, desc: 'S-Rank Ruler of Shadows' } },
         };
 
         function getTitleBonus(titleName) {
@@ -4596,118 +4518,6 @@ Cause: "${payload.cause}"`;
             setTimeout(() => notif.classList.remove('active'), 6000);
         }
 
-        // ==================== SHADOW SYSTEM ====================
-        const SHADOW_PREFIXES = ['Shadow', 'Phantom', 'Wraith', 'Specter', 'Shade', 'Ghost', 'Revenant', 'Banshee'];
-        const SHADOW_ROLES = {
-            str: ['Knight', 'Berserker', 'Champion', 'Warlord', 'Titan'],
-            int: ['Mage', 'Sorcerer', 'Warlock', 'Archon', 'Oracle'],
-            agi: ['Assassin', 'Rogue', 'Scout', 'Phantom', 'Striker'],
-            vit: ['Tank', 'Guardian', 'Sentinel', 'Paladin', 'Fortress'],
-            sns: ['Scout', 'Tracker', 'Seer', 'Watchman', 'Probe']
-        };
-        const SHADOW_TIERS = { easy: 'E', medium: 'D', hard: 'C' };
-
-        function generateShadowName(attribute, difficulty) {
-            const prefix = SHADOW_PREFIXES[Math.floor(Math.random() * SHADOW_PREFIXES.length)];
-            const roles = SHADOW_ROLES[attribute] || SHADOW_ROLES.str;
-            const role = roles[Math.floor(Math.random() * roles.length)];
-            return `${prefix} ${role}`;
-        }
-
-        let pendingExtraction = null;
-
-        function attemptShadowExtraction(habit) {
-            if (!habit) return;
-            if (expansionState.awakeningActive) {
-                promptShadowExtraction(habit);
-                return;
-            }
-
-            const baseChance = { easy: 0.05, medium: 0.12, hard: 0.25 };
-            let chance = baseChance[habit.diff] || 0.05;
-
-            if (APEX && APEX.playerState) {
-                const intBonus = Math.min(20, Math.max(0, APEX.playerState.attributes.INT - 10));
-                chance += intBonus * 0.01;
-            }
-
-            if (expansionState.equippedTitle) {
-                const title = expansionState.titles.find(t => t.id === expansionState.equippedTitle);
-                if (title && title.bonus && title.bonus.type === 'shadow_extract') {
-                    chance += title.bonus.value;
-                }
-            }
-
-            chance = Math.min(1.0, chance);
-            if (Math.random() < chance) {
-                promptShadowExtraction(habit);
-            }
-        }
-
-        function promptShadowExtraction(habit) {
-            if (!habit) return;
-            pendingExtraction = {
-                sourceQuestId: habit.id,
-                attribute: habit.stat || 'str',
-                difficulty: habit.diff
-            };
-            const name = generateShadowName(habit.stat, habit.diff);
-            const tier = SHADOW_TIERS[habit.diff] || 'E';
-            const infoEl = document.getElementById('shadow-extract-info');
-            if (infoEl) infoEl.textContent = `Shadow: ${name} (${tier}-Rank, ${habit.stat.toUpperCase()})`;
-            const modal = document.getElementById('shadow-extract-modal');
-            if (modal) modal.classList.add('open');
-            if (window.AudioSys) window.AudioSys.play('complete');
-        }
-
-        function extractShadow() {
-            if (!pendingExtraction || !APEX) return;
-
-            const armyCap = Math.floor(APEX.playerState.level / 5) + 1 +
-                (expansionState.titles.find(t => t.id === 'shadow_monarch') ? 2 : 0);
-
-            if (expansionState.shadows.length >= armyCap) {
-                if (App) App.showSystemMessage('ARMY FULL', 'Shadow army is at capacity. Dismiss a shadow first.');
-                const modal = document.getElementById('shadow-extract-modal');
-                if (modal) modal.classList.remove('open');
-                pendingExtraction = null;
-                return;
-            }
-
-            const shadow = {
-                id: Date.now(),
-                name: generateShadowName(pendingExtraction.attribute, pendingExtraction.difficulty),
-                tier: SHADOW_TIERS[pendingExtraction.difficulty] || 'E',
-                attribute: pendingExtraction.attribute,
-                sourceQuestId: pendingExtraction.sourceQuestId,
-                extractedAt: new Date().toISOString()
-            };
-
-            expansionState.shadows.push(shadow);
-            saveExpansion();
-            checkAchievements();
-
-            const modal = document.getElementById('shadow-extract-modal');
-            if (modal) modal.classList.remove('open');
-            if (App) App.showSystemMessage('SHADOW EXTRACTED', `${shadow.name} has joined your army. (${expansionState.shadows.length}/${armyCap})`);
-            if (window.AudioSys) window.AudioSys.play('levelup');
-            pendingExtraction = null;
-            renderArmyView();
-        }
-
-        function dismissExtraction() {
-            const modal = document.getElementById('shadow-extract-modal');
-            if (modal) modal.classList.remove('open');
-            pendingExtraction = null;
-        }
-
-        function dismissShadow(shadowId) {
-            if (!confirm('Dismiss this shadow? It cannot be recovered.')) return;
-            expansionState.shadows = expansionState.shadows.filter(s => s.id !== shadowId);
-            saveExpansion();
-            renderArmyView();
-            if (App) App.showSystemMessage('SHADOW DISMISSED', 'A shadow has been released from your army.');
-        }
 
         // ==================== DAILY RESET SYSTEM ====================
         function checkDailyReset() {
@@ -4841,48 +4651,6 @@ Cause: "${payload.cause}"`;
             display.style.opacity = '1';
         }
 
-        // ==================== ARMY VIEW ====================
-        function renderArmyView() {
-            const grid = document.getElementById('army-grid');
-            const empty = document.getElementById('army-empty');
-            const powerEl = document.getElementById('army-power');
-            const capEl = document.getElementById('army-capacity');
-            if (!grid) return;
-
-            const armyCap = APEX ? Math.floor(APEX.playerState.level / 5) + 1 : 1;
-            const tierValues = { E: 10, D: 25, C: 50 };
-            const totalPower = expansionState.shadows.reduce((sum, s) => sum + (tierValues[s.tier] || 10), 0);
-
-            if (powerEl) powerEl.textContent = totalPower;
-            if (capEl) capEl.textContent = `${expansionState.shadows.length} / ${armyCap}`;
-
-            grid.innerHTML = '';
-            if (expansionState.shadows.length === 0) {
-                if (empty) empty.style.display = 'block';
-                return;
-            }
-            if (empty) empty.style.display = 'none';
-
-            const attrColors = { str: 'var(--danger)', int: 'var(--primary)', agi: 'var(--success)', vit: 'var(--warning)', sns: 'var(--accent-purple)' };
-            const attrIcons = { str: '⚔️', int: '📖', agi: '⚡', vit: '🛡️', sns: '👁️' };
-
-            expansionState.shadows.forEach(shadow => {
-                const card = document.createElement('div');
-                card.className = 'glass-panel';
-                card.style.cssText = `padding: 1.2rem; border-color: ${attrColors[shadow.attribute] || 'var(--accent-purple)'}; position: relative;`;
-                card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <span style="font-size: 1.2rem;">${attrIcons[shadow.attribute] || '👁️'}</span>
-                        <span style="font-family: var(--font-system); font-size: 0.6rem; color: var(--text-dim);">${shadow.tier}-RANK</span>
-                    </div>
-                    <div style="font-family: var(--font-display); font-size: 0.85rem; color: #fff; margin-bottom: 0.3rem;">${shadow.name}</div>
-                    <div style="font-family: var(--font-system); font-size: 0.65rem; color: ${attrColors[shadow.attribute]}; text-transform: uppercase;">${shadow.attribute.toUpperCase()}</div>
-                    <button onclick="APEX_EXPANSION.dismissShadow(${shadow.id})" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: #444; cursor: pointer; font-size: 1rem;" aria-label="Dismiss shadow" title="Dismiss shadow">✕</button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
         // ==================== UI INJECTION ====================
         function injectMandatoryCheckbox() {
             const modal = document.querySelector('#add-modal .modal-box');
@@ -4927,71 +4695,6 @@ Cause: "${payload.cause}"`;
                 <div class="ach-reward" id="ach-notif-reward">–</div>
             `;
             document.body.appendChild(div);
-        }
-
-        function createShadowExtractionModal() {
-            if (document.getElementById('shadow-extract-modal')) return;
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay shadow-extract-modal';
-            overlay.id = 'shadow-extract-modal';
-            overlay.innerHTML = `
-                <div class="modal-box" style="text-align: center; max-width: 500px; padding: 3rem 2rem;">
-                    <div style="font-family: var(--font-system); font-size: 0.7rem; color: var(--accent-purple); letter-spacing: 3px; margin-bottom: 1rem;">SYSTEM NOTIFICATION</div>
-                    <h2 style="font-family: var(--font-display); color: var(--accent-purple); font-size: 1.5rem; margin-bottom: 0.5rem; text-shadow: 0 0 20px var(--accent-purple);">SHADOW EXTRACTION AVAILABLE</h2>
-                    <div style="height: 2px; width: 100px; background: var(--accent-purple); margin: 1.5rem auto;"></div>
-                    <p id="shadow-extract-info" style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 2rem;">A shadow has appeared...</p>
-                    <div>
-                        <button class="extract-btn" onclick="APEX_EXPANSION.extractShadow()">⚡ EXTRACT</button>
-                        <button class="dismiss-btn" onclick="APEX_EXPANSION.dismissExtraction()">DISMISS</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-        }
-
-        function injectArmyNav() {
-            const sidebar = document.querySelector('.sidebar');
-            if (!sidebar || document.getElementById('nav-army-btn')) return;
-
-            const statusBtn = sidebar.querySelector('button[onclick*="status"]');
-            if (!statusBtn) return;
-
-            const armyBtn = document.createElement('button');
-            armyBtn.className = 'nav-btn';
-            armyBtn.id = 'nav-army-btn';
-            armyBtn.innerHTML = '👁️ Army';
-            armyBtn.onclick = () => APEX_EXPANSION.navigate('army');
-            statusBtn.after(armyBtn);
-        }
-
-        function injectArmyView() {
-            if (document.getElementById('army-view')) return;
-
-            const statusView = document.getElementById('status');
-            if (!statusView) return;
-
-            const armySection = document.createElement('section');
-            armySection.id = 'army';
-            armySection.className = 'view-section';
-            armySection.innerHTML = `
-                <h2 style="font-family: var(--font-display); color: var(--accent-purple); margin-bottom: 1.5rem; letter-spacing: 4px;">[ SHADOW ARMY ]</h2>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <div>
-                        <span style="font-family: var(--font-system); font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;">Army Power</span>
-                        <div id="army-power" style="font-family: var(--font-display); font-size: 2rem; color: var(--accent-purple); text-shadow: 0 0 15px var(--accent-purple);">0</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <span style="font-family: var(--font-system); font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;">Capacity</span>
-                        <div id="army-capacity" style="font-family: var(--font-display); font-size: 1.2rem; color: var(--text-main);">0 / 1</div>
-                    </div>
-                </div>
-                <div id="army-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;"></div>
-                <div id="army-empty" style="text-align: center; padding: 3rem; color: var(--text-dim); font-family: var(--font-system); letter-spacing: 2px;">
-                    [ NO SHADOWS EXTRACTED ]<br><br>
-                    <span style="font-size: 0.8rem; color: #555;">Complete quests to extract shadows</span>
-                </div>
-            `;
-            statusView.after(armySection);
         }
 
         // ==================== HOOKS INTO EXISTING SYSTEM ====================
@@ -5068,32 +4771,7 @@ Cause: "${payload.cause}"`;
                 };
             }
 
-            // Hook navigate for army view
-            const originalNavigate = App.navigate ? App.navigate.bind(App) : null;
-            if (originalNavigate) {
-                App.navigate = function(view) {
-                    const armyView = document.getElementById('army');
-                    if (armyView) armyView.classList.remove('active');
-
-                    if (view === 'army') {
-                        document.getElementById('sidebar').classList.remove('open');
-                        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-                        if (armyView) armyView.classList.add('active');
-
-                        document.querySelectorAll('.nav-btn').forEach(b => {
-                            b.classList.remove('active');
-                            if (b.getAttribute('onclick')?.includes("'army'") || b.id === 'nav-army-btn') {
-                                b.classList.add('active');
-                            }
-                        });
-                        renderArmyView();
-                    } else {
-                        originalNavigate(view);
-                    }
-                };
-            }
-
-            // Hook toggleHabit to trigger shadow extraction
+            // Hook toggleHabit
             const originalToggleHabit = App.toggleHabit ? App.toggleHabit.bind(App) : null;
             if (originalToggleHabit) {
                 App.toggleHabit = function(event, habitId) {
@@ -5104,7 +4782,6 @@ Cause: "${payload.cause}"`;
                         const isCompletedNow = habit.completedDates.includes(todayStr);
 
                         if (isCompletedNow) {
-                            attemptShadowExtraction(habit);
                             if (habit.isRecovery) {
                                 expansionState.criticalState = false;
                                 expansionState.consecutiveMisses = 0;
@@ -5123,7 +4800,7 @@ Cause: "${payload.cause}"`;
         // ==================== PHASE 2: SKILLS & ATTRIBUTES ====================
         const SKILLS = {
             str_tier1: { name: 'Power Strike', attribute: 'STR', threshold: 25, type: 'passive', desc: '+15% XP on Hard quests', effect: { type: 'xp_hard', value: 0.15 } },
-            int_tier1: { name: 'Keen Mind', attribute: 'INT', threshold: 25, type: 'passive', desc: '+5% shadow extraction', effect: { type: 'shadow_extract', value: 0.05 } },
+            int_tier1: { name: 'Keen Mind', attribute: 'INT', threshold: 25, type: 'passive', desc: '+5% Quest Focus', effect: { type: 'none', value: 0 } },
             agi_tier1: { name: 'Swift Action', attribute: 'AGI', threshold: 25, type: 'passive', desc: 'Streaks survive 1 miss/month', effect: { type: 'streak_save', value: 1 } },
             vit_tier1: { name: 'Iron Body', attribute: 'VIT', threshold: 25, type: 'passive', desc: '-10% daily penalty', effect: { type: 'penalty_reduce', value: 0.10 } },
             sns_tier1: { name: 'Perception', attribute: 'SNS', threshold: 25, type: 'passive', desc: '+3 bonus XP per quest', effect: { type: 'bonus_xp', value: 3 } },
@@ -5199,14 +4876,12 @@ Cause: "${payload.cause}"`;
             if (!APEX || !APEX.playerState) return 0;
             const ps = APEX.playerState;
             const es = expansionState;
-            const tierValues = { E: 10, D: 25, C: 50 };
 
             const attrSum = Object.values(ps.attributes).reduce((s, v) => s + v, 0);
             const levelBonus = ps.level * 10;
-            const shadowPower = es.shadows.reduce((sum, s) => sum + (tierValues[s.tier] || 10), 0);
             const titleBonus = es.titles.length * 50;
 
-            expansionState.powerRating = attrSum + levelBonus + shadowPower + titleBonus;
+            expansionState.powerRating = attrSum + levelBonus + titleBonus;
             expansionState.powerRatingUpdatedAt = new Date().toISOString();
             saveExpansion();
             return expansionState.powerRating;
@@ -5229,9 +4904,6 @@ Cause: "${payload.cause}"`;
                 injectMandatoryCheckbox();
                 injectDailyTimer();
                 injectAchievementNotification();
-                createShadowExtractionModal();
-                injectArmyNav();
-                injectArmyView();
 
                 hookIntoSystem();
 
@@ -5239,7 +4911,6 @@ Cause: "${payload.cause}"`;
                 checkAchievements();
                 checkSkillUnlocks();
                 checkAwakening();
-                renderArmyView();
                 renderComboDisplayEnhanced();
                 renderSkillBar();
 
@@ -5249,9 +4920,6 @@ Cause: "${payload.cause}"`;
                 console.log("[EXPANSION] APEX System Expansion initialized successfully");
             },
 
-            extractShadow,
-            dismissExtraction,
-            dismissShadow,
             navigate: (view) => {
                 if (App && App.navigate) App.navigate(view);
             },
