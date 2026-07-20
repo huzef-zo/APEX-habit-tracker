@@ -50,14 +50,6 @@ A high-performance habit tracking application inspired by the "Solo Leveling" ae
 - **Vitality Bonus:** The VIT attribute reduces XP loss by up to 50%.
 - **Critical State:** 3 consecutive days of missing mandatory quests triggers a state where all XP gains are halved.
 
-### 👥 Shadow Recruitment
-- **Extraction:** Completed quests have a chance to yield shadows:
-  - **Easy:** 5%
-  - **Medium:** 12%
-  - **Hard:** 25%
-- **Intelligence Bonus:** Each point in INT above 10 increases extraction chance by 1%.
-- **Army Capacity:** You can hold `1 + floor(Level / 5)` shadows.
-
 ### 🛡️ Other Systems
 - **Audio Feedback:** Immersive sound effects for quest completion, leveling up, and system interactions.
 - **PWA Ready:** Install APEX as a native app on mobile or desktop with offline support.
