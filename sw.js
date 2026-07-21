@@ -1,12 +1,10 @@
-const CACHE_NAME = 'apex-pwa-v15';
+const CACHE_NAME = 'apex-pwa-v16';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  './worker.js',
-  'https://esm.run/@mlc-ai/web-llm@0.2.84'
+  './icon-512.png'
 ];
 
 // Install event - caching assets
@@ -51,16 +49,7 @@ self.addEventListener('fetch', (event) => {
     // Cache-first strategy for other assets
     event.respondWith(
       caches.match(event.request).then((response) => {
-        return response || fetch(event.request).then((networkResponse) => {
-          // Dynamically cache WebLLM library and model CDN files on first download
-          if (event.request.url.includes('cdn.jsdelivr.net') || event.request.url.includes('esm.run')) {
-            return caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse.clone());
-              return networkResponse;
-            });
-          }
-          return networkResponse;
-        });
+        return response || fetch(event.request);
       })
     );
   }
