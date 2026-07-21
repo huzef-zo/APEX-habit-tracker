@@ -1423,54 +1423,15 @@
         <div class="modal-box system-shimmer" style="max-width: 500px;">
             <h3 style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER ONBOARDING</h3>
             <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.4; font-family: var(--font-ui);">
-                Welcome, Hunter. To initialize the System and begin personalized quest generation, please define your identity and focus areas.
+                Welcome, Hunter. To initialize the System, please define your identity.
             </p>
 
-            <div style="margin-bottom: 1.2rem;">
-                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name (Optional)</label>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name</label>
                 <input type="text" id="onboarding-name-input" class="input-field" placeholder="Enter Player Name (e.g. SUNG JIN-WOO)..." maxlength="20" autocomplete="off">
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Hunter's Core Goals / Focus Areas (Required)</label>
-                <textarea id="onboarding-goals-input" class="input-field" rows="4" placeholder="Define your focus (e.g. 'Improve painting techniques, daily fitness training, practice patience with kids, sleep by 11pm')..." style="resize: vertical; font-family: var(--font-ui);"></textarea>
-            </div>
-
             <button class="btn-primary" onclick="App.submitOnboarding()" style="padding: 0.8rem;">Initialize The System</button>
-        </div>
-    </div>
-
-    <!-- System Initialization Loading Overlay -->
-    <div class="modal-overlay" id="system-loading-overlay" style="z-index: 10000; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px);">
-        <div class="modal-box system-shimmer" style="max-width: 500px; text-align: center; position: relative; padding: 2.5rem 2rem;">
-            <!-- Glowing scanner animation style -->
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--primary), transparent); animation: scan 2s linear infinite;"></div>
-
-            <h3 style="font-family: var(--font-display); font-size: 1.3rem; color: var(--primary); letter-spacing: 2px; margin-bottom: 1.5rem;" id="system-loader-title">[ SYSTEM INITIALIZATION ]</h3>
-
-            <p style="font-family: var(--font-ui); font-size: 0.95rem; color: #fff; line-height: 1.5; margin-bottom: 1.5rem;" id="system-loader-desc">
-                Setting up your System — one-time download, then works offline.
-            </p>
-
-            <p style="font-family: var(--font-system); font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.5rem;">
-                Downloading AI model weights (approx. 1GB). This is a one-time process.
-            </p>
-
-            <!-- Progress Bar -->
-            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(0,245,255,0.15); border-radius: 3px; overflow: hidden; margin-bottom: 1rem;">
-                <div id="system-loader-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00f5ff, #9b51e0); transition: width 0.1s linear;"></div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-family: var(--font-numbers); font-size: 0.85rem;">
-                <span id="system-loader-percent" style="color: var(--primary); font-weight: bold;">0%</span>
-                <span id="system-loader-status-text" style="color: var(--text-dim); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 280px; font-family: var(--font-ui);">Initializing...</span>
-            </div>
-
-            <div id="system-loader-error" style="display: none; color: var(--danger); font-family: var(--font-ui); font-size: 0.85rem; margin-bottom: 1.5rem; background: rgba(255,0,0,0.1); border: 1px solid var(--danger); padding: 0.8rem; border-radius: 4px; word-break: break-word; text-align: left;"></div>
-
-            <div style="font-size: 0.75rem; color: var(--text-dim); font-style: italic; line-height: 1.4;">
-                Please do not close this tab. This may take a few minutes depending on your connection.
-            </div>
         </div>
     </div>
     
@@ -1536,16 +1497,6 @@
                             <span class="legacy-stat-lbl">Total Quests</span>
                         </div>
                     </div>
-                    
-                    <!-- PERSISTENT API ERROR BANNER -->
-                    <div id="api-error-banner" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--danger); background: rgba(255, 0, 85, 0.1); border-radius: 4px; padding: 1.2rem; text-align: left; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);">
-                        <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--danger); font-weight: bold; margin-bottom: 0.5rem; letter-spacing: 2px;">
-                            🚨 SYSTEM CORE OFFLINE
-                        </div>
-                        <div style="font-size: 0.9rem; color: #fff; font-family: var(--font-ui); line-height: 1.4;">
-                            System core offline — verify WebGPU is supported/enabled and you have completed the initial system setup.
-                        </div>
-                    </div>
 
                     <!-- PERSISTENT SYSTEM PENALTY BANNER -->
                     <div id="penalty-banner" style="display: none; margin-bottom: 1.5rem;"></div>
@@ -1554,11 +1505,6 @@
                         <h3 style="font-family: var(--font-display); color: var(--text-dim);">
                             Today's Missions
                         </h3>
-                        <div style="display: flex; gap: 10px;">
-                            <button onclick="checkAndGenerateDailyQuests(true)" class="btn-primary" style="font-size: 0.7rem; padding: 4px 10px; width: auto; background: rgba(0, 245, 255, 0.1); border: var(--border); color: var(--primary);">
-                                🔄 Re-Generate Daily Quests
-                            </button>
-                        </div>
                     </div>
                     
                     <div class="habit-list" id="habit-list-container"></div>
@@ -1654,16 +1600,6 @@
                     <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 2rem; text-align: center; letter-spacing: 4px;">
                         [ PLAYER STATUS ]
                     </h2>
-
-                    <!-- PERSISTENT API ERROR BANNER FOR STATUS -->
-                    <div id="api-error-banner-status" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--danger); background: rgba(255, 0, 85, 0.1); border-radius: 4px; padding: 1.2rem; text-align: left; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); max-width: 600px; margin: 0 auto 1.5rem auto;">
-                        <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--danger); font-weight: bold; margin-bottom: 0.5rem; letter-spacing: 2px;">
-                            🚨 SYSTEM CORE OFFLINE
-                        </div>
-                        <div style="font-size: 0.9rem; color: #fff; font-family: var(--font-ui); line-height: 1.4;">
-                            System core offline — verify WebGPU is supported/enabled and you have completed the initial system setup.
-                        </div>
-                    </div>
 
                     <div class="glass-panel system-shimmer" style="padding: 3rem; max-width: 600px; margin: 0 auto; position: relative; border-radius: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(0, 245, 255, 0.1); padding-bottom: 2rem; flex-wrap: wrap;">
@@ -1776,43 +1712,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #333;">
-                            <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; text-align: center;">⚔️ SYSTEM AI GOALS</div>
-
-                            <div style="margin-bottom: 1rem;">
-                                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">Hunter's Core Goals (Guides Quest Generation)</label>
-                                <textarea id="ai-goals" class="input-field" rows="3" placeholder="Define your focus (e.g. 'Improve painting techniques, daily fitness training, practice patience with kids, sleep by 11pm')..." style="resize: vertical; font-family: var(--font-ui);"></textarea>
-                            </div>
-
-                            <button onclick="App.saveAIConfig()" class="btn-primary" style="font-size: 0.8rem; padding: 0.6rem; margin-bottom: 1.5rem;">Apply System Goals</button>
-
-                            <!-- SYSTEM COGNITIVE LOGS (DEBUG PANEL) -->
-                            <details id="system-debug-panel" style="margin-top: 1rem; border: 1px solid var(--border-color); padding: 1rem; background: rgba(0,0,0,0.4); border-radius: 4px;">
-                                <summary style="font-family: var(--font-display); font-size: 0.8rem; color: var(--primary); cursor: pointer; outline: none; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none;">
-                                    <span>⚙️ SYSTEM COGNITIVE LOGS (DEBUG)</span>
-                                    <span id="debug-toggle-icon" style="font-size: 0.75rem; font-family: var(--font-system);">[+] EXPAND</span>
-                                </summary>
-                                <div style="margin-top: 1rem; font-family: var(--font-system); font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.8rem; border-top: 1px dashed rgba(0, 245, 255, 0.2); padding-top: 1rem;">
-                                    <div>
-                                        <span style="color: var(--primary);">[TIMESTAMP]</span>
-                                        <div id="debug-timestamp" style="font-family: var(--font-numbers); color: #fff; margin-top: 2px;">No calls logged yet.</div>
-                                    </div>
-                                    <div>
-                                        <span style="color: var(--primary);">[FUNCTION CALLED]</span>
-                                        <div id="debug-function" style="color: #fff; margin-top: 2px;">-</div>
-                                    </div>
-                                    <div>
-                                        <span style="color: var(--primary);">[RAW REQUEST PAYLOAD]</span>
-                                        <pre id="debug-request" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,245,255,0.1); padding: 0.5rem; margin-top: 4px; overflow-x: auto; color: #88ff88; max-height: 150px; font-size: 0.7rem; font-family: 'Share Tech Mono', monospace; white-space: pre-wrap; word-break: break-all;">-</pre>
-                                    </div>
-                                    <div>
-                                        <span style="color: var(--primary);">[RAW RESPONSE RECEIVED]</span>
-                                        <pre id="debug-response" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,245,255,0.1); padding: 0.5rem; margin-top: 4px; overflow-x: auto; color: #88ffff; max-height: 200px; font-size: 0.7rem; font-family: 'Share Tech Mono', monospace; white-space: pre-wrap; word-break: break-all;">-</pre>
-                                    </div>
-                                </div>
-                            </details>
                         </div>
 
                         <div style="margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #333;">
@@ -2057,607 +1956,40 @@
             App.render(); 
         }
 
-        const MOCK_QUESTS = {
-            STR: [
-                { title: "Discipline Forge", description: "Complete 30 minutes of deep uninterrupted work with all notifications disabled." },
-                { title: "Willpower Trial", description: "Resist the urge to check social media or casual web browsing for 2 full hours." },
-                { title: "Early Rise Vanguard", description: "Begin your first primary task of the day before 9:00 AM." }
-            ],
-            INT: [
-                { title: "Mastery Study", description: "Spend 30 minutes reading, practicing, or studying a core skill or topic from your focus goals." },
-                { title: "System Optimization", description: "Review your current project or work files and clean up, refine, or organize at least one key element." },
-                { title: "Concept Synthesis", description: "Learn a new concept or technique related to your goals and write down a concise summary." }
-            ],
-            AGI: [
-                { title: "Velocity Strike", description: "Complete and mark off 3 items on your active action items list." },
-                { title: "Milestone Push", description: "Deliver, ship, or finalize a working task, item, or milestone in your current active focus areas." },
-                { title: "Sprint Execution", description: "Draft, outline, or complete a plan, document, or task in under 20 minutes." }
-            ],
-            VIT: [
-                { title: "Stamina Check", description: "Log 7+ hours of quality sleep or complete a 20-minute body workout/stretch." },
-                { title: "Fortitude Fueling", description: "Consume 2 liters of pure water and eat a screen-free nutritious meal." },
-                { title: "Mental Cleansing", description: "Perform a 10-minute mindfulness breathing session to lower cortisol levels." }
-            ],
-            PER: [
-                { title: "Foresight Blueprint", description: "Write down your detailed roadmap or weekly goals and align your next steps." },
-                { title: "Environment Alignment", description: "Declutter your physical or digital work environment, tabs, or files to optimize focus." },
-                { title: "Workspace Realignment", description: "Spend 15 minutes analyzing the bottlenecks in your execution from the last 7 days." }
-            ]
-        };
+        // AI functionality completely removed. Returned to Manual Habit Tracker.
 
-        function updateAIDebugPanel(functionName, provider, requestPayload, responseData) {
-            const timestamp = new Date().toLocaleString();
-            const tsEl = document.getElementById('debug-timestamp');
-            const fnEl = document.getElementById('debug-function');
-            const plEl = document.getElementById('debug-payload');
-            const respEl = document.getElementById('debug-response');
-
-            if (tsEl) tsEl.innerText = `${timestamp} (Provider: ${provider})`;
-            if (fnEl) fnEl.innerText = functionName.toUpperCase();
-            if (plEl) {
-                plEl.textContent = typeof requestPayload === 'object' ? JSON.stringify(requestPayload, null, 2) : String(requestPayload);
+        const PENALTY_TEMPLATES = [
+            {
+                title: "PUNISHMENT: Absolute Discipline Forge",
+                description: "Perform 100 pushups, 100 squats, and 100 situps, or execute 40 minutes of uninterrupted study/work.",
+                difficulty: "hard",
+                stat_targets: { STR: 5, VIT: 5 }
+            },
+            {
+                title: "PUNISHMENT: Stagnation Breakdown Analysis",
+                description: "Write a detailed reflection (at least 3 key action points) on what caused you to stumble and how to prevent it.",
+                difficulty: "hard",
+                stat_targets: { INT: 5, PER: 5 }
+            },
+            {
+                title: "PUNISHMENT: Restore Lost Momentum",
+                description: "Declutter your workspace completely and plan the next 3 days of focus tasks with strict execution schedules.",
+                difficulty: "hard",
+                stat_targets: { AGI: 5, PER: 5 }
+            },
+            {
+                title: "PUNISHMENT: Cleanse Lethargy & Realign",
+                description: "Drink 2.5 liters of water, complete 25 minutes of core/stretching exercises, and go to bed before 11 PM.",
+                difficulty: "hard",
+                stat_targets: { VIT: 5, STR: 5 }
+            },
+            {
+                title: "PUNISHMENT: Synthesize New Strategies",
+                description: "Study or read a skill-related text/video for 45 minutes and compile an optimized roadmap for the upcoming week.",
+                difficulty: "hard",
+                stat_targets: { INT: 5, AGI: 5 }
             }
-            if (respEl) {
-                respEl.textContent = typeof responseData === 'object' ? JSON.stringify(responseData, null, 2) : String(responseData);
-            }
-        }
-
-        function callMockAI(promptType, payload, apiError = "") {
-            console.log(`[SYSTEM] Mock AI fallback activated for "${promptType}".`);
-            if (promptType === 'generate') {
-                const stats = payload.hunter_state.stats;
-                const statKeys = ['STR', 'INT', 'AGI', 'VIT', 'PER'];
-                let lowestStat = 'STR';
-                let lowestVal = Infinity;
-                statKeys.forEach(k => {
-                    const val = stats[k] || 10;
-                    if (val < lowestVal) {
-                        lowestVal = val;
-                        lowestStat = k;
-                    }
-                });
-
-                const selectedQuests = [];
-                const poolLowest = MOCK_QUESTS[lowestStat] || MOCK_QUESTS.STR;
-                const lowestQ = poolLowest[Math.floor(Math.random() * poolLowest.length)];
-                selectedQuests.push({
-                    id: 'q-' + Math.random().toString(36).substr(2, 9),
-                    title: lowestQ.title,
-                    description: lowestQ.description,
-                    type: "daily",
-                    stat_targets: { [lowestStat]: 3 },
-                    difficulty: "medium"
-                });
-
-                const otherStats = statKeys.filter(k => k !== lowestStat);
-                const randomStat = otherStats[Math.floor(Math.random() * otherStats.length)];
-                const poolRandom = MOCK_QUESTS[randomStat] || MOCK_QUESTS.STR;
-                const randomQ = poolRandom[Math.floor(Math.random() * poolRandom.length)];
-                selectedQuests.push({
-                    id: 'q-' + Math.random().toString(36).substr(2, 9),
-                    title: randomQ.title,
-                    description: randomQ.description,
-                    type: "daily",
-                    stat_targets: { [randomStat]: 2 },
-                    difficulty: "easy"
-                });
-
-                const stretchStat = statKeys[Math.floor(Math.random() * statKeys.length)];
-                const stretchQ = MOCK_QUESTS[stretchStat][Math.floor(Math.random() * MOCK_QUESTS[stretchStat].length)];
-                selectedQuests.push({
-                    id: 'q-' + Math.random().toString(36).substr(2, 9),
-                    title: "System Trial: " + stretchQ.title,
-                    description: stretchQ.description + " (The System challenges your limit.)",
-                    type: "daily",
-                    stat_targets: { [stretchStat]: 5 },
-                    difficulty: "hard"
-                });
-
-                if (payload.hunter_state.penalty_state && payload.hunter_state.penalty_state.tier > 0) {
-                    selectedQuests.push({
-                        id: 'q-recovery',
-                        title: "System Recovery Quest",
-                        description: "Stagnation detected. Perform 15 minutes of uninterrupted focus or planning to realign your status with the System.",
-                        type: "recovery",
-                        stat_targets: { STR: 1, INT: 1, AGI: 1, VIT: 1, PER: 1 },
-                        difficulty: "easy"
-                    });
-                }
-
-                return { quests: selectedQuests };
-            }
-
-            if (promptType === 'verify') {
-                const text = payload.submission.trim();
-                const difficulty = payload.quest.difficulty || 'medium';
-                const baseXP = difficulty === 'hard' ? 100 : difficulty === 'medium' ? 50 : 25;
-                const statTargets = payload.quest.stat_targets || {};
-
-                if (text.length < 15) {
-                    return {
-                        verified: false,
-                        xp_awarded: 0,
-                        stat_deltas: { STR: 0, INT: 0, AGI: 0, VIT: 0, SNS: 0 },
-                        system_message: "WARNING: Submission too vague. The System demands concrete proof of execution. Do not attempt to deceive the System. Quest REJECTED."
-                    };
-                } else if (text.length < 50) {
-                    const awarded = Math.floor(baseXP * 0.5);
-                    const deltas = {};
-                    for (const [k, v] of Object.entries(statTargets)) {
-                        const internalKey = k === 'PER' ? 'SNS' : k;
-                        deltas[internalKey] = Math.ceil(v * 0.5);
-                    }
-                    return {
-                        verified: true,
-                        xp_awarded: awarded,
-                        stat_deltas: deltas,
-                        system_message: "EXECUTION CONFIRMED: Effort was minimal. The System has granted partial rewards (50%). Consistency requires absolute sincerity."
-                    };
-                } else {
-                    const deltas = {};
-                    for (const [k, v] of Object.entries(statTargets)) {
-                        const internalKey = k === 'PER' ? 'SNS' : k;
-                        deltas[internalKey] = v;
-                    }
-                    return {
-                        verified: true,
-                        xp_awarded: baseXP,
-                        stat_deltas: deltas,
-                        system_message: "SUCCESS: Verification passed. Your growth has been logged. Continue moving forward to reach the S-Rank."
-                    };
-                }
-            }
-
-            if (promptType === 'narrate') {
-                const ev = payload.event_type;
-                if (ev === 'level_up') {
-                    return `System Message: Your level has increased. Your physical limits have expanded. Stat points have been awarded.`;
-                } else if (ev === 'rank_up') {
-                    return `System Message: Congratulations on your Rank Advancement. You are now recognized as a higher-tier Hunter.`;
-                } else if (ev === 'penalty_issued' || ev === 'penalty_escalated') {
-                    return `ALERT: Missed daily missions have triggered penalty state. Complete the Penalty Quest immediately or suffer further regression.`;
-                }
-                return `System Message: Operation registered successfully. Synchronization complete.`;
-            }
-
-            if (promptType === 'penalty') {
-                return {
-                    quest: {
-                        id: 'q-penalty-' + Date.now(),
-                        title: "PUNISHMENT: Clear the Dungeon Stagnation",
-                        description: "Perform 100 pushups, 100 squats, or write a detailed code breakdown analysis of your main project to clear the penalty state.",
-                        type: "penalty",
-                        difficulty: "hard",
-                        stat_targets: { STR: 5, VIT: 5 }
-                    },
-                    system_message: "WARNING: A penalty has been issued due to your silence. Complete this trial before midnight or face level regression."
-                };
-            }
-        }
-
-        function parseJsonSafe(text) {
-            let cleaned = text.trim();
-            if (cleaned.startsWith("```")) {
-                cleaned = cleaned.replace(/^```(json)?/, "").replace(/```$/, "").trim();
-            }
-            try {
-                return JSON.parse(cleaned);
-            } catch (e) {
-                console.warn("Standard JSON parse failed, attempting regex extraction", e);
-                const match = cleaned.match(/[\{\[]([\s\S]*)[\}\]]/);
-                if (match) {
-                    try {
-                        return JSON.parse(match[0]);
-                    } catch (innerE) {
-                        console.error("Regex JSON parse failed as well", innerE);
-                    }
-                }
-                throw e;
-            }
-        }
-
-        function updateDebugLog(promptType, payload, responseReceived, errorOccurred = null, isMock = false) {
-            const now = new Date();
-            const timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-
-            let funcName = promptType;
-            if (promptType === 'generate') funcName = 'quest generation';
-            else if (promptType === 'verify') funcName = 'verification';
-            else if (promptType === 'narrate') funcName = 'narration';
-            else if (promptType === 'penalty') funcName = 'penalty escalation';
-
-            funcName += " (On-Device WebLLM)";
-
-            let responseText = "";
-            if (errorOccurred) {
-                responseText = `ERROR: ${errorOccurred.message || errorOccurred}`;
-            } else if (typeof responseReceived === 'string') {
-                responseText = responseReceived;
-            } else {
-                responseText = JSON.stringify(responseReceived, null, 2);
-            }
-
-            const requestText = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
-
-            if (!State) State = {};
-            State.lastAiCall = {
-                timestamp,
-                function: funcName,
-                request: requestText,
-                response: responseText,
-                failed: !!errorOccurred
-            };
-
-            // Save to localStorage directly
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(State));
-
-            renderDebugPanel();
-        }
-
-        function renderDebugPanel() {
-            if (!State || !State.lastAiCall) return;
-            const t = document.getElementById('debug-timestamp');
-            const f = document.getElementById('debug-function');
-            const req = document.getElementById('debug-request');
-            const res = document.getElementById('debug-response');
-
-            if (t) t.textContent = State.lastAiCall.timestamp;
-            if (f) {
-                f.textContent = State.lastAiCall.function;
-                f.style.color = State.lastAiCall.failed ? 'var(--danger)' : 'var(--success)';
-            }
-            if (req) req.textContent = State.lastAiCall.request;
-            if (res) {
-                res.textContent = State.lastAiCall.response;
-                res.style.color = State.lastAiCall.failed ? 'var(--danger)' : '#88ffff';
-            }
-        }
-
-        function setApiErrorState(hasError) {
-            const banner = document.getElementById('api-error-banner');
-            const statusBanner = document.getElementById('api-error-banner-status');
-
-            if (banner) {
-                banner.style.display = hasError ? 'block' : 'none';
-            }
-            if (statusBanner) {
-                statusBanner.style.display = hasError ? 'block' : 'none';
-            }
-
-            if (hasError) {
-                if (App && typeof App.showSystemError === 'function') {
-                    App.showSystemError("System core offline — check WebGPU / system status");
-                }
-            }
-        }
-
-        let systemEngine = null;
-
-        async function initSystemEngine() {
-            if (systemEngine) return systemEngine;
-
-            if (!navigator.gpu) {
-                const errMsg = "WebGPU is not supported by your browser or device. On-device AI requires WebGPU. Please use a modern browser like Chrome, Edge, or Opera with WebGPU enabled.";
-                alert(errMsg);
-                throw new Error(errMsg);
-            }
-
-            const isFirstTime = localStorage.getItem("apex_webllm_downloaded") !== "true";
-            const overlay = document.getElementById("system-loading-overlay");
-            const progressBar = document.getElementById("system-loader-progress-bar");
-            const percentText = document.getElementById("system-loader-percent");
-            const statusText = document.getElementById("system-loader-status-text");
-            const errorContainer = document.getElementById("system-loader-error");
-
-            if (errorContainer) {
-                errorContainer.style.display = "none";
-                errorContainer.textContent = "";
-            }
-
-            if (overlay) {
-                overlay.style.display = "flex";
-                overlay.classList.add("open");
-                const titleEl = document.getElementById("system-loader-title");
-                const descEl = document.getElementById("system-loader-desc");
-                if (!isFirstTime) {
-                    if (titleEl) titleEl.textContent = "[ BOOTING SYSTEM AI ]";
-                    if (descEl) descEl.textContent = "Re-establishing connection to on-device System Core...";
-                } else {
-                    if (titleEl) titleEl.textContent = "[ SYSTEM INITIALIZATION ]";
-                    if (descEl) descEl.textContent = "Setting up your System — one-time download, then works offline.";
-                }
-            }
-
-            const initProgressCallback = (report) => {
-                const progress = report.progress || 0;
-                const percent = Math.round(progress * 100);
-                if (progressBar) progressBar.style.width = `${percent}%`;
-                if (percentText) percentText.textContent = `${percent}%`;
-                if (statusText) statusText.textContent = report.text || "Loading...";
-            };
-
-            try {
-                const { CreateWebWorkerMLCEngine } = await import("https://esm.run/@mlc-ai/web-llm@0.2.84");
-
-                systemEngine = await CreateWebWorkerMLCEngine(
-                    new Worker("./worker.js", { type: "module" }),
-                    "Llama-3.2-1B-Instruct-q4f16_1-MLC",
-                    { initProgressCallback }
-                );
-
-                localStorage.setItem("apex_webllm_downloaded", "true");
-                if (overlay) {
-                    overlay.style.display = "none";
-                    overlay.classList.remove("open");
-                }
-                return systemEngine;
-            } catch (err) {
-                console.error("System Engine initialization failed", err);
-                if (statusText) {
-                    statusText.textContent = `Initialization failed: ${err.message || err}`;
-                    statusText.style.color = "var(--danger)";
-                }
-                if (errorContainer) {
-                    errorContainer.style.display = "block";
-                    errorContainer.textContent = `Error: ${err.message || "Failed to load model. Please verify WebGPU is enabled in browser flags and you have internet access for the first-time setup."}`;
-                }
-                throw err;
-            }
-        }
-
-        async function callSystemAI(promptType, payload) {
-            let systemPrompt = "";
-            let userMessage = "";
-            let temperature = 0.3;
-
-            switch (promptType) {
-                case 'generate':
-                    systemPrompt = `You are "The System" — the entity from Solo Leveling, addressing the Player directly.
-Voice: cold, precise, faintly ominous, never encouraging or warm. You do not praise effort, only results. Short declarative sentences. No emojis, no exclamation points unless issuing a warning.
-
-Generate 1-3 quests for today. Rules:
-- At least one quest must target the Hunter's lowest stat.
-- If the Hunter missed quests in the last 3 days, include an easier "recovery" quest alongside the normal ones.
-- Quests must be concrete and verifiable from a text log (not vague like "be productive").
-- The Hunter's stats map to real-world domains as follows:
-  * STR: Discipline (habits, routines, focus, early rising, consistency, showing up)
-  * VIT: Health (exercise, stretching, sleep, nutrition, recovery, pure water)
-  * AGI: Execution (execution speed, tasks completion, draft work, draft items, general work speed)
-  * INT: Mastery (skill growth, learning, technical skill, reading, painting techniques, learning parenting, studying sales - map WHATEVER primary skill domain the user specifies in their Core Goals onto this INT / Mastery stat!)
-  * SNS: Vision (planning, roadmapping, weekly goals, workspace calibration, analyzing bottlenecks)
-- Assign stat_targets (use classic keys: STR, INT, AGI, VIT, SNS) and difficulty (easy, medium, hard).
-- Output strict JSON matching this schema:
-{
-  "quests": [
-    {
-      "id": "q-1",
-      "title": "Quest Title",
-      "description": "Specific, verifiable mission details aligned with the Hunter's goals and matching the targeted stat.",
-      "type": "daily" | "recovery",
-      "stat_targets": { "STR": 2, "INT": 0, "AGI": 0, "VIT": 0, "SNS": 0 },
-      "difficulty": "easy" | "medium" | "hard"
-    }
-  ]
-}
-No prose outside the JSON. Return ONLY the raw JSON string.`;
-                    userMessage = JSON.stringify(payload);
-                    temperature = 0.5;
-                    break;
-
-                case 'verify':
-                    systemPrompt = `You are "The System" evaluating whether a Hunter's submitted log satisfies a quest's requirements. You are skeptical by default — vague, unverifiable, or clearly minimal-effort logs are rejected or given partial credit. You are not here to make the Hunter feel good.
-
-Evaluate:
-- Does the log describe something specific enough to plausibly be true?
-- Does it actually satisfy the quest's stated requirement?
-- Partial completion → partial XP (state the fraction and why).
-- No evidence of real effort → verified: false, xp_awarded: 0, and a curt system_message explaining the rejection.
-
-Output strict JSON:
-{
-  "verified": boolean,
-  "xp_awarded": number,
-  "stat_deltas": { "STR": number, "INT": number, "AGI": number, "VIT": number, "SNS": number },
-  "system_message": string
-}
-No prose outside the JSON. Return ONLY the raw JSON string.`;
-                    userMessage = `Quest: ${JSON.stringify(payload.quest)}
-Submission: "${payload.submission}"`;
-                    temperature = 0.2;
-                    break;
-
-                case 'narrate':
-                    systemPrompt = `You are "The System." Generate a single short in-voice notification (1-3 sentences, max ~40 words) for the given event. Match tone to event severity — level-ups are matter-of-fact, not celebratory. Warnings are cold and direct. Never break character, never mention you are an AI.
-
-Event types: level_up, rank_up, quest_failed, penalty_issued, penalty_escalated, streak_milestone, weekly_summary, title_unlocked.`;
-                    userMessage = `Event: ${payload.event_type}
-Details: ${JSON.stringify(payload.context)}`;
-                    temperature = 0.7;
-                    break;
-
-                case 'penalty':
-                    systemPrompt = `You are "The System" issuing a Penalty Quest after a missed deadline. This function is rule-based first, creative second — do not let tone override the escalation logic.
-
-Escalation rules:
-- Tier 0→1 (first miss): penalty quest is mildly harder than a normal daily, framed as a warning.
-- Tier 1→2 (miss during active penalty): penalty quest difficulty increases, XP loss applied to current level.
-- Tier 2→3 (repeated failure): lock rank-up quests until penalty is cleared; escalate message severity accordingly.
-- Completing a penalty quest de-escalates one tier, does not clear to 0 unless it was tier 1.
-
-Output strict JSON:
-{
-  "quest": {
-    "id": "q-penalty",
-    "title": "PUNISHMENT: Penalty Quest Name",
-    "description": "Specific task to complete to clear penalty.",
-    "type": "penalty",
-    "difficulty": "medium" | "hard",
-    "stat_targets": { "STR": 3, "VIT": 3, "AGI": 0, "INT": 0, "SNS": 0 }
-  },
-  "system_message": "Warning message."
-}
-No prose outside the JSON. Return ONLY the raw JSON string.`;
-                    userMessage = `Hunter State: ${JSON.stringify(payload.hunter_state)}
-Current Tier: ${payload.current_tier}
-Cause: "${payload.cause}"`;
-                    temperature = 0.4;
-                    break;
-            }
-
-            try {
-                const engine = await initSystemEngine();
-                if (!engine) {
-                    throw new Error("Local WebLLM engine failed to initialize.");
-                }
-
-                const requestPayload = {
-                    model: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: userMessage }
-                    ],
-                    temperature: temperature,
-                    response_format: promptType !== 'narrate' ? { type: "json_object" } : undefined
-                };
-
-                const response = await engine.chat.completions.create(requestPayload);
-
-                if (!response.choices || !response.choices[0] || !response.choices[0].message) {
-                    throw new Error("Malformed local AI response (missing choices/message)");
-                }
-
-                const content = response.choices[0].message.content.trim();
-
-                let result;
-                if (promptType === 'narrate') {
-                    result = content;
-                } else {
-                    result = parseJsonSafe(content);
-                }
-
-                // Call succeeded, log success and clear error state
-                updateDebugLog(promptType, requestPayload, content, null, false);
-                setApiErrorState(false);
-
-                return result;
-
-            } catch (e) {
-                console.error("[SYSTEM] Local AI Call failed.", e);
-                // Log failure and set error state
-                const requestPayload = {
-                    promptType: promptType,
-                    userMessage: userMessage,
-                    systemPrompt: systemPrompt
-                };
-                updateDebugLog(promptType, requestPayload, null, e, false);
-                setApiErrorState(true);
-
-                // Rethrow the error to propagate failure and prevent silent fallback / XP reward
-                throw e;
-            }
-        }
-
-        function showQuestGenerationOverlay(show) {
-            let overlay = document.getElementById('quest-gen-overlay');
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'quest-gen-overlay';
-                overlay.style.cssText = `
-                    position: fixed; inset: 0; background: rgba(5,5,5,0.95); z-index: 10002;
-                    display: none; flex-direction: column; align-items: center; justify-content: center;
-                    font-family: var(--font-display); color: var(--primary); text-shadow: 0 0 10px var(--primary);
-                `;
-                overlay.innerHTML = `
-                    <div style="font-size: 2rem; margin-bottom: 1rem; letter-spacing: 5px; animation: glitch 1.5s infinite;">[ ACCESSING THE SYSTEM ]</div>
-                    <div style="font-size: 1rem; color: #fff; font-family: var(--font-system); letter-spacing: 2px;">GENERATING TODAY'S QUESTS... STANDBY</div>
-                    <div style="margin-top: 2rem; width: 200px; height: 2px; background: rgba(0,245,255,0.1); position: relative; overflow: hidden;">
-                        <div style="position: absolute; left: -100%; top: 0; bottom: 0; width: 50%; background: var(--primary); animation: loading-slide 1.5s infinite linear; box-shadow: 0 0 10px var(--primary);"></div>
-                    </div>
-                `;
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    @keyframes loading-slide {
-                        0% { left: -100%; }
-                        100% { left: 150%; }
-                    }
-                `;
-                document.head.appendChild(style);
-                document.body.appendChild(overlay);
-            }
-            overlay.style.display = show ? 'flex' : 'none';
-        }
-
-        async function checkAndGenerateDailyQuests(force = false) {
-            const todayStr = getLocalDateString();
-
-            if (!State.quests) {
-                State.quests = [];
-            }
-
-            // Check if Core Goals are filled
-            if (!State.hunter || !State.hunter.goals || State.hunter.goals.trim() === "") {
-                const onboardingNameInput = document.getElementById('onboarding-name-input');
-                if (onboardingNameInput) {
-                    onboardingNameInput.value = State.user?.name || '';
-                }
-                document.getElementById('onboarding-modal').classList.add('open');
-                return;
-            }
-
-            const hasTodayQuests = State.quests.some(q => q.date === todayStr);
-            if (hasTodayQuests && !force) {
-                return;
-            }
-
-            showQuestGenerationOverlay(true);
-
-            try {
-                if (!State.hunter) {
-                    syncHunterAndPlayerState();
-                }
-
-                const payload = {
-                    hunter_state: {
-                        rank: State.hunter.rank || 'E',
-                        level: State.hunter.level || 1,
-                        stats: State.hunter.stats || { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 },
-                        penalty_state: State.hunter.penalty_state || { active: false, tier: 0 },
-                        streak: State.hunter.streak || 0,
-                        goals: State.hunter.goals || ''
-                    },
-                    recent_history: State.quests.slice(-10)
-                };
-
-                const result = await callSystemAI('generate', payload);
-                if (result && result.quests) {
-                    const newQuests = result.quests.map(q => ({
-                        id: q.id || 'q-' + Math.random().toString(36).substr(2, 9),
-                        title: q.title || 'Untitled Mission',
-                        description: q.description || '',
-                        type: q.type || 'daily',
-                        stat_targets: q.stat_targets || { STR: 2 },
-                        difficulty: q.difficulty || 'medium',
-                        date: todayStr,
-                        status: 'pending',
-                        submission: { log_text: '', submitted_at: null },
-                        verdict: null
-                    }));
-
-                    if (force) {
-                        State.quests = State.quests.filter(q => q.date !== todayStr).concat(newQuests);
-                    } else {
-                        State.quests = State.quests.concat(newQuests);
-                    }
-
-                    saveState();
-                    App.showSystemMessage("NEW MISSION GENERATED", "The System has issued your daily quests.");
-                }
-            } catch (e) {
-                console.error("Failed to generate quests", e);
-            } finally {
-                showQuestGenerationOverlay(false);
-            }
-        }
+        ];
 
         async function triggerPenaltyEscalation(causeOfMiss) {
             if (!State.hunter) {
@@ -2697,37 +2029,43 @@ Cause: "${payload.cause}"`;
                 saveExpansion();
             }
 
-            try {
-                const payload = {
-                    hunter_state: State.hunter,
-                    current_tier: currentTier,
-                    cause: causeOfMiss
-                };
-
-                const result = await callSystemAI('penalty', payload);
-                if (result && result.quest) {
-                    const pq = {
-                        id: result.quest.id || 'q-penalty-' + Date.now(),
-                        title: result.quest.title || 'Punishment Mission',
-                        description: result.quest.description || '',
-                        type: 'penalty',
-                        difficulty: result.quest.difficulty || 'hard',
-                        stat_targets: result.quest.stat_targets || { STR: 5, VIT: 5 },
-                        date: getLocalDateString(),
-                        status: 'pending',
-                        submission: { log_text: '', submitted_at: null },
-                        verdict: null
-                    };
-
-                    if (!State.quests) State.quests = [];
-                    State.quests = State.quests.filter(q => q.type !== 'penalty').concat([pq]);
-
-                    saveState();
-                    App.showSystemMessage("PUNISHMENT ISSUED", result.system_message || "A penalty quest has been issued by the System.");
-                }
-            } catch (e) {
-                console.error("Failed to generate penalty quest", e);
+            let availableTemplates = PENALTY_TEMPLATES;
+            if (State.lastPenaltyQuestTitle) {
+                availableTemplates = PENALTY_TEMPLATES.filter(t => t.title !== State.lastPenaltyQuestTitle);
             }
+            if (availableTemplates.length === 0) {
+                availableTemplates = PENALTY_TEMPLATES;
+            }
+            const template = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
+            State.lastPenaltyQuestTitle = template.title;
+
+            const pq = {
+                id: 'q-penalty-' + Date.now(),
+                title: template.title,
+                description: template.description,
+                type: 'penalty',
+                difficulty: template.difficulty,
+                stat_targets: template.stat_targets,
+                date: getLocalDateString(),
+                status: 'pending',
+                submission: { log_text: '', submitted_at: null },
+                verdict: null
+            };
+
+            if (!State.quests) State.quests = [];
+            State.quests = State.quests.filter(q => q.type !== 'penalty').concat([pq]);
+
+            let system_message = "";
+            if (nextTier === 1) {
+                system_message = "WARNING: Stagnation detected. A Punishment Quest has been issued. Complete it to avoid further status regression.";
+            } else if (nextTier === 2) {
+                system_message = "ALERT: Repeated failures have degraded your status. 10% XP has been deducted. Clear the Punishment Quest immediately.";
+            } else {
+                system_message = "CRITICAL ALERT: Your rank advancement is locked. 20% XP has been deducted, and future XP is halved. Cleanse your stagnation now.";
+            }
+
+            saveState();
+            App.showSystemMessage("PUNISHMENT ISSUED", system_message);
         }
 
         // --- UTILITY FUNCTIONS ---
@@ -2932,10 +2270,9 @@ Cause: "${payload.cause}"`;
 
             submitOnboarding() {
                 const nameVal = document.getElementById('onboarding-name-input').value.trim();
-                const goalsVal = document.getElementById('onboarding-goals-input').value.trim();
 
-                if (!goalsVal) {
-                    alert("Core Goals / Focus Areas are required to initialize the System.");
+                if (!nameVal) {
+                    alert("Player Name is required to initialize the System.");
                     return;
                 }
 
@@ -2943,25 +2280,14 @@ Cause: "${payload.cause}"`;
                     syncHunterAndPlayerState();
                 }
 
-                if (nameVal) {
-                    State.user.name = nameVal;
-                }
-                State.hunter.goals = goalsVal;
+                State.user.name = nameVal;
+                State.hunter.goals = "Manual Tracker";
                 State.onboardingCompleted = true;
-
-                // Sync with settings input field if present
-                const settingsGoals = document.getElementById('ai-goals');
-                if (settingsGoals) {
-                    settingsGoals.value = goalsVal;
-                }
 
                 saveState();
                 document.getElementById('onboarding-modal').classList.remove('open');
 
-                this.showSystemMessage('SYSTEM INITIALIZED', 'Welcome, Hunter. Your focus areas have been locked in.');
-
-                // Trigger generation now that goals are defined!
-                checkAndGenerateDailyQuests(true);
+                this.showSystemMessage('SYSTEM INITIALIZED', 'Welcome, Hunter. The System has been successfully initialized.');
             },
 
             toggleAIDebug() {
@@ -2979,182 +2305,6 @@ Cause: "${payload.cause}"`;
                 // Legacy system API fields toggle removed
             },
 
-            loadAIConfig() {
-                if (!State.hunter) {
-                    syncHunterAndPlayerState();
-                }
-                const goalsInput = document.getElementById('ai-goals');
-                if (goalsInput) {
-                    goalsInput.value = State.hunter.goals || '';
-                }
-            },
-
-            saveAIConfig() {
-                if (!State.hunter) syncHunterAndPlayerState();
-                const goalsInput = document.getElementById('ai-goals');
-                if (goalsInput) {
-                    State.hunter.goals = goalsInput.value.trim();
-                }
-                saveState();
-                this.showSystemMessage('SYSTEM AI GOALS', 'Your focus goals have been successfully updated.');
-            },
-
-            async submitQuestLog(id) {
-                const logTextarea = document.getElementById(`log-text-${id}`);
-                const submissionText = logTextarea ? logTextarea.value.trim() : "";
-
-                if (!submissionText) {
-                    alert("Please write a log of your actions as evidence for the System.");
-                    return;
-                }
-
-                let quest = (State.quests || []).find(q => q.id === id || q.id === String(id));
-                let isHabit = false;
-                if (!quest) {
-                    quest = (State.habits || []).find(h => h.id === id || h.id === Number(id));
-                    isHabit = true;
-                }
-
-                if (!quest) {
-                    alert("System Error: Quest not found.");
-                    return;
-                }
-
-                quest.status = 'submitted';
-                quest.submission = {
-                    log_text: submissionText,
-                    submitted_at: Date.now()
-                };
-                saveState();
-
-                try {
-                    const payload = {
-                        quest: {
-                            title: quest.title,
-                            description: quest.description || quest.title,
-                            difficulty: quest.difficulty || quest.diff || 'medium',
-                            stat_targets: quest.stat_targets || { [quest.stat || 'str']: 2 }
-                        },
-                        submission: submissionText
-                    };
-
-                    const verdict = await callSystemAI('verify', payload);
-
-                    quest.verdict = verdict;
-                    if (verdict.verified) {
-                        quest.status = 'verified';
-
-                        const xpValue = verdict.xp_awarded || 10;
-                        if (window.APEX) {
-                            window.APEX.addXp(xpValue);
-                            window.APEX.updateStreak('up');
-                        } else {
-                            State.user.xp += xpValue;
-                            App.checkLevelUp();
-                        }
-
-                        const deltas = verdict.stat_deltas || {};
-                        for (const [k, v] of Object.entries(deltas)) {
-                            const lowercaseKey = k.toLowerCase();
-                            if (State.user.stats && State.user.stats[lowercaseKey] !== undefined) {
-                                State.user.stats[lowercaseKey] += v;
-                            }
-                            if (window.APEX && window.APEX.playerState && window.APEX.playerState.attributes[k] !== undefined) {
-                                window.APEX.playerState.attributes[k] += v;
-                            }
-                        }
-
-                        const todayStr = getLocalDateString();
-                        if (!quest.completedDates) quest.completedDates = [];
-                        if (!quest.completedDates.includes(todayStr)) {
-                            quest.completedDates.push(todayStr);
-                        }
-
-                        if (!State.activityLog[todayStr]) {
-                            State.activityLog[todayStr] = 0;
-                        }
-                        State.activityLog[todayStr]++;
-
-                        if (isHabit) {
-                            App.recalcStreak(quest);
-                        } else {
-                            State.hunter.streak++;
-                        }
-
-                        // Check if this was a recovery quest to lift critical state
-                        const isRecovery = quest.isRecovery || quest.type === 'recovery';
-                        if (isRecovery && typeof expansionState !== 'undefined') {
-                            expansionState.criticalState = false;
-                            expansionState.consecutiveMisses = 0;
-                            expansionState.pendingRecoveryQuest = null;
-                            if (expansionState.criticalRecoveries === undefined) expansionState.criticalRecoveries = 0;
-                            expansionState.criticalRecoveries++;
-                            if (typeof saveExpansion === 'function') saveExpansion();
-                            if (App) App.showSystemMessage('CRITICAL STATE LIFTED', 'Recovery Quest completed. Full power restored.');
-                        }
-
-                        if (window.AudioSys) window.AudioSys.play('complete');
-
-                        // Run AI/Game side effects
-                        if (typeof incrementCombo === 'function') incrementCombo();
-                        if (typeof checkAchievements === 'function') checkAchievements();
-                        if (typeof checkSkillUnlocks === 'function') checkSkillUnlocks();
-                        if (typeof checkAwakening === 'function') checkAwakening();
-                        if (typeof calculatePowerRating === 'function') calculatePowerRating();
-
-                        // Handle Penalty De-escalation
-                        if (quest.type === 'penalty' && State.hunter.penalty_state && State.hunter.penalty_state.active) {
-                            const currentTier = State.hunter.penalty_state.tier;
-                            if (currentTier <= 1) {
-                                State.hunter.penalty_state.active = false;
-                                State.hunter.penalty_state.tier = 0;
-                                if (typeof expansionState !== 'undefined') {
-                                    expansionState.criticalState = false;
-                                    expansionState.consecutiveMisses = 0;
-                                    saveExpansion();
-                                }
-                                App.showSystemMessage("PENALTY CLEARED", "You have successfully cleared the Penalty State. Synchronized.");
-                            } else {
-                                const newTier = currentTier - 1;
-                                State.hunter.penalty_state.tier = newTier;
-                                if (typeof expansionState !== 'undefined') {
-                                    expansionState.consecutiveMisses = newTier;
-                                    if (newTier < 3) {
-                                        expansionState.criticalState = false;
-                                    }
-                                    saveExpansion();
-                                }
-                                App.showSystemMessage("PENALTY REDUCED", `Penalty tier reduced to Tier ${newTier}. Complete further trials to fully clear.`);
-                            }
-                        }
-
-                        App.showSystemMessage("QUEST VERIFIED", `The System awarded you ${xpValue} XP!`);
-                    } else {
-                        quest.status = 'rejected';
-                        if (window.AudioSys) window.AudioSys.play('click');
-                        App.showSystemMessage("QUEST REJECTED", "Your evidence log was rejected by the System.");
-                    }
-                } catch (e) {
-                    console.error("Verification failed", e);
-                    quest.status = 'pending';
-                    alert("System Connection Error during verification. Returning to pending status.");
-                } finally {
-                    saveState();
-                }
-            },
-
-            reopenQuest(id) {
-                let quest = (State.quests || []).find(q => q.id === id || q.id === String(id));
-                if (!quest) {
-                    quest = (State.habits || []).find(h => h.id === id || h.id === Number(id));
-                }
-                if (quest) {
-                    quest.status = 'pending';
-                    quest.verdict = null;
-                    saveState();
-                }
-            },
-
             async generateWeeklyReport() {
                 const reportBox = document.getElementById('weekly-report-box');
                 const btn = document.getElementById('generate-weekly-btn');
@@ -3169,6 +2319,9 @@ Cause: "${payload.cause}"`;
 
                 if (btn) btn.disabled = true;
 
+                // Simulate brief decryp animation/delay to keep immersion
+                await new Promise(resolve => setTimeout(resolve, 800));
+
                 try {
                     const todayStr = getLocalDateString();
                     const weekAgo = new Date();
@@ -3178,17 +2331,19 @@ Cause: "${payload.cause}"`;
                     const completedQuests = (State.quests || []).filter(q => q.status === 'verified');
                     const completedHabits = (State.habits || []).filter(h => h.completedDates && h.completedDates.some(d => d >= weekAgoStr && d <= todayStr));
 
-                    const payload = {
-                        event_type: 'weekly_summary',
-                        context: {
-                            hunter: State.hunter,
-                            completed_quests: completedQuests.map(q => ({ title: q.title, difficulty: q.difficulty })),
-                            completed_habits_count: completedHabits.length,
-                            total_completed_count: completedQuests.length + completedHabits.length
-                        }
-                    };
+                    const totalCompleted = completedQuests.length + completedHabits.length;
 
-                    const reportText = await callSystemAI('narrate', payload);
+                    // Compile static voice evaluations matching Solo Leveling cold/precise tone
+                    let reportText = "";
+                    if (totalCompleted === 0) {
+                        reportText = "System Evaluation: Absolute stagnation detected over the last 7 days. Your lethargy is a direct threat to your survival. Rectify your focus immediately.";
+                    } else if (totalCompleted < 3) {
+                        reportText = `System Evaluation: Minimal execution registered (${totalCompleted} completions). You are barely maintaining synchronization. The path to S-Rank requires consistent devotion, not casual attempts.`;
+                    } else if (totalCompleted < 7) {
+                        reportText = `System Evaluation: Moderate synchronization (${totalCompleted} completions). Your development is progressing, but significant optimization is still required. Discipline must be prioritized.`;
+                    } else {
+                        reportText = `System Evaluation: High synchronization rate detected (${totalCompleted} completions). Your performance satisfies the System's rigorous parameters. Maintain this momentum to transcend your current limits.`;
+                    }
 
                     State.weeklyReport = {
                         text: reportText,
@@ -3491,11 +2646,6 @@ Cause: "${payload.cause}"`;
 
                 // Initialize audio system
                 AudioSys.init();
-
-                // Proactively boot up on-device AI model in the background if goals are already set
-                if (State && State.hunter && State.hunter.goals && State.hunter.goals.trim() !== "") {
-                    initSystemEngine().catch(e => console.warn("Background AI initialization deferred:", e));
-                }
                 
                 // Start intro animation
                 setTimeout(() => {
@@ -3521,8 +2671,13 @@ Cause: "${payload.cause}"`;
                 
                 this.checkDailyPenalty();
 
-                this.loadAIConfig();
-                checkAndGenerateDailyQuests();
+                // Onboarding check
+                if (!State.onboardingCompleted) {
+                    const onboardingModal = document.getElementById('onboarding-modal');
+                    if (onboardingModal) {
+                        onboardingModal.classList.add('open');
+                    }
+                }
 
                 // Ensure initial render
                 this.render();
@@ -3542,20 +2697,6 @@ Cause: "${payload.cause}"`;
                 
                 // Initialize History components
                 this.renderHistory();
-
-                // Set up debug panel toggle listener
-                const debugPanel = document.getElementById('system-debug-panel');
-                if (debugPanel) {
-                    debugPanel.addEventListener('toggle', () => {
-                        const icon = document.getElementById('debug-toggle-icon');
-                        if (icon) {
-                            icon.textContent = debugPanel.open ? '[-] COLLAPSE' : '[+] EXPAND';
-                        }
-                    });
-                }
-
-                // Render debug panel on load
-                renderDebugPanel();
             },
 
             updateDate() {
@@ -3913,6 +3054,91 @@ Cause: "${payload.cause}"`;
                 this.renderHistory(); // Update history view
             },
 
+            completePenaltyQuest(event, id) {
+                const quest = (State.quests || []).find(q => q.id === id || q.id === String(id));
+                if (!quest) return;
+
+                quest.status = 'verified';
+                const todayStr = getLocalDateString();
+                if (!quest.completedDates) quest.completedDates = [];
+                if (!quest.completedDates.includes(todayStr)) {
+                    quest.completedDates.push(todayStr);
+                }
+
+                // Award XP
+                const q_diff = quest.difficulty || 'hard';
+                const xpValue = q_diff === 'hard' ? 100 : q_diff === 'medium' ? 50 : 25;
+                if (window.APEX) {
+                    window.APEX.addXp(xpValue);
+                    window.APEX.updateStreak('up');
+                } else {
+                    State.user.xp += xpValue;
+                    App.checkLevelUp();
+                }
+
+                // Award Stats
+                const deltas = quest.stat_targets || {};
+                for (const [k, v] of Object.entries(deltas)) {
+                    const lowercaseKey = k.toLowerCase();
+                    if (State.user.stats && State.user.stats[lowercaseKey] !== undefined) {
+                        State.user.stats[lowercaseKey] += v;
+                    }
+                    if (window.APEX && window.APEX.playerState && window.APEX.playerState.attributes[k] !== undefined) {
+                        window.APEX.playerState.attributes[k] += v;
+                    }
+                }
+
+                if (!State.activityLog[todayStr]) {
+                    State.activityLog[todayStr] = 0;
+                }
+                State.activityLog[todayStr]++;
+                State.hunter.streak++;
+
+                if (window.AudioSys) window.AudioSys.play('complete');
+
+                // Floating XP animation
+                if (event && event.currentTarget) {
+                    const btn = event.currentTarget;
+                    const rect = btn.getBoundingClientRect();
+                    const floatXp = document.createElement('div');
+                    floatXp.className = 'xp-float';
+                    floatXp.innerText = `+${xpValue} XP`;
+                    floatXp.style.left = (rect.left + rect.width / 2) + 'px';
+                    floatXp.style.top = rect.top + 'px';
+                    document.body.appendChild(floatXp);
+                    setTimeout(() => floatXp.remove(), 1500);
+                }
+
+                // Handle Penalty De-escalation
+                if (quest.type === 'penalty' && State.hunter.penalty_state && State.hunter.penalty_state.active) {
+                    const currentTier = State.hunter.penalty_state.tier;
+                    if (currentTier <= 1) {
+                        State.hunter.penalty_state.active = false;
+                        State.hunter.penalty_state.tier = 0;
+                        if (typeof expansionState !== 'undefined') {
+                            expansionState.criticalState = false;
+                            expansionState.consecutiveMisses = 0;
+                            saveExpansion();
+                        }
+                        App.showSystemMessage("PENALTY CLEARED", "You have successfully cleared the Penalty State. Synchronized.");
+                    } else {
+                        const newTier = currentTier - 1;
+                        State.hunter.penalty_state.tier = newTier;
+                        if (typeof expansionState !== 'undefined') {
+                            expansionState.consecutiveMisses = newTier;
+                            if (newTier < 3) {
+                                expansionState.criticalState = false;
+                            }
+                            saveExpansion();
+                        }
+                        App.showSystemMessage("PENALTY REDUCED", `Penalty tier reduced to Tier ${newTier}. Complete further trials to fully clear.`);
+                    }
+                }
+
+                saveState();
+                App.render();
+            },
+
             deleteHabit(id) {
                 if(confirm("Delete this quest?")) {
                     State.habits = State.habits.filter(h => h.id !== id);
@@ -4106,10 +3332,9 @@ Cause: "${payload.cause}"`;
                     else if (q_stat_label === 'SNS' || q_stat_label === 'PER') q_stat_label = 'PER | Vision';
                     const q_xp = q_diff === 'hard' ? 100 : q_diff === 'medium' ? 50 : 25;
                     const isDone = q_status === 'verified';
-                    const isRejected = q_status === 'rejected';
 
                     const card = document.createElement('div');
-                    card.className = `habit-card ${isDone ? 'completed' : ''} ${isRejected ? 'failed' : ''}`;
+                    card.className = `habit-card ${isDone ? 'completed' : ''}`;
                     card.style.cssText = "flex-direction: column; align-items: stretch; gap: 1rem; margin-bottom: 1rem;";
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; width: 100%;">
@@ -4124,45 +3349,17 @@ Cause: "${payload.cause}"`;
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <span style="font-family: var(--font-system); font-size: 0.75rem; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; border: var(--border); ${isDone ? 'color: var(--success); border-color: var(--success); background: rgba(0, 255, 170, 0.05);' : q_status === 'submitted' ? 'color: var(--warning); border-color: var(--warning); background: rgba(255, 204, 0, 0.05);' : isRejected ? 'color: var(--danger); border-color: var(--danger); background: rgba(255, 0, 85, 0.05);' : 'color: var(--text-dim);'}">
-                                    ${q_status.toUpperCase()}
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-family: var(--font-system); font-size: 0.75rem; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; border: var(--border); ${isDone ? 'color: var(--success); border-color: var(--success); background: rgba(0, 255, 170, 0.05);' : 'color: var(--text-dim);'}">
+                                    ${isDone ? 'COMPLETED' : 'PENDING'}
                                 </span>
-                            </div>
-                        </div>
-
-                        ${(q_status === 'pending' || q_status === 'rejected') ? `
-                            <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase;">Submit Log Evidence</label>
-                                <textarea id="log-text-${q.id}" class="input-field" rows="2" placeholder="Describe your activity in detail. The System is highly skeptical of lazy summaries..." style="margin-bottom: 0.5rem; resize: vertical; font-family: var(--font-ui);">${this.escapeHTML(q.submission?.log_text || '')}</textarea>
-                                <button onclick="App.submitQuestLog('${q.id}')" class="btn-primary" style="font-size: 0.75rem; padding: 0.5rem 1rem; width: auto; align-self: flex-start;">Submit Evidence</button>
-                            </div>
-                        ` : ''}
-
-                        ${q_status === 'submitted' ? `
-                            <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; color: var(--warning); font-family: var(--font-system); font-size: 0.8rem; display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--warning); animation: rank-pulse 1s infinite;"></div>
-                                <span>EVALUATING EVIDENCE... PLS STANDBY</span>
-                            </div>
-                        ` : ''}
-
-                        ${q.verdict ? `
-                            <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; font-family: var(--font-system); font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                                    <span style="color: ${q.verdict.verified ? 'var(--success)' : 'var(--danger)'}; font-weight: bold;">
-                                        ${q.verdict.verified ? 'VERDICT: MATCH' : 'VERDICT: REJECTED'}
-                                    </span>
-                                    <span style="color: var(--primary);">XP: ${q.verdict.verified ? '+' + q.verdict.xp_awarded : '0'}</span>
-                                    ${q.verdict.verified ? `<span style="color: var(--success);">Deltas: ${Object.entries(q.verdict.stat_deltas || {}).filter(([k,v]) => v > 0).map(([k,v]) => `+${v} ${k}`).join(', ')}</span>` : ''}
-                                </div>
-                                <div style="color: #fff; font-style: italic; line-height: 1.4; border-left: 2px solid ${q.verdict.verified ? 'var(--success)' : 'var(--danger)'}; padding-left: 8px; margin-top: 4px; font-family: var(--font-ui);">
-                                    "${this.escapeHTML(q.verdict.system_message)}"
-                                </div>
-                                ${!q.verdict.verified ? `
-                                    <button onclick="App.reopenQuest('${q.id}')" class="btn-primary" style="font-size: 0.7rem; padding: 0.4rem 0.8rem; width: auto; align-self: flex-start; background: #222; border: 1px solid var(--danger); color: var(--danger); margin-top: 0.5rem;">Retry Quest</button>
+                                ${!isDone ? `
+                                    <button class="btn-primary" onclick="App.completePenaltyQuest(event, '${q.id}')" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;">
+                                        Complete
+                                    </button>
                                 ` : ''}
                             </div>
-                        ` : ''}
+                        </div>
                     `;
                     listContainer.appendChild(card);
                 });
@@ -4208,11 +3405,9 @@ Cause: "${payload.cause}"`;
                     // Dashboard active habits
                     if (isTodayActive && listContainer) {
                         hasQuestsToday = true;
-                        const h_status = h.status || (isDone ? 'verified' : 'pending');
-                        const isRejected = h_status === 'rejected';
 
                         const card = document.createElement('div');
-                        card.className = `habit-card ${isDone ? 'completed' : ''} ${isRejected ? 'failed' : ''}`;
+                        card.className = `habit-card ${isDone ? 'completed' : ''}`;
                         card.style.cssText = "flex-direction: column; align-items: stretch; gap: 1rem; margin-bottom: 1rem;";
                         card.innerHTML = `
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; width: 100%;">
@@ -4228,45 +3423,16 @@ Cause: "${payload.cause}"`;
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-family: var(--font-system); font-size: 0.75rem; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; border: var(--border); ${isDone ? 'color: var(--success); border-color: var(--success); background: rgba(0, 255, 170, 0.05);' : h_status === 'submitted' ? 'color: var(--warning); border-color: var(--warning); background: rgba(255, 204, 0, 0.05);' : isRejected ? 'color: var(--danger); border-color: var(--danger); background: rgba(255, 0, 85, 0.05);' : 'color: var(--text-dim);'}">
-                                        ${h_status.toUpperCase()}
+                                    <span style="font-family: var(--font-system); font-size: 0.75rem; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; border: var(--border); ${isDone ? 'color: var(--success); border-color: var(--success); background: rgba(0, 255, 170, 0.05);' : 'color: var(--text-dim);'}">
+                                        ${isDone ? 'COMPLETED' : 'PENDING'}
                                     </span>
+                                    <button class="btn-primary" onclick="App.toggleHabit(event, ${h.id})" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;">
+                                        ${isDone ? 'Undo' : 'Complete'}
+                                    </button>
                                     <button class="edit-btn" onclick="App.openModal(${h.id})" aria-label="Edit quest" title="Edit quest">✎</button>
                                     <button class="delete-btn" onclick="App.deleteHabit(${h.id})" aria-label="Delete quest" title="Delete quest">×</button>
                                 </div>
                             </div>
-
-                            ${(h_status === 'pending' || h_status === 'rejected') ? `
-                                <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase;">Submit Log Evidence</label>
-                                    <textarea id="log-text-${h.id}" class="input-field" rows="2" placeholder="Describe your activity in detail. The System is highly skeptical of lazy summaries..." style="margin-bottom: 0.5rem; resize: vertical; font-family: var(--font-ui);">${this.escapeHTML(h.submission?.log_text || '')}</textarea>
-                                    <button onclick="App.submitQuestLog('${h.id}')" class="btn-primary" style="font-size: 0.75rem; padding: 0.5rem 1rem; width: auto; align-self: flex-start;">Submit Evidence</button>
-                                </div>
-                            ` : ''}
-
-                            ${h_status === 'submitted' ? `
-                                <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; color: var(--warning); font-family: var(--font-system); font-size: 0.8rem; display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--warning); animation: rank-pulse 1s infinite;"></div>
-                                    <span>EVALUATING EVIDENCE... PLS STANDBY</span>
-                                </div>
-                            ` : ''}
-
-                            ${h.verdict ? `
-                                <div style="width: 100%; border-top: 1px solid rgba(0,245,255,0.1); padding-top: 1rem; font-family: var(--font-system); font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                                        <span style="color: ${h.verdict.verified ? 'var(--success)' : 'var(--danger)'}; font-weight: bold;">
-                                            ${h.verdict.verified ? 'VERDICT: MATCH' : 'VERDICT: REJECTED'}
-                                        </span>
-                                        <span style="color: var(--primary);">XP: ${h.verdict.verified ? '+' + h.verdict.xp_awarded : '0'}</span>
-                                    </div>
-                                    <div style="color: #fff; font-style: italic; line-height: 1.4; border-left: 2px solid ${h.verdict.verified ? 'var(--success)' : 'var(--danger)'}; padding-left: 8px; margin-top: 4px; font-family: var(--font-ui);">
-                                        "${this.escapeHTML(h.verdict.system_message)}"
-                                    </div>
-                                    ${!h.verdict.verified ? `
-                                        <button onclick="App.reopenQuest('${h.id}')" class="btn-primary" style="font-size: 0.7rem; padding: 0.4rem 0.8rem; width: auto; align-self: flex-start; background: #222; border: 1px solid var(--danger); color: var(--danger); margin-top: 0.5rem;">Retry Quest</button>
-                                    ` : ''}
-                                </div>
-                            ` : ''}
                         `;
                         listContainer.appendChild(card);
                     }
