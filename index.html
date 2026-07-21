@@ -1412,6 +1412,28 @@
             <button class="btn-primary" onclick="App.closeModal('level-modal')" style="width: auto; padding: 1.2rem 4rem;">ACKNOWLEDGE</button>
         </div>
     </div>
+
+    <!-- Onboarding Modal -->
+    <div class="modal-overlay" id="onboarding-modal">
+        <div class="modal-box system-shimmer" style="max-width: 500px;">
+            <h3 style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER ONBOARDING</h3>
+            <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.4; font-family: var(--font-ui);">
+                Welcome, Hunter. To initialize the System and begin personalized quest generation, please define your identity and focus areas.
+            </p>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name (Optional)</label>
+                <input type="text" id="onboarding-name-input" class="input-field" placeholder="Enter Player Name (e.g. SUNG JIN-WOO)..." maxlength="20" autocomplete="off">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Hunter's Core Goals / Focus Areas (Required)</label>
+                <textarea id="onboarding-goals-input" class="input-field" rows="4" placeholder="Define your focus (e.g. 'Improve painting techniques, daily fitness training, practice patience with kids, sleep by 11pm')..." style="resize: vertical; font-family: var(--font-ui);"></textarea>
+            </div>
+
+            <button class="btn-primary" onclick="App.submitOnboarding()" style="padding: 0.8rem;">Initialize The System</button>
+        </div>
+    </div>
     
     <!-- Mobile Menu Button -->
     <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open sidebar menu">☰</button>
@@ -1668,7 +1690,7 @@
                                 </div>
                                 <div class="rpg-stat-card" style="grid-column: span 3; background: rgba(255,255,255,0.02); padding: 10px; border: 1px solid rgba(0,245,255,0.05);">
                                     <div class="rpg-stat-label">
-                                        <span style="font-size: 10px; font-weight: bold; color: var(--primary);">INT | Tech Growth</span>
+                                        <span style="font-size: 10px; font-weight: bold; color: var(--primary);">INT | Mastery</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span id="stat-int" data-attr="INT" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
                                             <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
@@ -1748,7 +1770,7 @@
 
                             <div style="margin-bottom: 1rem;">
                                 <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">Hunter's Core Goals (Guides Quest Generation)</label>
-                                <textarea id="ai-goals" class="input-field" rows="3" placeholder="Define your focus (e.g. 'Master Django backend, study LeetCode, sleep by 11pm, stretch daily')..." style="resize: vertical; font-family: var(--font-ui);"></textarea>
+                                <textarea id="ai-goals" class="input-field" rows="3" placeholder="Define your focus (e.g. 'Improve painting techniques, daily fitness training, practice patience with kids, sleep by 11pm')..." style="resize: vertical; font-family: var(--font-ui);"></textarea>
                             </div>
 
                             <button onclick="App.saveAIConfig()" class="btn-primary" style="font-size: 0.8rem; padding: 0.6rem; margin-bottom: 1.5rem;">Apply System Config</button>
@@ -1912,7 +1934,7 @@
                 streak: 0,
                 quest_log: [],
                 titles: [],
-                goals: "Software engineering, technical growth, consistency"
+                goals: ""
             },
             quests: [],
             habits: [],
@@ -1959,7 +1981,7 @@
                     streak: State.user?.streak || 0,
                     quest_log: [],
                     titles: (typeof expansionState !== 'undefined' && expansionState?.titles) || [],
-                    goals: "Software engineering, technical growth, consistency"
+                    goals: ""
                 };
             }
 
@@ -2040,14 +2062,14 @@
                 { title: "Early Rise Vanguard", description: "Begin your first primary task of the day before 9:00 AM." }
             ],
             INT: [
-                { title: "Tech Ascendancy", description: "Solve 2 complex algorithms/code problems or read a technical design paper." },
-                { title: "Refactoring Raid", description: "Clean up, comment, or refactor at least one file/module in your codebase." },
-                { title: "Knowledge Capture", description: "Learn and write a concise summary of a new engineering or AI architecture concept." }
+                { title: "Mastery Study", description: "Spend 30 minutes reading, practicing, or studying a core skill or topic from your focus goals." },
+                { title: "System Optimization", description: "Review your current project or work files and clean up, refine, or organize at least one key element." },
+                { title: "Concept Synthesis", description: "Learn a new concept or technique related to your goals and write down a concise summary." }
             ],
             AGI: [
                 { title: "Velocity Strike", description: "Complete and mark off 3 items on your active action items list." },
-                { title: "Feature Deployment", description: "Ship a working feature, fix, or script into your current active project." },
-                { title: "Speed Run", description: "Draft, compile, or outline a pull request/document in under 20 minutes." }
+                { title: "Milestone Push", description: "Deliver, ship, or finalize a working task, item, or milestone in your current active focus areas." },
+                { title: "Sprint Execution", description: "Draft, outline, or complete a plan, document, or task in under 20 minutes." }
             ],
             VIT: [
                 { title: "Stamina Check", description: "Log 7+ hours of quality sleep or complete a 20-minute body workout/stretch." },
@@ -2056,7 +2078,7 @@
             ],
             PER: [
                 { title: "Foresight Blueprint", description: "Write down your detailed roadmap or weekly goals and align your next steps." },
-                { title: "Workspace Calibration", description: "Declutter your development environment, browser tabs, and files." },
+                { title: "Environment Alignment", description: "Declutter your physical or digital work environment, tabs, or files to optimize focus." },
                 { title: "Workspace Realignment", description: "Spend 15 minutes analyzing the bottlenecks in your execution from the last 7 days." }
             ]
         };
@@ -2292,11 +2314,6 @@
 
         async function callSystemAI(promptType, payload) {
             const config = State.apiConfig || { provider: 'mock' };
-            if (config.provider === 'mock' || !config.apiKey) {
-                const mockRes = callMockAI(promptType, payload);
-                updateDebugLog(promptType, payload, mockRes, null, true); // true = isMock
-                return mockRes;
-            }
 
             let systemPrompt = "";
             let userMessage = "";
@@ -2311,6 +2328,12 @@ Generate 1-3 quests for today. Rules:
 - At least one quest must target the Hunter's lowest stat.
 - If the Hunter missed quests in the last 3 days, include an easier "recovery" quest alongside the normal ones.
 - Quests must be concrete and verifiable from a text log (not vague like "be productive").
+- The Hunter's stats map to real-world domains as follows:
+  * STR: Discipline (habits, routines, focus, early rising, consistency, showing up)
+  * VIT: Health (exercise, stretching, sleep, nutrition, recovery, pure water)
+  * AGI: Execution (execution speed, tasks completion, draft work, draft items, general work speed)
+  * INT: Mastery (skill growth, learning, technical skill, reading, painting techniques, learning parenting, studying sales - map WHATEVER primary skill domain the user specifies in their Core Goals onto this INT / Mastery stat!)
+  * SNS: Vision (planning, roadmapping, weekly goals, workspace calibration, analyzing bottlenecks)
 - Assign stat_targets (use classic keys: STR, INT, AGI, VIT, SNS) and difficulty (easy, medium, hard).
 - Output strict JSON matching this schema:
 {
@@ -2318,7 +2341,7 @@ Generate 1-3 quests for today. Rules:
     {
       "id": "q-1",
       "title": "Quest Title",
-      "description": "Specific, verifiable mission details.",
+      "description": "Specific, verifiable mission details aligned with the Hunter's goals and matching the targeted stat.",
       "type": "daily" | "recovery",
       "stat_targets": { "STR": 2, "INT": 0, "AGI": 0, "VIT": 0, "SNS": 0 },
       "difficulty": "easy" | "medium" | "hard"
@@ -2388,6 +2411,20 @@ Current Tier: ${payload.current_tier}
 Cause: "${payload.cause}"`;
                     temperature = 0.4;
                     break;
+            }
+
+            if (config.provider === 'mock' || !config.apiKey) {
+                const mockRes = callMockAI(promptType, payload);
+                const mockPayloadWithPrompt = {
+                    model: "local-mock-ai",
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userMessage || payload }
+                    ],
+                    raw_payload: payload
+                };
+                updateDebugLog(promptType, mockPayloadWithPrompt, mockRes, null, true); // true = isMock
+                return mockRes;
             }
 
             try {
@@ -2500,6 +2537,16 @@ Cause: "${payload.cause}"`;
 
             if (!State.quests) {
                 State.quests = [];
+            }
+
+            // Check if Core Goals are filled
+            if (!State.hunter || !State.hunter.goals || State.hunter.goals.trim() === "") {
+                const onboardingNameInput = document.getElementById('onboarding-name-input');
+                if (onboardingNameInput) {
+                    onboardingNameInput.value = State.user?.name || '';
+                }
+                document.getElementById('onboarding-modal').classList.add('open');
+                return;
             }
 
             const hasTodayQuests = State.quests.some(q => q.date === todayStr);
@@ -2827,6 +2874,40 @@ Cause: "${payload.cause}"`;
             editingHabitId: null,
             _dayIdxCache: {}, // Performance cache for date string to day index mapping to avoid redundant Date parsing
             escapeHTML: escapeHTML,
+
+            submitOnboarding() {
+                const nameVal = document.getElementById('onboarding-name-input').value.trim();
+                const goalsVal = document.getElementById('onboarding-goals-input').value.trim();
+
+                if (!goalsVal) {
+                    alert("Core Goals / Focus Areas are required to initialize the System.");
+                    return;
+                }
+
+                if (!State.hunter) {
+                    syncHunterAndPlayerState();
+                }
+
+                if (nameVal) {
+                    State.user.name = nameVal;
+                }
+                State.hunter.goals = goalsVal;
+                State.onboardingCompleted = true;
+
+                // Sync with settings input field if present
+                const settingsGoals = document.getElementById('ai-goals');
+                if (settingsGoals) {
+                    settingsGoals.value = goalsVal;
+                }
+
+                saveState();
+                document.getElementById('onboarding-modal').classList.remove('open');
+
+                this.showSystemMessage('SYSTEM INITIALIZED', 'Welcome, Hunter. Your focus areas have been locked in.');
+
+                // Trigger generation now that goals are defined!
+                checkAndGenerateDailyQuests(true);
+            },
 
             toggleAIDebug() {
                 const debugContent = document.getElementById('ai-debug-content');
@@ -3993,7 +4074,13 @@ Cause: "${payload.cause}"`;
                     const q_desc = this.escapeHTML(q.description || 'System task evaluation.');
                     const q_diff = q.difficulty || 'medium';
                     const q_status = q.status || 'pending';
-                    const q_stat = Object.keys(q.stat_targets || { STR: 1 })[0] || 'STR';
+                    const q_stat_raw = Object.keys(q.stat_targets || { STR: 1 })[0] || 'STR';
+                    let q_stat_label = q_stat_raw.toUpperCase();
+                    if (q_stat_label === 'INT') q_stat_label = 'INT | Mastery';
+                    else if (q_stat_label === 'STR') q_stat_label = 'STR | Discipline';
+                    else if (q_stat_label === 'AGI') q_stat_label = 'AGI | Execution';
+                    else if (q_stat_label === 'VIT') q_stat_label = 'VIT | Health';
+                    else if (q_stat_label === 'SNS' || q_stat_label === 'PER') q_stat_label = 'PER | Vision';
                     const q_xp = q_diff === 'hard' ? 100 : q_diff === 'medium' ? 50 : 25;
                     const isDone = q_status === 'verified';
                     const isRejected = q_status === 'rejected';
@@ -4009,7 +4096,7 @@ Cause: "${payload.cause}"`;
                                     <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 4px; font-family: var(--font-ui);">${q_desc}</div>
                                     <div class="habit-meta" style="margin-top: 8px;">
                                         <span class="difficulty-badge difficulty-${q_diff}">${q_diff.toUpperCase()}</span>
-                                        <span style="color: var(--primary); font-weight: bold;">[${q_stat.toUpperCase()}]</span>
+                                        <span style="color: var(--primary); font-weight: bold;">[${q_stat_label}]</span>
                                         <span>⭐ ${q_xp} XP</span>
                                     </div>
                                 </div>
@@ -4062,7 +4149,13 @@ Cause: "${payload.cause}"`;
                     const h_title = this.escapeHTML(h.title || 'Unknown Quest');
                     const h_comp = Array.isArray(h.completedDates) ? h.completedDates : [];
                     const h_diff = h.diff || 'medium';
-                    const h_stat = h.stat || 'str';
+                    const h_stat_raw = h.stat || 'str';
+                    let h_stat_label = h_stat_raw.toUpperCase();
+                    if (h_stat_label === 'INT') h_stat_label = 'INT | Mastery';
+                    else if (h_stat_label === 'STR') h_stat_label = 'STR | Discipline';
+                    else if (h_stat_label === 'AGI') h_stat_label = 'AGI | Execution';
+                    else if (h_stat_label === 'VIT') h_stat_label = 'VIT | Health';
+                    else if (h_stat_label === 'SNS' || h_stat_label === 'PER') h_stat_label = 'PER | Vision';
                     const h_streak = typeof h.streak === 'number' ? h.streak : 0;
                     const h_type = h.type || 'repeating';
 
@@ -4105,7 +4198,7 @@ Cause: "${payload.cause}"`;
                                         <div class="habit-title">${h_title}</div>
                                         <div class="habit-meta" style="margin-top: 8px;">
                                             <span class="difficulty-badge difficulty-${h_diff}">${h_diff.toUpperCase()}</span>
-                                            <span style="color: var(--primary); font-weight: bold;">[${h_stat.toUpperCase()}]</span>
+                                            <span style="color: var(--primary); font-weight: bold;">[${h_stat_label}]</span>
                                             <span>🔥 ${h_streak}</span>
                                             <span>⭐ ${xpValue} XP</span>
                                         </div>
@@ -5255,7 +5348,7 @@ Cause: "${payload.cause}"`;
                                         streak: newState.user.streak || 0,
                                         quest_log: [],
                                         titles: [],
-                                        goals: "Software engineering, technical growth, consistency"
+                                        goals: ""
                                     };
                                 }
                             }
