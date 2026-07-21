@@ -1732,6 +1732,20 @@
                             </div>
 
                             <button onclick="App.saveAIConfig()" class="btn-primary" style="font-size: 0.8rem; padding: 0.6rem; margin-bottom: 1.5rem;">Apply System Config</button>
+
+                            <!-- SYSTEM AI DEBUG PANEL -->
+                            <div id="ai-debug-panel" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #333;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;">📡 SYSTEM AI DEBUG PANEL</div>
+                                    <button onclick="App.toggleAIDebug()" class="btn-primary" style="font-size: 0.65rem; padding: 0.25rem 0.5rem; width: auto; background: #222; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; margin-bottom: 0;">Toggle Debug Info</button>
+                                </div>
+                                <div id="ai-debug-content" style="display: none; background: rgba(5, 5, 10, 0.9); border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 4px; font-family: monospace; font-size: 0.75rem; color: #00ffaa; max-height: 350px; overflow-y: auto;">
+                                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--primary);">[TIMESTAMP]:</span> <span id="debug-timestamp">N/A</span></div>
+                                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--primary);">[FUNCTION]:</span> <span id="debug-function">N/A</span></div>
+                                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--primary);">[PAYLOAD]:</span> <pre id="debug-payload" style="white-space: pre-wrap; word-break: break-all; margin: 0.2rem 0; padding: 0.4rem; background: rgba(255,255,255,0.05); color: #fff;"></pre></div>
+                                    <div><span style="color: var(--primary);">[RESPONSE]:</span> <pre id="debug-response" style="white-space: pre-wrap; word-break: break-all; margin: 0.2rem 0; padding: 0.4rem; background: rgba(255,255,255,0.05); color: #fff;"></pre></div>
+                                </div>
+                            </div>
                         </div>
 
                         <div style="margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #333;">
@@ -2015,6 +2029,23 @@
             ]
         };
 
+        function updateAIDebugPanel(functionName, provider, requestPayload, responseData) {
+            const timestamp = new Date().toLocaleString();
+            const tsEl = document.getElementById('debug-timestamp');
+            const fnEl = document.getElementById('debug-function');
+            const plEl = document.getElementById('debug-payload');
+            const respEl = document.getElementById('debug-response');
+
+            if (tsEl) tsEl.innerText = `${timestamp} (Provider: ${provider})`;
+            if (fnEl) fnEl.innerText = functionName.toUpperCase();
+            if (plEl) {
+                plEl.textContent = typeof requestPayload === 'object' ? JSON.stringify(requestPayload, null, 2) : String(requestPayload);
+            }
+            if (respEl) {
+                respEl.textContent = typeof responseData === 'object' ? JSON.stringify(responseData, null, 2) : String(responseData);
+            }
+        }
+
         function callMockAI(promptType, payload, apiError = "") {
             console.log(`[SYSTEM] Mock AI fallback activated for "${promptType}".`);
             if (promptType === 'generate') {
@@ -2150,8 +2181,22 @@
 
         async function callSystemAI(promptType, payload) {
             const config = State.apiConfig || { provider: 'mock' };
-            if (config.provider === 'mock' || !config.apiKey) {
-                return callMockAI(promptType, payload);
+            if (config.provider === 'mock') {
+                const mockResult = callMockAI(promptType, payload);
+                updateAIDebugPanel(promptType, "mock (local)", payload, mockResult);
+                return mockResult;
+            }
+
+            if (!config.apiKey) {
+                const errMsg = "System connection failed — check API configuration (Missing API Key)";
+                if (window.App && typeof window.App.showSystemMessage === 'function') {
+                    window.App.showSystemMessage("SYSTEM CONNECTION FAILED", errMsg);
+                } else {
+                    alert(errMsg);
+                }
+                const err = new Error(errMsg);
+                updateAIDebugPanel(promptType, config.provider, payload, { error: err.message });
+                throw err;
             }
 
             let systemPrompt = "";
@@ -2247,41 +2292,65 @@ Cause: "${payload.cause}"`;
             }
 
             try {
-                const url = config.baseUrl || (config.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions');
+                let baseUrl = config.baseUrl || (config.provider === 'groq' ? 'https://api.groq.com/openai/v1' : 'https://api.deepseek.com/v1');
+                if (!baseUrl.endsWith('/chat/completions')) {
+                    if (baseUrl.endsWith('/')) {
+                        baseUrl = baseUrl.slice(0, -1);
+                    }
+                    baseUrl += '/chat/completions';
+                }
+
                 const model = config.model || (config.provider === 'groq' ? 'llama-3.3-70b-specdec' : 'deepseek-chat');
 
-                const response = await fetch(url, {
+                const requestPayload = {
+                    model: model,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userMessage }
+                    ],
+                    temperature: temperature,
+                    response_format: promptType !== 'narrate' ? { type: "json_object" } : undefined
+                };
+
+                const response = await fetch(baseUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${config.apiKey}`
                     },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userMessage }
-                        ],
-                        temperature: temperature,
-                        response_format: promptType !== 'narrate' ? { type: "json_object" } : undefined
-                    })
+                    body: JSON.stringify(requestPayload)
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                    let errBody = "";
+                    try {
+                        errBody = await response.text();
+                    } catch (innerE) {}
+                    throw new Error(`API returned ${response.status}: ${response.statusText}. Response: ${errBody}`);
                 }
 
                 const data = await response.json();
                 const content = data.choices[0].message.content.trim();
 
+                let finalResult;
                 if (promptType === 'narrate') {
-                    return content;
+                    finalResult = content;
                 } else {
-                    return JSON.parse(content);
+                    finalResult = JSON.parse(content);
                 }
+
+                updateAIDebugPanel(promptType, config.provider, requestPayload, finalResult);
+                return finalResult;
             } catch (e) {
-                console.error("[SYSTEM] AI Call failed. Falling back to local Mock AI.", e);
-                return callMockAI(promptType, payload, e.message);
+                console.error("[SYSTEM] AI Call failed.", e);
+                const errMsg = "System connection failed — check API configuration";
+                if (window.App && typeof window.App.showSystemMessage === 'function') {
+                    window.App.showSystemMessage("SYSTEM CONNECTION FAILED", errMsg);
+                } else {
+                    alert(errMsg);
+                }
+                updateAIDebugPanel(promptType, config.provider, { promptType, payload }, { error: e.message });
+                throw e;
             }
         }
 
@@ -2647,6 +2716,17 @@ Cause: "${payload.cause}"`;
             editingHabitId: null,
             _dayIdxCache: {}, // Performance cache for date string to day index mapping to avoid redundant Date parsing
             escapeHTML: escapeHTML,
+
+            toggleAIDebug() {
+                const debugContent = document.getElementById('ai-debug-content');
+                if (debugContent) {
+                    if (debugContent.style.display === 'none') {
+                        debugContent.style.display = 'block';
+                    } else {
+                        debugContent.style.display = 'none';
+                    }
+                }
+            },
 
             toggleAPIFields() {
                 const provider = document.getElementById('ai-provider').value;
