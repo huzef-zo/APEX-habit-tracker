@@ -1476,6 +1476,16 @@
                         </div>
                     </div>
                     
+                    <!-- PERSISTENT API ERROR BANNER -->
+                    <div id="api-error-banner" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--danger); background: rgba(255, 0, 85, 0.1); border-radius: 4px; padding: 1.2rem; text-align: left; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);">
+                        <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--danger); font-weight: bold; margin-bottom: 0.5rem; letter-spacing: 2px;">
+                            🚨 SYSTEM CONNECTION FAILED
+                        </div>
+                        <div style="font-size: 0.9rem; color: #fff; font-family: var(--font-ui); line-height: 1.4;">
+                            System connection failed — check API configuration. Never award XP or mark a quest verified when the API call itself failed.
+                        </div>
+                    </div>
+
                     <!-- PERSISTENT SYSTEM PENALTY BANNER -->
                     <div id="penalty-banner" style="display: none; margin-bottom: 1.5rem;"></div>
 
@@ -1583,6 +1593,16 @@
                     <h2 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 2rem; text-align: center; letter-spacing: 4px;">
                         [ PLAYER STATUS ]
                     </h2>
+
+                    <!-- PERSISTENT API ERROR BANNER FOR STATUS -->
+                    <div id="api-error-banner-status" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--danger); background: rgba(255, 0, 85, 0.1); border-radius: 4px; padding: 1.2rem; text-align: left; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); max-width: 600px; margin: 0 auto 1.5rem auto;">
+                        <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--danger); font-weight: bold; margin-bottom: 0.5rem; letter-spacing: 2px;">
+                            🚨 SYSTEM CONNECTION FAILED
+                        </div>
+                        <div style="font-size: 0.9rem; color: #fff; font-family: var(--font-ui); line-height: 1.4;">
+                            System connection failed — check API configuration. Never award XP or mark a quest verified when the API call itself failed.
+                        </div>
+                    </div>
 
                     <div class="glass-panel system-shimmer" style="padding: 3rem; max-width: 600px; margin: 0 auto; position: relative; border-radius: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(0, 245, 255, 0.1); padding-bottom: 2rem; flex-wrap: wrap;">
@@ -1732,6 +1752,32 @@
                             </div>
 
                             <button onclick="App.saveAIConfig()" class="btn-primary" style="font-size: 0.8rem; padding: 0.6rem; margin-bottom: 1.5rem;">Apply System Config</button>
+
+                            <!-- SYSTEM COGNITIVE LOGS (DEBUG PANEL) -->
+                            <details id="system-debug-panel" style="margin-top: 1rem; border: 1px solid var(--border-color); padding: 1rem; background: rgba(0,0,0,0.4); border-radius: 4px;">
+                                <summary style="font-family: var(--font-display); font-size: 0.8rem; color: var(--primary); cursor: pointer; outline: none; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                                    <span>⚙️ SYSTEM COGNITIVE LOGS (DEBUG)</span>
+                                    <span id="debug-toggle-icon" style="font-size: 0.75rem; font-family: var(--font-system);">[+] EXPAND</span>
+                                </summary>
+                                <div style="margin-top: 1rem; font-family: var(--font-system); font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.8rem; border-top: 1px dashed rgba(0, 245, 255, 0.2); padding-top: 1rem;">
+                                    <div>
+                                        <span style="color: var(--primary);">[TIMESTAMP]</span>
+                                        <div id="debug-timestamp" style="font-family: var(--font-numbers); color: #fff; margin-top: 2px;">No calls logged yet.</div>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--primary);">[FUNCTION CALLED]</span>
+                                        <div id="debug-function" style="color: #fff; margin-top: 2px;">-</div>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--primary);">[RAW REQUEST PAYLOAD]</span>
+                                        <pre id="debug-request" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,245,255,0.1); padding: 0.5rem; margin-top: 4px; overflow-x: auto; color: #88ff88; max-height: 150px; font-size: 0.7rem; font-family: 'Share Tech Mono', monospace; white-space: pre-wrap; word-break: break-all;">-</pre>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--primary);">[RAW RESPONSE RECEIVED]</span>
+                                        <pre id="debug-response" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,245,255,0.1); padding: 0.5rem; margin-top: 4px; overflow-x: auto; color: #88ffff; max-height: 200px; font-size: 0.7rem; font-family: 'Share Tech Mono', monospace; white-space: pre-wrap; word-break: break-all;">-</pre>
+                                    </div>
+                                </div>
+                            </details>
                         </div>
 
                         <div style="margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #333;">
@@ -2148,10 +2194,91 @@
             }
         }
 
+        function updateDebugLog(promptType, payload, responseReceived, errorOccurred = null, isMock = false) {
+            const now = new Date();
+            const timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
+            let funcName = promptType;
+            if (promptType === 'generate') funcName = 'quest generation';
+            else if (promptType === 'verify') funcName = 'verification';
+            else if (promptType === 'narrate') funcName = 'narration';
+            else if (promptType === 'penalty') funcName = 'penalty escalation';
+
+            if (isMock) {
+                funcName += " (Local Mock AI)";
+            } else {
+                funcName += " (Real API)";
+            }
+
+            let responseText = "";
+            if (errorOccurred) {
+                responseText = `ERROR: ${errorOccurred.message || errorOccurred}`;
+            } else if (typeof responseReceived === 'string') {
+                responseText = responseReceived;
+            } else {
+                responseText = JSON.stringify(responseReceived, null, 2);
+            }
+
+            const requestText = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+
+            if (!State) State = {};
+            State.lastAiCall = {
+                timestamp,
+                function: funcName,
+                request: requestText,
+                response: responseText,
+                failed: !!errorOccurred
+            };
+
+            // Save to localStorage directly
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(State));
+
+            renderDebugPanel();
+        }
+
+        function renderDebugPanel() {
+            if (!State || !State.lastAiCall) return;
+            const t = document.getElementById('debug-timestamp');
+            const f = document.getElementById('debug-function');
+            const req = document.getElementById('debug-request');
+            const res = document.getElementById('debug-response');
+
+            if (t) t.textContent = State.lastAiCall.timestamp;
+            if (f) {
+                f.textContent = State.lastAiCall.function;
+                f.style.color = State.lastAiCall.failed ? 'var(--danger)' : 'var(--success)';
+            }
+            if (req) req.textContent = State.lastAiCall.request;
+            if (res) {
+                res.textContent = State.lastAiCall.response;
+                res.style.color = State.lastAiCall.failed ? 'var(--danger)' : '#88ffff';
+            }
+        }
+
+        function setApiErrorState(hasError) {
+            const banner = document.getElementById('api-error-banner');
+            const statusBanner = document.getElementById('api-error-banner-status');
+
+            if (banner) {
+                banner.style.display = hasError ? 'block' : 'none';
+            }
+            if (statusBanner) {
+                statusBanner.style.display = hasError ? 'block' : 'none';
+            }
+
+            if (hasError) {
+                if (App && typeof App.showSystemError === 'function') {
+                    App.showSystemError("System connection failed — check API configuration");
+                }
+            }
+        }
+
         async function callSystemAI(promptType, payload) {
             const config = State.apiConfig || { provider: 'mock' };
             if (config.provider === 'mock' || !config.apiKey) {
-                return callMockAI(promptType, payload);
+                const mockRes = callMockAI(promptType, payload);
+                updateDebugLog(promptType, payload, mockRes, null, true); // true = isMock
+                return mockRes;
             }
 
             let systemPrompt = "";
@@ -2250,21 +2377,23 @@ Cause: "${payload.cause}"`;
                 const url = config.baseUrl || (config.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions');
                 const model = config.model || (config.provider === 'groq' ? 'llama-3.3-70b-specdec' : 'deepseek-chat');
 
+                const requestPayload = {
+                    model: model,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userMessage }
+                    ],
+                    temperature: temperature,
+                    response_format: promptType !== 'narrate' ? { type: "json_object" } : undefined
+                };
+
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${config.apiKey}`
                     },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userMessage }
-                        ],
-                        temperature: temperature,
-                        response_format: promptType !== 'narrate' ? { type: "json_object" } : undefined
-                    })
+                    body: JSON.stringify(requestPayload)
                 });
 
                 if (!response.ok) {
@@ -2272,16 +2401,39 @@ Cause: "${payload.cause}"`;
                 }
 
                 const data = await response.json();
+
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                    throw new Error("Malformed API response (missing choices/message)");
+                }
+
                 const content = data.choices[0].message.content.trim();
 
+                let result;
                 if (promptType === 'narrate') {
-                    return content;
+                    result = content;
                 } else {
-                    return JSON.parse(content);
+                    result = JSON.parse(content);
                 }
+
+                // Call succeeded, log success and clear error state
+                updateDebugLog(promptType, requestPayload, data, null, false);
+                setApiErrorState(false);
+
+                return result;
+
             } catch (e) {
-                console.error("[SYSTEM] AI Call failed. Falling back to local Mock AI.", e);
-                return callMockAI(promptType, payload, e.message);
+                console.error("[SYSTEM] AI Call failed.", e);
+                // Log failure and set error state
+                const requestPayload = {
+                    provider: config.provider,
+                    promptType: promptType,
+                    userMessage: userMessage
+                };
+                updateDebugLog(promptType, requestPayload, null, e, false);
+                setApiErrorState(true);
+
+                // Rethrow the error to propagate failure and prevent silent fallback / XP reward
+                throw e;
             }
         }
 
@@ -3067,6 +3219,35 @@ Cause: "${payload.cause}"`;
                 }, 5000);
             },
 
+            showSystemError(message) {
+                const notif = document.getElementById('system-notification');
+                const titleEl = document.getElementById('sys-notif-title');
+                const bodyEl = document.getElementById('sys-notif-body');
+
+                if (!notif || !titleEl || !bodyEl) return;
+
+                titleEl.innerText = "🚨 SYSTEM CONNECTION FAILED";
+                bodyEl.innerText = message;
+
+                // Temporarily apply error styling
+                notif.style.borderColor = "var(--danger)";
+                notif.style.boxShadow = "0 0 30px rgba(255, 0, 85, 0.6), inset 0 0 15px rgba(255, 0, 85, 0.2)";
+                titleEl.style.color = "var(--danger)";
+
+                notif.classList.add('active');
+                if (window.AudioSys) window.AudioSys.play('click'); // Play error click
+
+                setTimeout(() => {
+                    notif.classList.remove('active');
+                    // Reset styling after transition
+                    setTimeout(() => {
+                        notif.style.borderColor = "";
+                        notif.style.boxShadow = "";
+                        titleEl.style.color = "";
+                    }, 500);
+                }, 8000); // Keep open longer for visibility
+            },
+
             updateRank() {
                 const lvl = State.user.level;
                 if (lvl >= 51) State.user.rank = 'S';
@@ -3218,6 +3399,20 @@ Cause: "${payload.cause}"`;
                 
                 // Initialize History components
                 this.renderHistory();
+
+                // Set up debug panel toggle listener
+                const debugPanel = document.getElementById('system-debug-panel');
+                if (debugPanel) {
+                    debugPanel.addEventListener('toggle', () => {
+                        const icon = document.getElementById('debug-toggle-icon');
+                        if (icon) {
+                            icon.textContent = debugPanel.open ? '[-] COLLAPSE' : '[+] EXPAND';
+                        }
+                    });
+                }
+
+                // Render debug panel on load
+                renderDebugPanel();
             },
 
             updateDate() {
