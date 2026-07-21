@@ -100,6 +100,11 @@
         @keyframes fadeUp { 
             to { opacity: 1; transform: translateY(0); } 
         }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
 
         /* --- LAYOUT --- */
         #app-container { display: flex; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s; }
@@ -1434,6 +1439,40 @@
             <button class="btn-primary" onclick="App.submitOnboarding()" style="padding: 0.8rem;">Initialize The System</button>
         </div>
     </div>
+
+    <!-- System Initialization Loading Overlay -->
+    <div class="modal-overlay" id="system-loading-overlay" style="z-index: 10000; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px);">
+        <div class="modal-box system-shimmer" style="max-width: 500px; text-align: center; position: relative; padding: 2.5rem 2rem;">
+            <!-- Glowing scanner animation style -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--primary), transparent); animation: scan 2s linear infinite;"></div>
+
+            <h3 style="font-family: var(--font-display); font-size: 1.3rem; color: var(--primary); letter-spacing: 2px; margin-bottom: 1.5rem;" id="system-loader-title">[ SYSTEM INITIALIZATION ]</h3>
+
+            <p style="font-family: var(--font-ui); font-size: 0.95rem; color: #fff; line-height: 1.5; margin-bottom: 1.5rem;" id="system-loader-desc">
+                Setting up your System — one-time download, then works offline.
+            </p>
+
+            <p style="font-family: var(--font-system); font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.5rem;">
+                Downloading AI model weights (approx. 1GB). This is a one-time process.
+            </p>
+
+            <!-- Progress Bar -->
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(0,245,255,0.15); border-radius: 3px; overflow: hidden; margin-bottom: 1rem;">
+                <div id="system-loader-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00f5ff, #9b51e0); transition: width 0.1s linear;"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-family: var(--font-numbers); font-size: 0.85rem;">
+                <span id="system-loader-percent" style="color: var(--primary); font-weight: bold;">0%</span>
+                <span id="system-loader-status-text" style="color: var(--text-dim); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 280px; font-family: var(--font-ui);">Initializing...</span>
+            </div>
+
+            <div id="system-loader-error" style="display: none; color: var(--danger); font-family: var(--font-ui); font-size: 0.85rem; margin-bottom: 1.5rem; background: rgba(255,0,0,0.1); border: 1px solid var(--danger); padding: 0.8rem; border-radius: 4px; word-break: break-word; text-align: left;"></div>
+
+            <div style="font-size: 0.75rem; color: var(--text-dim); font-style: italic; line-height: 1.4;">
+                Please do not close this tab. This may take a few minutes depending on your connection.
+            </div>
+        </div>
+    </div>
     
     <!-- Mobile Menu Button -->
     <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open sidebar menu">☰</button>
@@ -1501,10 +1540,10 @@
                     <!-- PERSISTENT API ERROR BANNER -->
                     <div id="api-error-banner" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--danger); background: rgba(255, 0, 85, 0.1); border-radius: 4px; padding: 1.2rem; text-align: left; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);">
                         <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--danger); font-weight: bold; margin-bottom: 0.5rem; letter-spacing: 2px;">
-                            🚨 SYSTEM CONNECTION FAILED
+                            🚨 SYSTEM CORE OFFLINE
                         </div>
                         <div style="font-size: 0.9rem; color: #fff; font-family: var(--font-ui); line-height: 1.4;">
-                            System connection failed — check API configuration. Never award XP or mark a quest verified when the API call itself failed.
+                            System core offline — verify WebGPU is supported/enabled and you have completed the initial system setup.
                         </div>
                     </div>
 
@@ -1619,10 +1658,10 @@
                     <!-- PERSISTENT API ERROR BANNER FOR STATUS -->
                     <div id="api-error-banner-status" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--danger); background: rgba(255, 0, 85, 0.1); border-radius: 4px; padding: 1.2rem; text-align: left; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); max-width: 600px; margin: 0 auto 1.5rem auto;">
                         <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--danger); font-weight: bold; margin-bottom: 0.5rem; letter-spacing: 2px;">
-                            🚨 SYSTEM CONNECTION FAILED
+                            🚨 SYSTEM CORE OFFLINE
                         </div>
                         <div style="font-size: 0.9rem; color: #fff; font-family: var(--font-ui); line-height: 1.4;">
-                            System connection failed — check API configuration. Never award XP or mark a quest verified when the API call itself failed.
+                            System core offline — verify WebGPU is supported/enabled and you have completed the initial system setup.
                         </div>
                     </div>
 
@@ -1740,40 +1779,14 @@
                         </div>
 
                         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #333;">
-                            <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; text-align: center;">⚔️ SYSTEM AI CONFIGURATION</div>
-
-                            <div style="margin-bottom: 1rem;">
-                                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">API Provider</label>
-                                <select id="ai-provider" class="input-field" onchange="App.toggleAPIFields()" style="margin-bottom: 0.5rem;">
-                                    <option value="mock" selected>🤖 Local Mock AI (No Key Required)</option>
-                                    <option value="groq">⚡ Groq Cloud (Llama 3.3)</option>
-                                    <option value="deepseek">🐳 DeepSeek AI (deepseek-chat)</option>
-                                    <option value="custom">⚙️ Custom OpenAI-Compatible API</option>
-                                </select>
-                            </div>
-
-                            <div id="ai-key-container" style="display: none; margin-bottom: 1rem;">
-                                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">API Key</label>
-                                <input type="password" id="ai-apikey" class="input-field" placeholder="Enter API Key..." autocomplete="off">
-                            </div>
-
-                            <div id="ai-model-container" style="display: none; margin-bottom: 1rem; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                <div>
-                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">Model Name</label>
-                                    <input type="text" id="ai-model" class="input-field" placeholder="e.g. llama-3.3-70b-specdec">
-                                </div>
-                                <div>
-                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">Base URL</label>
-                                    <input type="text" id="ai-baseurl" class="input-field" placeholder="e.g. https://api.groq.com/openai/v1">
-                                </div>
-                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; text-align: center;">⚔️ SYSTEM AI GOALS</div>
 
                             <div style="margin-bottom: 1rem;">
                                 <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">Hunter's Core Goals (Guides Quest Generation)</label>
                                 <textarea id="ai-goals" class="input-field" rows="3" placeholder="Define your focus (e.g. 'Improve painting techniques, daily fitness training, practice patience with kids, sleep by 11pm')..." style="resize: vertical; font-family: var(--font-ui);"></textarea>
                             </div>
 
-                            <button onclick="App.saveAIConfig()" class="btn-primary" style="font-size: 0.8rem; padding: 0.6rem; margin-bottom: 1.5rem;">Apply System Config</button>
+                            <button onclick="App.saveAIConfig()" class="btn-primary" style="font-size: 0.8rem; padding: 0.6rem; margin-bottom: 1.5rem;">Apply System Goals</button>
 
                             <!-- SYSTEM COGNITIVE LOGS (DEBUG PANEL) -->
                             <details id="system-debug-panel" style="margin-top: 1rem; border: 1px solid var(--border-color); padding: 1rem; background: rgba(0,0,0,0.4); border-radius: 4px;">
@@ -1938,25 +1951,11 @@
             },
             quests: [],
             habits: [],
-            activityLog: {},
-            apiConfig: {
-                provider: "mock",
-                apiKey: "",
-                model: "",
-                baseUrl: ""
-            }
+            activityLog: {}
         };
 
         function syncHunterAndPlayerState() {
             if (!State) return;
-            if (!State.apiConfig) {
-                State.apiConfig = {
-                    provider: 'mock',
-                    apiKey: '',
-                    model: '',
-                    baseUrl: ''
-                };
-            }
             if (!State.hunter) {
                 State.hunter = {
                     rank: State.user?.rank || 'E',
@@ -2044,6 +2043,9 @@
                 State = deepMerge(JSON.parse(JSON.stringify(defaultState)), parsed);
             } else {
                 State = defaultState;
+            }
+            if (State.apiConfig) {
+                delete State.apiConfig;
             }
         } catch (e) {
             console.error("State corrupted, resetting to default.", e);
@@ -2233,6 +2235,27 @@
             }
         }
 
+        function parseJsonSafe(text) {
+            let cleaned = text.trim();
+            if (cleaned.startsWith("```")) {
+                cleaned = cleaned.replace(/^```(json)?/, "").replace(/```$/, "").trim();
+            }
+            try {
+                return JSON.parse(cleaned);
+            } catch (e) {
+                console.warn("Standard JSON parse failed, attempting regex extraction", e);
+                const match = cleaned.match(/[\{\[]([\s\S]*)[\}\]]/);
+                if (match) {
+                    try {
+                        return JSON.parse(match[0]);
+                    } catch (innerE) {
+                        console.error("Regex JSON parse failed as well", innerE);
+                    }
+                }
+                throw e;
+            }
+        }
+
         function updateDebugLog(promptType, payload, responseReceived, errorOccurred = null, isMock = false) {
             const now = new Date();
             const timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
@@ -2243,11 +2266,7 @@
             else if (promptType === 'narrate') funcName = 'narration';
             else if (promptType === 'penalty') funcName = 'penalty escalation';
 
-            if (isMock) {
-                funcName += " (Local Mock AI)";
-            } else {
-                funcName += " (Real API)";
-            }
+            funcName += " (On-Device WebLLM)";
 
             let responseText = "";
             if (errorOccurred) {
@@ -2307,14 +2326,86 @@
 
             if (hasError) {
                 if (App && typeof App.showSystemError === 'function') {
-                    App.showSystemError("System connection failed — check API configuration");
+                    App.showSystemError("System core offline — check WebGPU / system status");
                 }
             }
         }
 
-        async function callSystemAI(promptType, payload) {
-            const config = State.apiConfig || { provider: 'mock' };
+        let systemEngine = null;
 
+        async function initSystemEngine() {
+            if (systemEngine) return systemEngine;
+
+            if (!navigator.gpu) {
+                const errMsg = "WebGPU is not supported by your browser or device. On-device AI requires WebGPU. Please use a modern browser like Chrome, Edge, or Opera with WebGPU enabled.";
+                alert(errMsg);
+                throw new Error(errMsg);
+            }
+
+            const isFirstTime = localStorage.getItem("apex_webllm_downloaded") !== "true";
+            const overlay = document.getElementById("system-loading-overlay");
+            const progressBar = document.getElementById("system-loader-progress-bar");
+            const percentText = document.getElementById("system-loader-percent");
+            const statusText = document.getElementById("system-loader-status-text");
+            const errorContainer = document.getElementById("system-loader-error");
+
+            if (errorContainer) {
+                errorContainer.style.display = "none";
+                errorContainer.textContent = "";
+            }
+
+            if (overlay) {
+                overlay.style.display = "flex";
+                overlay.classList.add("open");
+                const titleEl = document.getElementById("system-loader-title");
+                const descEl = document.getElementById("system-loader-desc");
+                if (!isFirstTime) {
+                    if (titleEl) titleEl.textContent = "[ BOOTING SYSTEM AI ]";
+                    if (descEl) descEl.textContent = "Re-establishing connection to on-device System Core...";
+                } else {
+                    if (titleEl) titleEl.textContent = "[ SYSTEM INITIALIZATION ]";
+                    if (descEl) descEl.textContent = "Setting up your System — one-time download, then works offline.";
+                }
+            }
+
+            const initProgressCallback = (report) => {
+                const progress = report.progress || 0;
+                const percent = Math.round(progress * 100);
+                if (progressBar) progressBar.style.width = `${percent}%`;
+                if (percentText) percentText.textContent = `${percent}%`;
+                if (statusText) statusText.textContent = report.text || "Loading...";
+            };
+
+            try {
+                const { CreateWebWorkerMLCEngine } = await import("https://esm.run/@mlc-ai/web-llm@0.2.84");
+
+                systemEngine = await CreateWebWorkerMLCEngine(
+                    new Worker("./worker.js", { type: "module" }),
+                    "Llama-3.2-1B-Instruct-q4f16_1-MLC",
+                    { initProgressCallback }
+                );
+
+                localStorage.setItem("apex_webllm_downloaded", "true");
+                if (overlay) {
+                    overlay.style.display = "none";
+                    overlay.classList.remove("open");
+                }
+                return systemEngine;
+            } catch (err) {
+                console.error("System Engine initialization failed", err);
+                if (statusText) {
+                    statusText.textContent = `Initialization failed: ${err.message || err}`;
+                    statusText.style.color = "var(--danger)";
+                }
+                if (errorContainer) {
+                    errorContainer.style.display = "block";
+                    errorContainer.textContent = `Error: ${err.message || "Failed to load model. Please verify WebGPU is enabled in browser flags and you have internet access for the first-time setup."}`;
+                }
+                throw err;
+            }
+        }
+
+        async function callSystemAI(promptType, payload) {
             let systemPrompt = "";
             let userMessage = "";
             let temperature = 0.3;
@@ -2413,33 +2504,14 @@ Cause: "${payload.cause}"`;
                     break;
             }
 
-            if (config.provider === 'mock' || !config.apiKey) {
-                const mockRes = callMockAI(promptType, payload);
-                const mockPayloadWithPrompt = {
-                    model: "local-mock-ai",
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: userMessage || payload }
-                    ],
-                    raw_payload: payload
-                };
-                updateDebugLog(promptType, mockPayloadWithPrompt, mockRes, null, true); // true = isMock
-                return mockRes;
-            }
-
             try {
-                let baseUrl = config.baseUrl || (config.provider === 'groq' ? 'https://api.groq.com/openai/v1' : 'https://api.deepseek.com/v1');
-                if (!baseUrl.endsWith('/chat/completions')) {
-                    if (baseUrl.endsWith('/')) {
-                        baseUrl = baseUrl.slice(0, -1);
-                    }
-                    baseUrl += '/chat/completions';
+                const engine = await initSystemEngine();
+                if (!engine) {
+                    throw new Error("Local WebLLM engine failed to initialize.");
                 }
 
-                const model = config.model || (config.provider === 'groq' ? 'llama-3.3-70b-specdec' : 'deepseek-chat');
-
                 const requestPayload = {
-                    model: model,
+                    model: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userMessage }
@@ -2448,51 +2520,34 @@ Cause: "${payload.cause}"`;
                     response_format: promptType !== 'narrate' ? { type: "json_object" } : undefined
                 };
 
-                const response = await fetch(baseUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${config.apiKey}`
-                    },
-                    body: JSON.stringify(requestPayload)
-                });
+                const response = await engine.chat.completions.create(requestPayload);
 
-                if (!response.ok) {
-                    let errBody = "";
-                    try {
-                        errBody = await response.text();
-                    } catch (innerE) {}
-                    throw new Error(`API returned ${response.status}: ${response.statusText}. Response: ${errBody}`);
+                if (!response.choices || !response.choices[0] || !response.choices[0].message) {
+                    throw new Error("Malformed local AI response (missing choices/message)");
                 }
 
-                const data = await response.json();
-
-                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                    throw new Error("Malformed API response (missing choices/message)");
-                }
-
-                const content = data.choices[0].message.content.trim();
+                const content = response.choices[0].message.content.trim();
 
                 let result;
                 if (promptType === 'narrate') {
                     result = content;
                 } else {
-                    result = JSON.parse(content);
+                    result = parseJsonSafe(content);
                 }
 
                 // Call succeeded, log success and clear error state
-                updateDebugLog(promptType, requestPayload, data, null, false);
+                updateDebugLog(promptType, requestPayload, content, null, false);
                 setApiErrorState(false);
 
                 return result;
 
             } catch (e) {
-                console.error("[SYSTEM] AI Call failed.", e);
+                console.error("[SYSTEM] Local AI Call failed.", e);
                 // Log failure and set error state
                 const requestPayload = {
-                    provider: config.provider,
                     promptType: promptType,
-                    userMessage: userMessage
+                    userMessage: userMessage,
+                    systemPrompt: systemPrompt
                 };
                 updateDebugLog(promptType, requestPayload, null, e, false);
                 setApiErrorState(true);
@@ -2921,64 +2976,27 @@ Cause: "${payload.cause}"`;
             },
 
             toggleAPIFields() {
-                const provider = document.getElementById('ai-provider').value;
-                const keyContainer = document.getElementById('ai-key-container');
-                const modelContainer = document.getElementById('ai-model-container');
-
-                if (provider === 'mock') {
-                    keyContainer.style.display = 'none';
-                    modelContainer.style.display = 'none';
-                } else {
-                    keyContainer.style.display = 'block';
-                    modelContainer.style.display = 'grid';
-
-                    const modelInput = document.getElementById('ai-model');
-                    const urlInput = document.getElementById('ai-baseurl');
-
-                    if (provider === 'groq') {
-                        if (!modelInput.value) modelInput.value = 'llama-3.3-70b-specdec';
-                        if (!urlInput.value) urlInput.value = 'https://api.groq.com/openai/v1';
-                    } else if (provider === 'deepseek') {
-                        if (!modelInput.value || modelInput.value === 'llama-3.3-70b-specdec') modelInput.value = 'deepseek-chat';
-                        if (!urlInput.value || urlInput.value === 'https://api.groq.com/openai/v1') urlInput.value = 'https://api.deepseek.com/v1';
-                    }
-                }
+                // Legacy system API fields toggle removed
             },
 
             loadAIConfig() {
-                if (!State.apiConfig) {
-                    State.apiConfig = {
-                        provider: 'mock',
-                        apiKey: '',
-                        model: '',
-                        baseUrl: ''
-                    };
-                }
                 if (!State.hunter) {
                     syncHunterAndPlayerState();
                 }
-
-                document.getElementById('ai-provider').value = State.apiConfig.provider || 'mock';
-                document.getElementById('ai-apikey').value = State.apiConfig.apiKey || '';
-                document.getElementById('ai-model').value = State.apiConfig.model || '';
-                document.getElementById('ai-baseurl').value = State.apiConfig.baseUrl || '';
-                document.getElementById('ai-goals').value = State.hunter.goals || '';
-
-                this.toggleAPIFields();
+                const goalsInput = document.getElementById('ai-goals');
+                if (goalsInput) {
+                    goalsInput.value = State.hunter.goals || '';
+                }
             },
 
             saveAIConfig() {
-                if (!State.apiConfig) State.apiConfig = {};
                 if (!State.hunter) syncHunterAndPlayerState();
-
-                State.apiConfig.provider = document.getElementById('ai-provider').value;
-                State.apiConfig.apiKey = document.getElementById('ai-apikey').value.trim();
-                State.apiConfig.model = document.getElementById('ai-model').value.trim();
-                State.apiConfig.baseUrl = document.getElementById('ai-baseurl').value.trim();
-                State.hunter.goals = document.getElementById('ai-goals').value.trim();
-
+                const goalsInput = document.getElementById('ai-goals');
+                if (goalsInput) {
+                    State.hunter.goals = goalsInput.value.trim();
+                }
                 saveState();
-                this.showSystemMessage('AI SYSTEM CONFIG', 'AI and Goals configuration successfully applied to the System.');
+                this.showSystemMessage('SYSTEM AI GOALS', 'Your focus goals have been successfully updated.');
             },
 
             async submitQuestLog(id) {
@@ -3473,6 +3491,11 @@ Cause: "${payload.cause}"`;
 
                 // Initialize audio system
                 AudioSys.init();
+
+                // Proactively boot up on-device AI model in the background if goals are already set
+                if (State && State.hunter && State.hunter.goals && State.hunter.goals.trim() !== "") {
+                    initSystemEngine().catch(e => console.warn("Background AI initialization deferred:", e));
+                }
                 
                 // Start intro animation
                 setTimeout(() => {
