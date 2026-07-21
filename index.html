@@ -2061,6 +2061,23 @@
             ]
         };
 
+        function updateAIDebugPanel(functionName, provider, requestPayload, responseData) {
+            const timestamp = new Date().toLocaleString();
+            const tsEl = document.getElementById('debug-timestamp');
+            const fnEl = document.getElementById('debug-function');
+            const plEl = document.getElementById('debug-payload');
+            const respEl = document.getElementById('debug-response');
+
+            if (tsEl) tsEl.innerText = `${timestamp} (Provider: ${provider})`;
+            if (fnEl) fnEl.innerText = functionName.toUpperCase();
+            if (plEl) {
+                plEl.textContent = typeof requestPayload === 'object' ? JSON.stringify(requestPayload, null, 2) : String(requestPayload);
+            }
+            if (respEl) {
+                respEl.textContent = typeof responseData === 'object' ? JSON.stringify(responseData, null, 2) : String(responseData);
+            }
+        }
+
         function callMockAI(promptType, payload, apiError = "") {
             console.log(`[SYSTEM] Mock AI fallback activated for "${promptType}".`);
             if (promptType === 'generate') {
@@ -2374,7 +2391,14 @@ Cause: "${payload.cause}"`;
             }
 
             try {
-                const url = config.baseUrl || (config.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions');
+                let baseUrl = config.baseUrl || (config.provider === 'groq' ? 'https://api.groq.com/openai/v1' : 'https://api.deepseek.com/v1');
+                if (!baseUrl.endsWith('/chat/completions')) {
+                    if (baseUrl.endsWith('/')) {
+                        baseUrl = baseUrl.slice(0, -1);
+                    }
+                    baseUrl += '/chat/completions';
+                }
+
                 const model = config.model || (config.provider === 'groq' ? 'llama-3.3-70b-specdec' : 'deepseek-chat');
 
                 const requestPayload = {
@@ -2397,7 +2421,11 @@ Cause: "${payload.cause}"`;
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                    let errBody = "";
+                    try {
+                        errBody = await response.text();
+                    } catch (innerE) {}
+                    throw new Error(`API returned ${response.status}: ${response.statusText}. Response: ${errBody}`);
                 }
 
                 const data = await response.json();
@@ -2799,6 +2827,17 @@ Cause: "${payload.cause}"`;
             editingHabitId: null,
             _dayIdxCache: {}, // Performance cache for date string to day index mapping to avoid redundant Date parsing
             escapeHTML: escapeHTML,
+
+            toggleAIDebug() {
+                const debugContent = document.getElementById('ai-debug-content');
+                if (debugContent) {
+                    if (debugContent.style.display === 'none') {
+                        debugContent.style.display = 'block';
+                    } else {
+                        debugContent.style.display = 'none';
+                    }
+                }
+            },
 
             toggleAPIFields() {
                 const provider = document.getElementById('ai-provider').value;
