@@ -1776,6 +1776,9 @@
     <button id="fab" onclick="App.openModal()" aria-label="Create new quest" title="Create new quest">+</button>
     
     <script>
+        // --- CONSTANTS ---
+        const MIN_EVIDENCE_WORDS = 15;
+
         // --- AUDIO SYSTEM ---
         const AudioSys = {
             ctx: null,
@@ -3014,6 +3017,26 @@
                     State.user.sleepBonusAvailable = true;
                 } else {
                     // Complete habit
+                    const textEl = document.getElementById(`evidence-habit-${id}`);
+                    const rawText = textEl ? textEl.value.trim() : "";
+                    const wordCount = rawText === "" ? 0 : rawText.split(/\s+/).length;
+
+                    if (wordCount < MIN_EVIDENCE_WORDS) {
+                        App.showSystemMessage("VERIFICATION FAILED", "The System requires more detail.");
+                        return;
+                    }
+
+                    const text = App.escapeHTML(rawText);
+                    if (!habit.submissions) habit.submissions = {};
+                    habit.submissions[todayStr] = {
+                        log_text: text,
+                        submitted_at: new Date().toISOString()
+                    };
+                    habit.submission = {
+                        log_text: text,
+                        submitted_at: new Date().toISOString()
+                    };
+
                     habit.completedDates.push(todayStr);
                     this.recalcStreak(habit);
                     const xpValue = this.getHabitXP(habit);
@@ -3058,12 +3081,28 @@
                 const quest = (State.quests || []).find(q => q.id === id || q.id === String(id));
                 if (!quest) return;
 
+                const textEl = document.getElementById(`evidence-quest-${id}`);
+                const rawText = textEl ? textEl.value.trim() : "";
+                const wordCount = rawText === "" ? 0 : rawText.split(/\s+/).length;
+
+                if (wordCount < MIN_EVIDENCE_WORDS) {
+                    App.showSystemMessage("VERIFICATION FAILED", "The System requires more detail.");
+                    return;
+                }
+
+                const text = App.escapeHTML(rawText);
+
                 quest.status = 'verified';
                 const todayStr = getLocalDateString();
                 if (!quest.completedDates) quest.completedDates = [];
                 if (!quest.completedDates.includes(todayStr)) {
                     quest.completedDates.push(todayStr);
                 }
+
+                quest.submission = {
+                    log_text: text,
+                    submitted_at: new Date().toISOString()
+                };
 
                 // Award XP
                 const q_diff = quest.difficulty || 'hard';
@@ -3342,7 +3381,7 @@
                                 <div>
                                     <div class="habit-title">${q_title}</div>
                                     <div style="color: var(--text-dim); font-size: 0.9rem; margin-top: 4px; font-family: var(--font-ui);">${q_desc}</div>
-                                    <div class="habit-meta" style="margin-top: 8px;">
+                                    <div class="habit-meta" style="margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                         <span class="difficulty-badge difficulty-${q_diff}">${q_diff.toUpperCase()}</span>
                                         <span style="color: var(--primary); font-weight: bold;">[${q_stat_label}]</span>
                                         <span>⭐ ${q_xp} XP</span>
@@ -3360,6 +3399,14 @@
                                 ` : ''}
                             </div>
                         </div>
+                        ${!isDone ? `
+                            <div class="evidence-container" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px;">
+                                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">
+                                    Proof of Effort (Verification: checks detail and length, not truthfulness)
+                                </label>
+                                <textarea id="evidence-quest-${q.id}" class="input-field" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
+                            </div>
+                        ` : ''}
                     `;
                     listContainer.appendChild(card);
                 });
@@ -3414,10 +3461,9 @@
                                 <div class="habit-left">
                                     <div>
                                         <div class="habit-title">${h_title}</div>
-                                        <div class="habit-meta" style="margin-top: 8px;">
+                                        <div class="habit-meta" style="margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                             <span class="difficulty-badge difficulty-${h_diff}">${h_diff.toUpperCase()}</span>
                                             <span style="color: var(--primary); font-weight: bold;">[${h_stat_label}]</span>
-                                            <span>🔥 ${h_streak}</span>
                                             <span>⭐ ${xpValue} XP</span>
                                         </div>
                                     </div>
@@ -3433,6 +3479,14 @@
                                     <button class="delete-btn" onclick="App.deleteHabit(${h.id})" aria-label="Delete quest" title="Delete quest">×</button>
                                 </div>
                             </div>
+                            ${!isDone ? `
+                                <div class="evidence-container" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px;">
+                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">
+                                        Proof of Effort (Verification: checks detail and length, not truthfulness)
+                                    </label>
+                                    <textarea id="evidence-habit-${h.id}" class="input-field" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
+                                </div>
+                            ` : ''}
                         `;
                         listContainer.appendChild(card);
                     }
