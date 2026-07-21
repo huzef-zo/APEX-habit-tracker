@@ -1759,8 +1759,11 @@
 
                             <div id="ai-model-container" style="display: none; margin-bottom: 1rem; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div>
-                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">Model Name</label>
-                                    <input type="text" id="ai-model" class="input-field" placeholder="e.g. llama-3.3-70b-specdec">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; display: block;">Model Name</label>
+                                        <a href="https://console.groq.com/docs/models" target="_blank" style="font-family: var(--font-system); font-size: 0.65rem; color: var(--text-dim); text-decoration: underline;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-dim)'">docs ↗</a>
+                                    </div>
+                                    <input type="text" id="ai-model" class="input-field" placeholder="e.g. openai/gpt-oss-120b">
                                 </div>
                                 <div>
                                     <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">Base URL</label>
@@ -2044,6 +2047,11 @@
                 State = deepMerge(JSON.parse(JSON.stringify(defaultState)), parsed);
             } else {
                 State = defaultState;
+            }
+            // Migrate deprecated/decomissioned model
+            if (State && State.apiConfig && State.apiConfig.model === 'llama-3.3-70b-specdec') {
+                State.apiConfig.model = 'openai/gpt-oss-120b';
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(State));
             }
         } catch (e) {
             console.error("State corrupted, resetting to default.", e);
@@ -2436,7 +2444,7 @@ Cause: "${payload.cause}"`;
                     baseUrl += '/chat/completions';
                 }
 
-                const model = config.model || (config.provider === 'groq' ? 'llama-3.3-70b-specdec' : 'deepseek-chat');
+                const model = config.model || (config.provider === 'groq' ? 'openai/gpt-oss-120b' : 'deepseek-chat');
 
                 const requestPayload = {
                     model: model,
@@ -2936,10 +2944,10 @@ Cause: "${payload.cause}"`;
                     const urlInput = document.getElementById('ai-baseurl');
 
                     if (provider === 'groq') {
-                        if (!modelInput.value) modelInput.value = 'llama-3.3-70b-specdec';
+                        if (!modelInput.value || modelInput.value === 'llama-3.3-70b-specdec' || modelInput.value === 'deepseek-chat') modelInput.value = 'openai/gpt-oss-120b';
                         if (!urlInput.value) urlInput.value = 'https://api.groq.com/openai/v1';
                     } else if (provider === 'deepseek') {
-                        if (!modelInput.value || modelInput.value === 'llama-3.3-70b-specdec') modelInput.value = 'deepseek-chat';
+                        if (!modelInput.value || modelInput.value === 'llama-3.3-70b-specdec' || modelInput.value === 'openai/gpt-oss-120b') modelInput.value = 'deepseek-chat';
                         if (!urlInput.value || urlInput.value === 'https://api.groq.com/openai/v1') urlInput.value = 'https://api.deepseek.com/v1';
                     }
                 }
