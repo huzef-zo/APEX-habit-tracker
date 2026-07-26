@@ -1027,6 +1027,13 @@
             box-shadow: 0 0 15px var(--primary);
         }
 
+        /* Keyboard Accessibility - Focus styling */
+        :focus-visible {
+            outline: 2px solid var(--primary) !important;
+            outline-offset: 2px !important;
+            box-shadow: 0 0 10px var(--primary) !important;
+        }
+
         /* Centering plus buttons */
         .rpg-stat-label {
             display: flex;
@@ -1656,7 +1663,7 @@
                                         <span style="font-size: 10px; font-weight: bold; color: var(--danger);">STR | Discipline</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span id="stat-str" data-attr="STR" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
-                                            <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                            <button onclick="App.allocateStat('str')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;" aria-label="Increase STR (Discipline) attribute" title="Increase STR (Discipline) attribute">+</button>
                                         </div>
                                     </div>
                                     <div class="rpg-stat-bar-bg">
@@ -1668,7 +1675,7 @@
                                         <span style="font-size: 10px; font-weight: bold; color: var(--primary);">INT | Mastery</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span id="stat-int" data-attr="INT" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
-                                            <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                            <button onclick="App.allocateStat('int')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;" aria-label="Increase INT (Mastery) attribute" title="Increase INT (Mastery) attribute">+</button>
                                         </div>
                                     </div>
                                     <div class="rpg-stat-bar-bg">
@@ -1680,7 +1687,7 @@
                                         <span style="font-size: 10px; font-weight: bold; color: var(--success);">AGI | Execution</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span id="stat-agi" data-attr="AGI" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
-                                            <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                            <button onclick="App.allocateStat('agi')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;" aria-label="Increase AGI (Execution) attribute" title="Increase AGI (Execution) attribute">+</button>
                                         </div>
                                     </div>
                                     <div class="rpg-stat-bar-bg">
@@ -1692,7 +1699,7 @@
                                         <span style="font-size: 10px; font-weight: bold; color: var(--warning);">VIT | Health</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span id="stat-vit" data-attr="VIT" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
-                                            <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                            <button onclick="App.allocateStat('vit')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;" aria-label="Increase VIT (Health) attribute" title="Increase VIT (Health) attribute">+</button>
                                         </div>
                                     </div>
                                     <div class="rpg-stat-bar-bg">
@@ -1704,7 +1711,7 @@
                                         <span style="font-size: 10px; font-weight: bold; color: var(--accent-purple);">PER | Vision</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span id="stat-sns" data-attr="SNS" style="font-family: var(--font-numbers); font-size: 14px;">10</span>
-                                            <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;">+</button>
+                                            <button onclick="App.allocateStat('sns')" class="stat-up-btn" style="width: 18px; height: 18px; background: none; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; display: grid; place-items: center; font-size: 10px;" aria-label="Increase PER (Vision) attribute" title="Increase PER (Vision) attribute">+</button>
                                         </div>
                                     </div>
                                     <div class="rpg-stat-bar-bg">
