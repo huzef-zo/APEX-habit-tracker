@@ -2108,17 +2108,26 @@
 
             const dataPoints = [];
             const labels = [];
+
+            // BOLT OPTIMIZATION: Instantiate a single Date object and advance day-by-day to avoid
+            // 30x expensive redundant Date creations and complex calendar calculation overhead.
+            const d = new Date();
+            d.setDate(d.getDate() - 29);
             for (let i = 29; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
                 const dateStr = getLocalDateString(d);
                 labels.push(d.getDate());
-                    const habitsScheduled = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
+
+                const habitsScheduled = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 const scheduled = habitsScheduled.length;
-                if (scheduled === 0) { dataPoints.push(0); continue; }
-                let completed = 0;
-                habitsScheduled.forEach(h => { if (h.completedDates.includes(dateStr)) completed++; });
-                dataPoints.push((completed / scheduled) * 100);
+                if (scheduled === 0) {
+                    dataPoints.push(0);
+                } else {
+                    let completed = 0;
+                    habitsScheduled.forEach(h => { if (h.completedDates.includes(dateStr)) completed++; });
+                    dataPoints.push((completed / scheduled) * 100);
+                }
+
+                d.setDate(d.getDate() + 1);
             }
 
             const colorLine = '#00f5ff';
@@ -2197,9 +2206,14 @@
             const month = now.getMonth();
             const today = now.getDate();
 
+            // BOLT OPTIMIZATION: Bypasses expensive new Date creation inside the loop
+            // by using string interpolation to construct the date string.
+            const yearStr = String(year);
+            const monthStr = String(month + 1).padStart(2, '0');
+
             for (let i = 1; i <= today; i++) {
-                const d = new Date(year, month, i);
-                const dateStr = getLocalDateString(d);
+                const dayStr = String(i).padStart(2, '0');
+                const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
                 const habits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 totalPossible += habits.length;
                 habits.forEach(h => { if(h.completedDates.includes(dateStr)) totalDone++; });
@@ -2227,10 +2241,16 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const todayStr = getLocalDateString();
 
+            // BOLT OPTIMIZATION: Construct date strings directly in the loop to completely bypass
+            // the overhead of 28-31 new Date instantiation, object-based date formatting, and date comparison logic.
+            const yearStr = String(year);
+            const monthStr = String(month + 1).padStart(2, '0');
+            const currentDay = now.getDate();
+
             for (let i = 1; i <= daysInMonth; i++) {
-                const d = new Date(year, month, i);
-                const dateStr = getLocalDateString(d); 
-                const dayNum = d.getDate();
+                const dayStr = String(i).padStart(2, '0');
+                const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
+                const dayNum = i;
                 const isToday = dateStr === todayStr;
 
                 const scheduledHabits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
@@ -2239,7 +2259,7 @@
                     if(h.completedDates.includes(dateStr)) completedCount++; 
                 });
                 
-                const isPast = d < now && dateStr !== todayStr;
+                const isPast = i < currentDay && !isToday;
                 const isMissed = isPast && scheduledHabits.length > 0 && completedCount === 0;
 
                 // Calculate heat level based on completed tasks
