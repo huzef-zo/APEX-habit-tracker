@@ -2120,6 +2120,8 @@
             // 30x expensive redundant Date creations and complex calendar calculation overhead.
             const d = new Date();
             d.setDate(d.getDate() - 29);
+            // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
+            const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
             for (let i = 29; i >= 0; i--) {
                 const dateStr = getLocalDateString(d);
                 labels.push(d.getDate());
@@ -2130,7 +2132,10 @@
                     dataPoints.push(0);
                 } else {
                     let completed = 0;
-                    habitsScheduled.forEach(h => { if (h.completedDates.includes(dateStr)) completed++; });
+                    habitsScheduled.forEach(h => {
+                        const compSet = completedSets.get(h.id);
+                        if (compSet && compSet.has(dateStr)) completed++;
+                    });
                     dataPoints.push((completed / scheduled) * 100);
                 }
 
@@ -2218,12 +2223,18 @@
             const yearStr = String(year);
             const monthStr = String(month + 1).padStart(2, '0');
 
+            // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
+            const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
+
             for (let i = 1; i <= today; i++) {
                 const dayStr = String(i).padStart(2, '0');
                 const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
                 const habits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 totalPossible += habits.length;
-                habits.forEach(h => { if(h.completedDates.includes(dateStr)) totalDone++; });
+                habits.forEach(h => {
+                    const compSet = completedSets.get(h.id);
+                    if (compSet && compSet.has(dateStr)) totalDone++;
+                });
             }
             const pct = totalPossible === 0 ? 0 : Math.round((totalDone / totalPossible) * 100);
             const circle = document.getElementById('history-ring');
@@ -2254,6 +2265,9 @@
             const monthStr = String(month + 1).padStart(2, '0');
             const currentDay = now.getDate();
 
+            // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
+            const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
+
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayStr = String(i).padStart(2, '0');
                 const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
@@ -2263,7 +2277,8 @@
                 const scheduledHabits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
                 let completedCount = 0;
                 scheduledHabits.forEach(h => { 
-                    if(h.completedDates.includes(dateStr)) completedCount++; 
+                    const compSet = completedSets.get(h.id);
+                    if (compSet && compSet.has(dateStr)) completedCount++;
                 });
                 
                 const isPast = i < currentDay && !isToday;
@@ -2630,6 +2645,9 @@
                 let checkDate = new Date(lastCheckStr + 'T00:00:00');
                 let totalMissedQuests = 0;
 
+                // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
+                const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
+
                 while (getLocalDateString(checkDate) !== todayStr) {
                     const dateStr = getLocalDateString(checkDate);
 
@@ -2637,7 +2655,11 @@
                     const missedGen = genQuests.filter(q => q.status !== 'verified');
 
                     const habitsDue = State.habits.filter(h => this.isHabitActiveOnDate(h, dateStr));
-                    const missedHabits = habitsDue.filter(h => !h.completedDates.includes(dateStr) && h.status !== 'verified');
+                    const missedHabits = habitsDue.filter(h => {
+                        const compSet = completedSets.get(h.id);
+                        const isCompleted = compSet ? compSet.has(dateStr) : false;
+                        return !isCompleted && h.status !== 'verified';
+                    });
 
                     const totalMissedForDay = missedGen.length + missedHabits.length;
 
