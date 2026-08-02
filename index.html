@@ -2313,6 +2313,21 @@
             _dayIdxCache: {}, // Performance cache for date string to day index mapping to avoid redundant Date parsing
             escapeHTML: escapeHTML,
 
+            updateWordCount(textarea, id, type) {
+                const rawText = textarea.value.trim();
+                const wordCount = rawText === "" ? 0 : rawText.split(/\s+/).length;
+                const counterEl = document.getElementById(`word-count-${type}-${id}`);
+                if (counterEl) {
+                    if (wordCount >= MIN_EVIDENCE_WORDS) {
+                        counterEl.innerText = `${wordCount} words (Ready)`;
+                        counterEl.style.color = "var(--success)";
+                    } else {
+                        counterEl.innerText = `${wordCount} / ${MIN_EVIDENCE_WORDS} words`;
+                        counterEl.style.color = "var(--text-dim)";
+                    }
+                }
+            },
+
             submitOnboarding() {
                 const nameVal = document.getElementById('onboarding-name-input').value.trim();
 
@@ -3450,10 +3465,13 @@
                         </div>
                         ${!isDone ? `
                             <div class="evidence-container" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px;">
-                                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">
-                                    Proof of Effort (Verification: checks detail and length, not truthfulness)
-                                </label>
-                                <textarea id="evidence-quest-${q.id}" class="input-field" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 0;">
+                                        Proof of Effort (Verification: checks detail and length, not truthfulness)
+                                    </label>
+                                    <span id="word-count-quest-${q.id}" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--text-dim); transition: color 0.3s ease;">0 / 15 words</span>
+                                </div>
+                                <textarea id="evidence-quest-${q.id}" class="input-field" oninput="App.updateWordCount(this, '${q.id}', 'quest')" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
                             </div>
                         ` : ''}
                     `;
@@ -3530,10 +3548,13 @@
                             </div>
                             ${!isDone ? `
                                 <div class="evidence-container" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px;">
-                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block;">
-                                        Proof of Effort (Verification: checks detail and length, not truthfulness)
-                                    </label>
-                                    <textarea id="evidence-habit-${h.id}" class="input-field" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+                                        <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 0;">
+                                            Proof of Effort (Verification: checks detail and length, not truthfulness)
+                                        </label>
+                                        <span id="word-count-habit-${h.id}" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--text-dim); transition: color 0.3s ease;">0 / 15 words</span>
+                                    </div>
+                                    <textarea id="evidence-habit-${h.id}" class="input-field" oninput="App.updateWordCount(this, '${h.id}', 'habit')" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
                                 </div>
                             ` : ''}
                         `;
