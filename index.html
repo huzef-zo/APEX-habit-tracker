@@ -2094,6 +2094,150 @@
                 .replace(/'/g, '&#039;');
         }
 
+        function sanitizeKeys(obj) {
+            if (!obj || typeof obj !== 'object') return obj;
+            if (Array.isArray(obj)) {
+                return obj.map(item => sanitizeKeys(item));
+            }
+            const clean = {};
+            for (const key in obj) {
+                if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+                    continue;
+                }
+                if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                    clean[key] = sanitizeKeys(obj[key]);
+                }
+            }
+            return clean;
+        }
+
+        function validateAndSanitizeImport(imported) {
+            if (!imported || typeof imported !== 'object') {
+                throw new Error('Import data must be a valid JSON object.');
+            }
+            const clean = sanitizeKeys(imported);
+
+            // Helper to force numbers within safe ranges
+            const forceNum = (val, min, max, def) => {
+                const n = Number(val);
+                if (isNaN(n)) return def;
+                return Math.min(max, Math.max(min, n));
+            };
+
+            // Helper to truncate/force strings
+            const forceStr = (val, maxLen, def) => {
+                if (val === null || val === undefined) return def;
+                return String(val).substring(0, maxLen);
+            };
+
+            // Internal schema validation
+            const validateAppState = (appState) => {
+                if (!appState || typeof appState !== 'object') return;
+                if (appState.user && typeof appState.user === 'object') {
+                    appState.user.name = forceStr(appState.user.name, 50, 'SUNG JIN-WOO');
+                    appState.user.job = forceStr(appState.user.job, 50, 'Shadow Monarch');
+                    appState.user.level = forceNum(appState.user.level, 1, 90, 1);
+                    appState.user.xp = forceNum(appState.user.xp, 0, 100000000, 0);
+                    appState.user.streak = forceNum(appState.user.streak, 0, 10000, 0);
+                    appState.user.totalCompleted = forceNum(appState.user.totalCompleted, 0, 1000000, 0);
+                    if (appState.user.stats && typeof appState.user.stats === 'object') {
+                        appState.user.stats.str = forceNum(appState.user.stats.str, 1, 999, 10);
+                        appState.user.stats.int = forceNum(appState.user.stats.int, 1, 999, 10);
+                        appState.user.stats.agi = forceNum(appState.user.stats.agi, 1, 999, 10);
+                        appState.user.stats.vit = forceNum(appState.user.stats.vit, 1, 999, 10);
+                        appState.user.stats.sns = forceNum(appState.user.stats.sns, 1, 999, 10);
+                        appState.user.stats.points = forceNum(appState.user.stats.points, 0, 99999, 0);
+                        appState.user.stats.overflowPool = forceNum(appState.user.stats.overflowPool, 0, 99999, 0);
+                    }
+                }
+                if (appState.habits && Array.isArray(appState.habits)) {
+                    appState.habits = appState.habits.map(h => {
+                        if (!h || typeof h !== 'object') return null;
+                        return {
+                            id: forceNum(h.id, 0, Number.MAX_SAFE_INTEGER, Date.now()),
+                            title: forceStr(h.title, 100, 'Unknown Quest'),
+                            desc: forceStr(h.desc || h.description, 200, ''),
+                            completedDates: Array.isArray(h.completedDates) ? h.completedDates.map(d => forceStr(d, 20, '')) : [],
+                            diff: forceStr(h.diff, 20, 'medium'),
+                            stat: forceStr(h.stat, 20, 'str'),
+                            type: forceStr(h.type, 20, 'repeating'),
+                            streak: forceNum(h.streak, 0, 10000, 0),
+                            date: forceStr(h.date, 20, null),
+                            startDate: forceStr(h.startDate, 20, null),
+                            endDate: forceStr(h.endDate, 20, null)
+                        };
+                    }).filter(Boolean);
+                }
+                if (appState.quests && Array.isArray(appState.quests)) {
+                    appState.quests = appState.quests.map(q => {
+                        if (!q || typeof q !== 'object') return null;
+                        return {
+                            id: forceStr(q.id, 100, String(Date.now())),
+                            title: forceStr(q.title, 100, 'Untitled System Mission'),
+                            description: forceStr(q.description, 200, 'System task evaluation.'),
+                            difficulty: forceStr(q.difficulty, 20, 'medium'),
+                            status: forceStr(q.status, 20, 'pending'),
+                            date: forceStr(q.date, 20, ''),
+                            stat_targets: (q.stat_targets && typeof q.stat_targets === 'object') ? q.stat_targets : { STR: 1 }
+                        };
+                    }).filter(Boolean);
+                }
+                if (appState.hunter && typeof appState.hunter === 'object') {
+                    appState.hunter.rank = forceStr(appState.hunter.rank, 10, 'E');
+                    appState.hunter.level = forceNum(appState.hunter.level, 1, 90, 1);
+                    appState.hunter.xp = forceNum(appState.hunter.xp, 0, 100000000, 0);
+                    appState.hunter.xp_to_next = forceNum(appState.hunter.xp_to_next, 10, 100000000, 100);
+                    appState.hunter.streak = forceNum(appState.hunter.streak, 0, 10000, 0);
+                    if (appState.hunter.stats && typeof appState.hunter.stats === 'object') {
+                        appState.hunter.stats.STR = forceNum(appState.hunter.stats.STR, 1, 999, 10);
+                        appState.hunter.stats.VIT = forceNum(appState.hunter.stats.VIT, 1, 999, 10);
+                        appState.hunter.stats.AGI = forceNum(appState.hunter.stats.AGI, 1, 999, 10);
+                        appState.hunter.stats.INT = forceNum(appState.hunter.stats.INT, 1, 999, 10);
+                        appState.hunter.stats.PER = forceNum(appState.hunter.stats.PER, 1, 999, 10);
+                        appState.hunter.stats.points = forceNum(appState.hunter.stats.points, 0, 99999, 0);
+                        appState.hunter.stats.overflowPool = forceNum(appState.hunter.stats.overflowPool, 0, 99999, 0);
+                    }
+                }
+                if (appState.submissions && typeof appState.submissions === 'object') {
+                    for (const key in appState.submissions) {
+                        if (appState.submissions[key] && typeof appState.submissions[key] === 'object') {
+                            const sub = appState.submissions[key];
+                            sub.log_text = forceStr(sub.log_text, 2000, '');
+                            sub.submitted_at = forceStr(sub.submitted_at, 50, '');
+                        }
+                    }
+                }
+            };
+
+            const validatePlayerState = (playerState) => {
+                if (!playerState || typeof playerState !== 'object') return;
+                playerState.level = forceNum(playerState.level, 1, 90, 1);
+                playerState.currentXp = forceNum(playerState.currentXp, 0, 100000000, 0);
+                playerState.rank = forceStr(playerState.rank, 10, 'E');
+                playerState.streak = forceNum(playerState.streak, 0, 10000, 0);
+                playerState.bestStreak = forceNum(playerState.bestStreak, 0, 10000, 0);
+                playerState.totalQuests = forceNum(playerState.totalQuests, 0, 1000000, 0);
+                if (playerState.attributes && typeof playerState.attributes === 'object') {
+                    playerState.attributes.STR = forceNum(playerState.attributes.STR, 1, 999, 10);
+                    playerState.attributes.INT = forceNum(playerState.attributes.INT, 1, 999, 10);
+                    playerState.attributes.AGI = forceNum(playerState.attributes.AGI, 1, 999, 10);
+                    playerState.attributes.VIT = forceNum(playerState.attributes.VIT, 1, 999, 10);
+                    playerState.attributes.SNS = forceNum(playerState.attributes.SNS, 1, 999, 10);
+                }
+                playerState.availablePoints = forceNum(playerState.availablePoints, 0, 99999, 0);
+                playerState.overflowPool = forceNum(playerState.overflowPool, 0, 99999, 0);
+            };
+
+            if (clean.appState && clean.playerState) {
+                validateAppState(clean.appState);
+                validatePlayerState(clean.playerState);
+            } else {
+                // Old format
+                validateAppState(clean);
+            }
+            return clean;
+        }
+
         function getLocalDateString(date = new Date()) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -2514,7 +2658,10 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
-                        const imported = JSON.parse(e.target.result);
+                        let imported = JSON.parse(e.target.result);
+                        // Validate and sanitize the imported data to prevent script execution, prototype pollution, or logical overflows
+                        imported = validateAndSanitizeImport(imported);
+
                         let newState, newPlayerState;
 
                         if (imported.appState && imported.playerState) {
@@ -4649,7 +4796,10 @@
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         try {
-                            const imported = JSON.parse(e.target.result);
+                            let imported = JSON.parse(e.target.result);
+                            // Validate and sanitize the imported data to prevent script execution, prototype pollution, or logical overflows
+                            imported = validateAndSanitizeImport(imported);
+
                             let newState, newPlayerState, newExpansionState;
 
                             if (imported.appState && imported.playerState) {
