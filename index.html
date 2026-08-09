@@ -3666,6 +3666,25 @@
         document.addEventListener('DOMContentLoaded', function() {
             Particles.init();
             App.init();
+
+            // Click outside a modal to close it (except onboarding-modal)
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay && overlay.id !== 'onboarding-modal') {
+                        App.closeModal(overlay.id);
+                    }
+                });
+            });
+
+            // Press Escape to close the currently open modal (except onboarding-modal)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const openModal = document.querySelector('.modal-overlay.open');
+                    if (openModal && openModal.id !== 'onboarding-modal') {
+                        App.closeModal(openModal.id);
+                    }
+                }
+            });
         });
 
         function toggleSidebar() {
