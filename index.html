@@ -1298,6 +1298,125 @@
             color: #ffd700 !important;
         }
 
+        /* Honesty Oath & Swipe to Complete Slider Styling */
+        .swipe-container {
+            transition: all 0.3s ease;
+        }
+
+        .swipe-track-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 38px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.1s ease;
+        }
+
+        .swipe-track-wrapper.unlocked {
+            border-color: rgba(0, 245, 255, 0.4) !important;
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.15);
+        }
+
+        .swipe-bg-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-family: var(--font-system);
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            text-transform: uppercase;
+            transition: opacity 0.2s ease, color 0.3s ease;
+            z-index: 1;
+        }
+
+        .swipe-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            outline: none;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Slider Thumb styling */
+        .swipe-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #00f5ff;
+            box-shadow: 0 0 10px #00f5ff, inset 0 0 5px #fff;
+            cursor: not-allowed;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .swipe-slider::-moz-range-thumb {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 50%;
+            background: #00f5ff;
+            box-shadow: 0 0 10px #00f5ff, inset 0 0 5px #fff;
+            cursor: not-allowed;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        /* Active thumb styling when enabled */
+        .swipe-slider:not(:disabled)::-webkit-slider-thumb {
+            cursor: grab;
+        }
+
+        .swipe-slider:not(:disabled)::-moz-range-thumb {
+            cursor: grab;
+        }
+
+        .swipe-slider:not(:disabled):active::-webkit-slider-thumb {
+            cursor: grabbing;
+            background: #fff;
+            box-shadow: 0 0 15px #00f5ff, 0 0 25px #00f5ff;
+        }
+
+        .swipe-slider:not(:disabled):active::-moz-range-thumb {
+            cursor: grabbing;
+            background: #fff;
+            box-shadow: 0 0 15px #00f5ff, 0 0 25px #00f5ff;
+        }
+
+        /* Disabled thumb styling */
+        .swipe-slider:disabled::-webkit-slider-thumb {
+            background: #222;
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .swipe-slider:disabled::-moz-range-thumb {
+            background: #222;
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .honesty-label:hover {
+            color: var(--primary) !important;
+        }
+
+        .honesty-radio {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -2462,6 +2581,74 @@
             _dayIdxCache: {}, // Performance cache for date string to day index mapping to avoid redundant Date parsing
             escapeHTML: escapeHTML,
 
+            unlockSwipe(id, type) {
+                const radio = document.getElementById(`honesty-${type}-${id}`);
+                const slider = document.getElementById(`swipe-slider-${type}-${id}`);
+                const text = document.getElementById(`swipe-text-${type}-${id}`);
+
+                if (radio && radio.checked && slider) {
+                    slider.disabled = false;
+                    slider.style.cursor = 'grab';
+                    slider.style.opacity = '1';
+                    const label = radio.closest('.honesty-label');
+                    if (label) label.style.color = 'var(--primary)';
+                    if (text) {
+                        text.innerText = 'Swipe to Complete';
+                        text.style.color = 'rgba(0, 245, 255, 0.6)';
+                    }
+                    const wrapper = slider.closest('.swipe-track-wrapper');
+                    if (wrapper) wrapper.classList.add('unlocked');
+                    if (window.AudioSys) window.AudioSys.play('click');
+                }
+            },
+
+            handleSwipeInput(slider, id, type) {
+                const text = document.getElementById(`swipe-text-${type}-${id}`);
+                const val = parseInt(slider.value, 10);
+                if (text) {
+                    text.style.opacity = Math.max(0, 1 - (val / 70)).toString();
+                }
+                const wrapper = slider.closest('.swipe-track-wrapper');
+                if (wrapper) {
+                    wrapper.style.background = `linear-gradient(to right, rgba(0, 245, 255, 0.2) ${val}%, rgba(0, 0, 0, 0.6) ${val}%)`;
+                }
+            },
+
+            handleSwipeChange(slider, id, type) {
+                const val = parseInt(slider.value, 10);
+                if (val >= 100) {
+                    // Trigger completion by passing dynamic currentTarget as the slider element
+                    // This allows the floating XP animation to rise directly from the slider thumb!
+                    const dummyEvent = { currentTarget: slider };
+                    const targetId = isNaN(id) ? id : Number(id);
+                    if (type === 'quest') {
+                        App.completePenaltyQuest(dummyEvent, targetId);
+                    } else {
+                        App.toggleHabit(dummyEvent, targetId);
+                    }
+                } else {
+                    // Smooth snap back using requestAnimationFrame
+                    const startVal = val;
+                    let start = null;
+                    const duration = 200; // 200ms animation
+
+                    const step = (timestamp) => {
+                        if (!start) start = timestamp;
+                        const progress = timestamp - start;
+                        const currentVal = Math.max(0, startVal - (startVal * (progress / duration)));
+                        slider.value = currentVal;
+                        App.handleSwipeInput(slider, id, type);
+                        if (progress < duration) {
+                            window.requestAnimationFrame(step);
+                        } else {
+                            slider.value = 0;
+                            App.handleSwipeInput(slider, id, type);
+                        }
+                    };
+                    window.requestAnimationFrame(step);
+                }
+            },
+
             updateWordCount(textarea, id, type) {
                 const rawText = textarea.value.trim();
                 const wordCount = rawText === "" ? 0 : rawText.split(/\s+/).length;
@@ -3207,7 +3394,7 @@
             },
 
             toggleHabit(event, id) {
-                const habit = State.habits.find(h => h.id === id);
+                const habit = State.habits.find(h => h.id === id || String(h.id) === String(id));
                 if(!habit) return;
                 
                 const todayStr = getLocalDateString();
@@ -3242,16 +3429,13 @@
                     State.user.sleepBonusAvailable = true;
                 } else {
                     // Complete habit
-                    const textEl = document.getElementById(`evidence-habit-${id}`);
-                    const rawText = textEl ? textEl.value.trim() : "";
-                    const wordCount = rawText === "" ? 0 : rawText.split(/\s+/).length;
-
-                    if (wordCount < MIN_EVIDENCE_WORDS) {
-                        App.showSystemMessage("VERIFICATION FAILED", "The System requires more detail.");
+                    const radio = document.getElementById(`honesty-habit-${id}`);
+                    if (!radio || !radio.checked) {
+                        App.showSystemMessage("OATH REQUIRED", "You must swear the Honesty Oath first.");
                         return;
                     }
 
-                    const text = App.escapeHTML(rawText);
+                    const text = "Completed under Honesty Oath: " + App.escapeHTML(habit.title);
                     if (!habit.submissions) habit.submissions = {};
                     habit.submissions[todayStr] = {
                         log_text: text,
@@ -3306,16 +3490,13 @@
                 const quest = (State.quests || []).find(q => q.id === id || q.id === String(id));
                 if (!quest) return;
 
-                const textEl = document.getElementById(`evidence-quest-${id}`);
-                const rawText = textEl ? textEl.value.trim() : "";
-                const wordCount = rawText === "" ? 0 : rawText.split(/\s+/).length;
-
-                if (wordCount < MIN_EVIDENCE_WORDS) {
-                    App.showSystemMessage("VERIFICATION FAILED", "The System requires more detail.");
+                const radio = document.getElementById(`honesty-quest-${id}`);
+                if (!radio || !radio.checked) {
+                    App.showSystemMessage("OATH REQUIRED", "You must swear the Honesty Oath first.");
                     return;
                 }
 
-                const text = App.escapeHTML(rawText);
+                const text = "Completed under Honesty Oath: " + App.escapeHTML(quest.title);
 
                 quest.status = 'verified';
                 const todayStr = getLocalDateString();
@@ -3617,22 +3798,22 @@
                                 <span style="font-family: var(--font-system); font-size: 0.75rem; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; border: var(--border); ${isDone ? 'color: var(--success); border-color: var(--success); background: rgba(0, 255, 170, 0.05);' : 'color: var(--text-dim);'}">
                                     ${isDone ? 'COMPLETED' : 'PENDING'}
                                 </span>
-                                ${!isDone ? `
-                                    <button class="btn-primary" onclick="App.completePenaltyQuest(event, '${q.id}')" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;">
-                                        Complete
-                                    </button>
-                                ` : ''}
                             </div>
                         </div>
                         ${!isDone ? `
-                            <div class="evidence-container" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
-                                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 0;">
-                                        Proof of Effort (Verification: checks detail and length, not truthfulness)
-                                    </label>
-                                    <span id="word-count-quest-${q.id}" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--text-dim); transition: color 0.3s ease;">0 / 15 words</span>
+                            <div class="swipe-container" id="swipe-container-quest-${q.id}" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
+                                <label class="honesty-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-system); font-size: 0.85rem; color: var(--text-dim); transition: color 0.3s ease;">
+                                    <input type="radio" name="honesty-quest-${q.id}" id="honesty-quest-${q.id}" class="honesty-radio" onclick="App.unlockSwipe('${q.id}', 'quest')">
+                                    <span>I swear, on my honor, that I completed this quest honestly.</span>
+                                </label>
+                                <div class="swipe-track-wrapper">
+                                    <div class="swipe-bg-text" id="swipe-text-quest-${q.id}">
+                                        Locked - Swear Oath First
+                                    </div>
+                                    <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-quest-${q.id}" disabled
+                                           oninput="App.handleSwipeInput(this, '${q.id}', 'quest')"
+                                           onchange="App.handleSwipeChange(this, '${q.id}', 'quest')">
                                 </div>
-                                <textarea id="evidence-quest-${q.id}" class="input-field" oninput="App.updateWordCount(this, '${q.id}', 'quest')" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
                             </div>
                         ` : ''}
                     `;
@@ -3700,22 +3881,29 @@
                                     <span style="font-family: var(--font-system); font-size: 0.75rem; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; border: var(--border); ${isDone ? 'color: var(--success); border-color: var(--success); background: rgba(0, 255, 170, 0.05);' : 'color: var(--text-dim);'}">
                                         ${isDone ? 'COMPLETED' : 'PENDING'}
                                     </span>
-                                    <button class="btn-primary" onclick="App.toggleHabit(event, ${h.id})" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;">
-                                        ${isDone ? 'Undo' : 'Complete'}
-                                    </button>
+                                    ${isDone ? `
+                                        <button class="btn-primary" onclick="App.toggleHabit(event, ${h.id})" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;">
+                                            Undo
+                                        </button>
+                                    ` : ''}
                                     <button class="edit-btn" onclick="App.openModal(${h.id})" aria-label="Edit quest" title="Edit quest">✎</button>
                                     <button class="delete-btn" onclick="App.deleteHabit(${h.id})" aria-label="Delete quest" title="Delete quest">×</button>
                                 </div>
                             </div>
                             ${!isDone ? `
-                                <div class="evidence-container" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
-                                        <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 0;">
-                                            Proof of Effort (Verification: checks detail and length, not truthfulness)
-                                        </label>
-                                        <span id="word-count-habit-${h.id}" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--text-dim); transition: color 0.3s ease;">0 / 15 words</span>
+                                <div class="swipe-container" id="swipe-container-habit-${h.id}" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
+                                    <label class="honesty-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-system); font-size: 0.85rem; color: var(--text-dim); transition: color 0.3s ease;">
+                                        <input type="radio" name="honesty-habit-${h.id}" id="honesty-habit-${h.id}" class="honesty-radio" onclick="App.unlockSwipe('${h.id}', 'habit')">
+                                        <span>I swear, on my honor, that I completed this quest honestly.</span>
+                                    </label>
+                                    <div class="swipe-track-wrapper">
+                                        <div class="swipe-bg-text" id="swipe-text-habit-${h.id}">
+                                            Locked - Swear Oath First
+                                        </div>
+                                        <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-habit-${h.id}" disabled
+                                               oninput="App.handleSwipeInput(this, '${h.id}', 'habit')"
+                                               onchange="App.handleSwipeChange(this, '${h.id}', 'habit')">
                                     </div>
-                                    <textarea id="evidence-habit-${h.id}" class="input-field" oninput="App.updateWordCount(this, '${h.id}', 'habit')" placeholder="Describe what you did to complete this quest... (minimum 15 words)" style="width: 100%; min-height: 70px; font-family: var(--font-ui); font-size: 0.9rem; border: 1px solid rgba(0, 245, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #fff; padding: 8px; resize: vertical; box-sizing: border-box; margin-bottom: 0;"></textarea>
                                 </div>
                             ` : ''}
                         `;
@@ -4126,7 +4314,7 @@
 
                 const originalToggle = App.toggleHabit.bind(App);
                 App.toggleHabit = (event, id) => {
-                    const habit = State.habits.find(h => h.id === id);
+                    const habit = State.habits.find(h => h.id === id || String(h.id) === String(id));
                     if (!habit) return;
                     const todayStr = getLocalDateString();
                     const wasCompleted = habit.completedDates.includes(todayStr);
