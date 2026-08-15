@@ -2536,6 +2536,9 @@
             // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
             const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
 
+            // BOLT OPTIMIZATION: Batch DOM insertions using a DocumentFragment to minimize browser layout reflows and recalculations.
+            const gridFrag = document.createDocumentFragment();
+
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayStr = String(i).padStart(2, '0');
                 const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
@@ -2570,8 +2573,9 @@
                 }
 
                 div.textContent = dayNum;
-                grid.appendChild(div);
+                gridFrag.appendChild(div);
             }
+            grid.appendChild(gridFrag);
         }
 
         // --- APP LOGIC ---
@@ -3761,6 +3765,11 @@
                 // Gather generated quests for today
                 const todayQuests = (State.quests || []).filter(q => q.date === todayStr);
 
+                // BOLT OPTIMIZATION: Use DocumentFragments to batch DOM nodes for quest cards and sidebar items,
+                // minimizing expensive browser reflows and layout recalculations during re-renders.
+                const listFrag = document.createDocumentFragment();
+                const sidebarFrag = document.createDocumentFragment();
+
                 // Render generated quests
                 todayQuests.forEach(q => {
                     hasQuestsToday = true;
@@ -3817,7 +3826,7 @@
                             </div>
                         ` : ''}
                     `;
-                    listContainer.appendChild(card);
+                    listFrag.appendChild(card);
                 });
 
                 // Render custom user-created habits/quests
@@ -3855,7 +3864,7 @@
                                 <span class="sb-del" onclick="App.deleteHabit(${h.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" style="margin-left: 10px;" role="button" tabindex="0" aria-label="Delete quest" title="Delete quest">×</span>
                             </div>
                         `;
-                        sidebarList.appendChild(sbItem);
+                        sidebarFrag.appendChild(sbItem);
                     }
                     
                     // Dashboard active habits
@@ -3907,9 +3916,13 @@
                                 </div>
                             ` : ''}
                         `;
-                        listContainer.appendChild(card);
+                        listFrag.appendChild(card);
                     }
                 });
+
+                // Append batched fragments to container elements
+                if (listContainer) listContainer.appendChild(listFrag);
+                if (sidebarList) sidebarList.appendChild(sidebarFrag);
                 
                 // Update status view elements if they exist
                 if (document.getElementById('status-rank')) {

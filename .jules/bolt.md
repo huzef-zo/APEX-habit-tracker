@@ -13,3 +13,7 @@
 ## 2026-08-08 - Eliminating Costly Date Object Construction via Sakamoto's Algorithm
 **Learning:** Instantiating `new Date(dateStr + "T00:00:00")` is extremely slow and memory-intensive in loops and on cache misses, triggering costly JS engine allocations and subsequent garbage collection. By utilizing Sakamoto's mathematical weekday algorithm directly on the extracted year, month, and day integer slices from the string, we completely eliminate `Date` object allocation, producing identical results at >2.5x execution speeds.
 **Action:** Replace string-to-Date parsers with non-allocating, mathematical algorithms whenever standard components like weekdays or arithmetic offsets are needed for formatted date strings.
+
+## 2026-08-15 - Batching DOM Insertions via DocumentFragment
+**Learning:** Sequential calls to `parent.appendChild(element)` inside render loops (such as calendar days in `renderCalendar()` and habit/quest cards in `App.render()`) trigger incremental layout reflows and browser recalculations. Building elements inside a `DocumentFragment` in memory and performing a single `parent.appendChild(fragment)` call eliminates redundant reflows during UI re-renders.
+**Action:** Always wrap loop-generated DOM lists in a `DocumentFragment` before attaching them to active container elements.
