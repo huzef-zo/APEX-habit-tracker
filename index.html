@@ -1441,7 +1441,7 @@
             <h3 id="modal-title" style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ NEW QUEST ]</h3>
             <div style="margin-bottom: 1rem;">
                 <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Quest Title</label>
-                <input type="text" id="habit-name" class="input-field" placeholder="Enter quest description..." autocomplete="off">
+                <input type="text" id="habit-name" class="input-field" placeholder="Enter quest description..." maxlength="100" autocomplete="off">
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -3320,7 +3320,7 @@
             },
 
             saveHabit() {
-                const name = document.getElementById('habit-name').value.trim();
+                const name = document.getElementById('habit-name').value.trim().substring(0, 100);
                 const diffSelect = document.getElementById('habit-diff');
                 const diff = diffSelect.options[diffSelect.selectedIndex].value;
                 const statSelect = document.getElementById('habit-stat-cat');
