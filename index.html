@@ -1440,13 +1440,13 @@
         <div class="modal-box system-shimmer">
             <h3 id="modal-title" style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ NEW QUEST ]</h3>
             <div style="margin-bottom: 1rem;">
-                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Quest Title</label>
+                <label for="habit-name" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Quest Title</label>
                 <input type="text" id="habit-name" class="input-field" placeholder="Enter quest description..." maxlength="100" autocomplete="off">
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div>
-                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Difficulty</label>
+                    <label for="habit-diff" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Difficulty</label>
                     <select id="habit-diff" class="input-field">
                         <option value="easy">Easy (E-Rank)</option>
                         <option value="medium" selected>Normal (C-Rank)</option>
@@ -1455,7 +1455,7 @@
                 </div>
 
                 <div>
-                    <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Attribute</label>
+                    <label for="habit-stat-cat" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Attribute</label>
                     <select id="habit-stat-cat" class="input-field">
                         <option value="str">💪 STR</option>
                         <option value="int">🧠 INT</option>
@@ -1466,7 +1466,7 @@
                 </div>
             </div>
 
-            <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Quest Type</label>
+            <label for="habit-type" style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Quest Type</label>
             <select id="habit-type" class="input-field" onchange="App.toggleHabitType()">
                 <option value="repeating">Repeating Quest</option>
                 <option value="one-time">One-time Quest</option>
@@ -1474,14 +1474,14 @@
             </select>
 
             <div id="target-date-container" style="display: none;">
-                <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Target Date</label>
+                <label for="habit-target-date" style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Target Date</label>
                 <input type="date" id="habit-target-date" class="input-field">
             </div>
 
             <div id="date-range-container" style="display: none;">
-                <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Start Date</label>
+                <label for="habit-start-date" style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">Start Date</label>
                 <input type="date" id="habit-start-date" class="input-field">
-                <label style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">End Date</label>
+                <label for="habit-end-date" style="font-size: 0.8rem; color: #666; margin-bottom: 5px; display: block;">End Date</label>
                 <input type="date" id="habit-end-date" class="input-field">
             </div>
             
@@ -1512,12 +1512,12 @@
             <h3 style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER REGISTRATION</h3>
 
             <div style="margin-bottom: 1.5rem;">
-                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name</label>
+                <label for="profile-name-input" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name</label>
                 <input type="text" id="profile-name-input" class="input-field" placeholder="Enter Player Name..." maxlength="20" autocomplete="off">
             </div>
 
             <div style="margin-bottom: 2rem;">
-                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Job / Class</label>
+                <label for="profile-job-input" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Job / Class</label>
                 <input type="text" id="profile-job-input" class="input-field" list="job-suggestions" placeholder="Enter Job..." maxlength="25" autocomplete="off">
                 <datalist id="job-suggestions">
                     <option value="Shadow Monarch">
@@ -1553,7 +1553,7 @@
             </p>
 
             <div style="margin-bottom: 1.5rem;">
-                <label style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name</label>
+                <label for="onboarding-name-input" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name</label>
                 <input type="text" id="onboarding-name-input" class="input-field" placeholder="Enter Player Name (e.g. SUNG JIN-WOO)..." maxlength="20" autocomplete="off">
             </div>
 

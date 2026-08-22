@@ -13,3 +13,7 @@
 ## 2025-08-08 - Accessible Modal Dismissal Mechanics via Escape and Outside Clicks
 **Learning:** Forcing users to locate and click specific small "Cancel" or close buttons to dismiss modals introduces significant friction, particularly on mobile or for keyboard navigators. While native browsers handle dismissals for `<dialog>` elements, custom `.modal-overlay` div architectures require manual event handlers for standard Escape key actions and overlay backdrop clicks. However, mandatory or critical flow-blocking modals (such as onboarding) must be explicitly exempted to protect system initialization state.
 **Action:** Bind keydown 'Escape' and click-outside event listeners globally to all `.modal-overlay` elements, while filtering out mandatory flow IDs like `#onboarding-modal` to preserve state flow integrity.
+
+## 2025-08-22 - Explicit Label-Input Associations for Form Accessibility
+**Learning:** Custom form modals often render `<label>` elements visually adjacent to form fields without explicit `for` attributes matching `<input>` or `<select>` `id` attributes. This deprives assistive technology (screen readers) of explicit input associations and prevents touch/pointer users from clicking labels to focus inputs.
+**Action:** Always provide explicit `for="[id]"` attributes on `<label>` elements matching target input/select IDs across all modal dialogs.
