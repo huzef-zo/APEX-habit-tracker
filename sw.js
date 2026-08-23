@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apex-pwa-v24';
+const CACHE_NAME = 'apex-pwa-v25';
 const ASSETS = [
   './',
   './index.html',
