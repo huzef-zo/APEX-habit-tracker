@@ -2680,7 +2680,8 @@
                     syncHunterAndPlayerState();
                 }
 
-                State.user.name = nameVal;
+                // Security: Sanitize player name to prevent Stored XSS
+                State.user.name = this.escapeHTML(nameVal);
                 State.hunter.goals = "Manual Tracker";
                 State.onboardingCompleted = true;
 
@@ -3283,11 +3284,15 @@
                     return;
                 }
 
-                const updatedName = newName !== State.user.name;
-                const updatedJob = newJob !== State.user.job;
+                // Security: Sanitize profile fields before saving to prevent Stored XSS
+                const sanitizedName = this.escapeHTML(newName);
+                const sanitizedJob = this.escapeHTML(newJob);
 
-                State.user.name = newName;
-                State.user.job = newJob;
+                const updatedName = sanitizedName !== State.user.name;
+                const updatedJob = sanitizedJob !== State.user.job;
+
+                State.user.name = sanitizedName;
+                State.user.job = sanitizedJob;
 
                 saveState();
                 this.closeModal('profile-modal');
