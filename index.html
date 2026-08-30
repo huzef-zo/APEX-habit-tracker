@@ -2357,10 +2357,12 @@
             return clean;
         }
 
+        // BOLT OPTIMIZATION: Bypass redundant Date object re-instantiation when date is already a Date instance
         function getLocalDateString(date = new Date()) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
+            const d = date instanceof Date ? date : new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
 
@@ -4476,21 +4478,6 @@
 
         function saveExpansion() {
             localStorage.setItem(EXPANSION_KEY, JSON.stringify(expansionState));
-        }
-
-        // ==================== UTILITY FUNCTIONS ====================
-        function getLocalDateString(date = new Date()) {
-            const d = new Date(date);
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function getYesterdayDateString() {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            return getLocalDateString(yesterday);
         }
 
         // ==================== ACHIEVEMENT SYSTEM ====================
