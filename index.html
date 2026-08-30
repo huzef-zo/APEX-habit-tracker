@@ -3898,7 +3898,7 @@
                                         ${isDone ? 'COMPLETED' : 'PENDING'}
                                     </span>
                                     ${isDone ? `
-                                        <button class="btn-primary" onclick="App.toggleHabit(event, ${h.id})" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;">
+                                        <button class="btn-primary" onclick="App.toggleHabit(event, ${h.id})" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;" aria-label="Undo quest completion" title="Undo quest completion">
                                             Undo
                                         </button>
                                     ` : ''}
