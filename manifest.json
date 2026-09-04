@@ -2,8 +2,8 @@
   "name": "APEX Habit Tracker",
   "short_name": "APEX",
   "description": "Track habits, build consistency, level up your life.",
-  "start_url": "/APEX-habit-tracker/",
-  "scope": "/APEX-habit-tracker/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#000000",
@@ -28,7 +28,7 @@
       "name": "Add Habit",
       "short_name": "Add",
       "description": "Quickly add a new habit",
-      "url": "/APEX-habit-tracker/?action=add",
+      "url": "./?action=add",
       "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
     }
   ]
