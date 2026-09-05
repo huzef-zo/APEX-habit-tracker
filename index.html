@@ -3830,6 +3830,7 @@
                                         Locked - Swear Oath First
                                     </div>
                                     <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-quest-${q.id}" disabled
+                                           aria-label="Swipe to complete quest" title="Swipe to complete quest"
                                            oninput="App.handleSwipeInput(this, '${q.id}', 'quest')"
                                            onchange="App.handleSwipeChange(this, '${q.id}', 'quest')">
                                 </div>
@@ -3920,6 +3921,7 @@
                                             Locked - Swear Oath First
                                         </div>
                                         <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-habit-${h.id}" disabled
+                                               aria-label="Swipe to complete quest" title="Swipe to complete quest"
                                                oninput="App.handleSwipeInput(this, '${h.id}', 'habit')"
                                                onchange="App.handleSwipeChange(this, '${h.id}', 'habit')">
                                     </div>
