@@ -2294,7 +2294,8 @@
                     appState.quests = appState.quests.map(q => {
                         if (!q || typeof q !== 'object') return null;
                         return {
-                            id: forceStr(q.id, 100, String(Date.now())),
+                            // Security: Sanitize quest id to alphanumeric/dash/underscore to prevent inline XSS injection; fallback to Date.now if empty
+                            id: forceStr(q.id, 100, '').replace(/[^a-zA-Z0-9_-]/g, '') || String(Date.now()),
                             title: forceStr(q.title, 100, 'Untitled System Mission'),
                             description: forceStr(q.description, 200, 'System task evaluation.'),
                             difficulty: forceStr(q.difficulty, 20, 'medium'),
