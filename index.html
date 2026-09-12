@@ -3613,17 +3613,23 @@
                     if (habit.streak > habit.bestStreak) habit.bestStreak = habit.streak;
                     return;
                 }
-                const completedSet = new Set(habit.completedDates);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                const sortedDates = habit.completedDates.slice().sort().reverse();
-                if (sortedDates.length === 0) {
+                const completedDates = habit.completedDates;
+                if (!completedDates || completedDates.length === 0) {
                     habit.streak = 0;
                     return;
                 }
-                
-                const lastCompletedStr = sortedDates[0];
+
+                const completedSet = new Set(completedDates);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // BOLT OPTIMIZATION: Use a single-pass O(N) max string comparison loop to locate lastCompletedStr
+                // instead of creating array copies and executing expensive full array sorts via .slice().sort().reverse().
+                let lastCompletedStr = completedDates[0];
+                for (let i = 1; i < completedDates.length; i++) {
+                    if (completedDates[i] > lastCompletedStr) lastCompletedStr = completedDates[i];
+                }
+
                 const lastCompletedDate = new Date(lastCompletedStr + 'T00:00:00');
 
                 let tempDate = new Date(lastCompletedDate);
@@ -3645,6 +3651,10 @@
                     let curr = new Date(lastCompletedDate);
                     curr.setDate(curr.getDate() - 1);
 
+                    // BOLT OPTIMIZATION: Pre-parse createdAt into a single Date instance outside the loop
+                    // to prevent re-instantiating new Date(habit.createdAt) on every loop iteration.
+                    const createdLimit = habit.createdAt ? new Date(habit.createdAt) : null;
+
                     while (true) {
                         const dStr = getLocalDateString(curr);
                         const isScheduled = this.isHabitActiveOnDate(habit, dStr);
@@ -3658,7 +3668,7 @@
                         }
                         curr.setDate(curr.getDate() - 1);
                         if (streak > 1000) break;
-                        if (habit.createdAt && curr < new Date(habit.createdAt)) break;
+                        if (createdLimit && curr < createdLimit) break;
                     }
                     habit.streak = streak;
                     if (streak > habit.bestStreak) habit.bestStreak = streak;
