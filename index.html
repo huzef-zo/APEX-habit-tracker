@@ -1443,8 +1443,11 @@
         <div class="modal-box system-shimmer">
             <h3 id="modal-title" style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ NEW QUEST ]</h3>
             <div style="margin-bottom: 1rem;">
-                <label for="habit-name" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Quest Title</label>
-                <input type="text" id="habit-name" class="input-field" placeholder="Enter quest description..." maxlength="100" autocomplete="off">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label for="habit-name" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; display: block;">Quest Title</label>
+                    <span id="habit-name-count" style="font-family: var(--font-system); font-size: 0.7rem; color: var(--text-dim);">0 / 100</span>
+                </div>
+                <input type="text" id="habit-name" class="input-field" placeholder="Enter quest description..." maxlength="100" autocomplete="off" oninput="App.updateCharCount()">
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -3267,8 +3270,19 @@
                     document.getElementById('modal-save-btn').innerText = "Initialize Quest";
                 }
 
+                this.updateCharCount();
                 this.toggleHabitType();
                 document.getElementById('add-modal').classList.add('open');
+            },
+
+            updateCharCount() {
+                const input = document.getElementById('habit-name');
+                const counter = document.getElementById('habit-name-count');
+                if (input && counter) {
+                    const len = input.value.length;
+                    counter.textContent = `${len} / 100`;
+                    counter.style.color = len >= 100 ? 'var(--danger)' : 'var(--text-dim)';
+                }
             },
 
             closeModal(id = 'add-modal') { 
@@ -3604,6 +3618,7 @@
                     State.habits = State.habits.filter(h => h.id !== id);
                     saveState();
                     this.renderHistory(); // Update history view
+                    this.render(); // Instantly refresh active dashboard & sidebar list
                 }
             },
 
@@ -3971,7 +3986,13 @@
                 if (!hasQuestsToday && listContainer) {
                     listContainer.innerHTML = `
                         <div style="text-align:center; color:var(--text-dim); padding:4rem 2rem; font-family: var(--font-system); letter-spacing: 2px;">
-                            [ NO MISSIONS SCHEDULED ]
+                            <div style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-dim);">[ NO MISSIONS SCHEDULED ]</div>
+                            <p style="font-size: 0.85rem; color: #888; font-family: var(--font-ui); margin-bottom: 1.5rem; text-transform: none; letter-spacing: normal;">
+                                No active quests for today. Create a new quest to begin earning XP and leveling up!
+                            </p>
+                            <button class="btn-primary" onclick="App.openModal()" style="width: auto; padding: 0.75rem 1.8rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;" aria-label="Initialize new quest" title="Initialize new quest">
+                                <span>+</span> Initialize New Quest
+                            </button>
                         </div>
                     `;
                 }

@@ -17,3 +17,7 @@
 ## 2025-08-22 - Explicit Label-Input Associations for Form Accessibility
 **Learning:** Custom form modals often render `<label>` elements visually adjacent to form fields without explicit `for` attributes matching `<input>` or `<select>` `id` attributes. This deprives assistive technology (screen readers) of explicit input associations and prevents touch/pointer users from clicking labels to focus inputs.
 **Action:** Always provide explicit `for="[id]"` attributes on `<label>` elements matching target input/select IDs across all modal dialogs.
+
+## 2025-09-12 - Actionable Empty States in Focused Gaming Dashboards
+**Learning:** Displaying standalone status strings like `[ NO MISSIONS SCHEDULED ]` without next steps leaves users stranded, forcing them to search for floating action elements (like FABs). Integrating an explicit description and an inline CTA button directly inside the empty state component creates a frictionless, contextual flow for new and daily active users.
+**Action:** Always include actionable CTA buttons alongside empty state notices to guide the user to the next logical step without requiring interface navigation.
