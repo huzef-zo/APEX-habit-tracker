@@ -2351,12 +2351,38 @@
                 playerState.overflowPool = forceNum(playerState.overflowPool, 0, 99999, 0);
             };
 
+            const validateExpansionState = (expState) => {
+                if (!expState || typeof expState !== 'object') return;
+                expState.dailyResetHour = forceNum(expState.dailyResetHour, 0, 23, 0);
+                expState.consecutiveMisses = forceNum(expState.consecutiveMisses, 0, 1000, 0);
+                expState.criticalState = Boolean(expState.criticalState);
+                expState.perfectDays = forceNum(expState.perfectDays, 0, 100000, 0);
+                expState.perfectStreak = forceNum(expState.perfectStreak, 0, 100000, 0);
+                expState.comboCount = forceNum(expState.comboCount, 0, 10000, 0);
+                expState.chainDays = forceNum(expState.chainDays, 0, 10000, 0);
+                expState.raidsCompleted = forceNum(expState.raidsCompleted, 0, 100000, 0);
+                expState.awakeningCount = forceNum(expState.awakeningCount, 0, 10000, 0);
+                expState.powerRating = forceNum(expState.powerRating, 0, 10000000, 0);
+                expState.version = forceNum(expState.version, 1, 100, 1);
+                expState.equippedTitle = forceStr(expState.equippedTitle, 50, null);
+                expState.raidRank = forceStr(expState.raidRank, 10, 'E');
+                expState.comboDate = forceStr(expState.comboDate, 20, null);
+                if (expState.titles && Array.isArray(expState.titles)) {
+                    expState.titles = expState.titles.map(t => typeof t === 'object' && t ? { id: forceStr(t.id, 50, ''), name: forceStr(t.name, 50, '') } : null).filter(Boolean);
+                }
+                if (expState.achievements && Array.isArray(expState.achievements)) {
+                    expState.achievements = expState.achievements.map(a => typeof a === 'object' && a ? { id: forceStr(a.id, 50, ''), unlockedAt: forceStr(a.unlockedAt, 50, '') } : null).filter(Boolean);
+                }
+            };
+
             if (clean.appState && clean.playerState) {
                 validateAppState(clean.appState);
                 validatePlayerState(clean.playerState);
+                if (clean.expansionState) validateExpansionState(clean.expansionState);
             } else {
                 // Old format
                 validateAppState(clean);
+                if (clean.expansionState) validateExpansionState(clean.expansionState);
             }
             return clean;
         }
