@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+  <rect width="600" height="800" fill="#111827"/>
+  <rect x="50" y="50" width="500" height="700" rx="20" fill="#1F2937" stroke="#374151" stroke-width="4"/>
+  <text x="300" y="380" font-family="sans-serif" font-size="28" font-weight="bold" fill="#F3F4F6" text-anchor="middle">NILEX TS ZIP 1</text>
+</svg>
