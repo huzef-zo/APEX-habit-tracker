@@ -1439,7 +1439,7 @@
     </div>
     
     <!-- Add Habit Modal -->
-    <div class="modal-overlay" id="add-modal">
+    <div class="modal-overlay" id="add-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-box system-shimmer">
             <h3 id="modal-title" style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ NEW QUEST ]</h3>
             <div style="margin-bottom: 1rem;">
@@ -1513,9 +1513,9 @@
     </div>
     
     <!-- Player Profile Modal -->
-    <div class="modal-overlay" id="profile-modal">
+    <div class="modal-overlay" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
         <div class="modal-box system-shimmer">
-            <h3 style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER REGISTRATION</h3>
+            <h3 id="profile-modal-title" style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER REGISTRATION</h3>
 
             <div style="margin-bottom: 1.5rem;">
                 <label for="profile-name-input" style="font-family: var(--font-system); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block;">Player Name</label>
@@ -1540,10 +1540,10 @@
     </div>
 
     <!-- Level Up Modal -->
-    <div class="modal-overlay" id="level-modal">
+    <div class="modal-overlay" id="level-modal" role="dialog" aria-modal="true" aria-labelledby="level-modal-title">
         <div class="modal-box" style="text-align: center; max-width: 500px; padding: 4rem 2rem;">
             <div style="font-family: var(--font-display); color: #fff; font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 1rem; opacity: 0.8;">CONGRATULATIONS</div>
-            <h1 style="color: var(--primary); font-family: var(--font-display); font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 0 0 30px var(--primary);">★ LEVEL UP ★</h1>
+            <h1 id="level-modal-title" style="color: var(--primary); font-family: var(--font-display); font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 0 0 30px var(--primary);">★ LEVEL UP ★</h1>
             <div style="height: 2px; width: 100px; background: var(--primary); margin: 2rem auto;"></div>
             <p style="margin-bottom: 3rem; color: #fff; font-family: var(--font-ui); font-size: 1.5rem; letter-spacing: 1px;" id="level-msg">You have reached Level 2</p>
             <button class="btn-primary" onclick="App.closeModal('level-modal')" style="width: auto; padding: 1.2rem 4rem;">ACKNOWLEDGE</button>
@@ -1551,9 +1551,9 @@
     </div>
 
     <!-- Onboarding Modal -->
-    <div class="modal-overlay" id="onboarding-modal">
+    <div class="modal-overlay" id="onboarding-modal" role="dialog" aria-modal="true" aria-labelledby="onboarding-modal-title">
         <div class="modal-box system-shimmer" style="max-width: 500px;">
-            <h3 style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER ONBOARDING</h3>
+            <h3 id="onboarding-modal-title" style="font-family: var(--font-display); margin-bottom: 1.5rem; color: var(--primary); letter-spacing: 2px;">[ SYSTEM ] PLAYER ONBOARDING</h3>
             <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.4; font-family: var(--font-ui);">
                 Welcome, Hunter. To initialize the System, please define your identity.
             </p>
