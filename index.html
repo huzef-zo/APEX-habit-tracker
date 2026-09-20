@@ -2283,8 +2283,8 @@
                             title: forceStr(h.title, 100, 'Unknown Quest'),
                             desc: forceStr(h.desc || h.description, 200, ''),
                             completedDates: Array.isArray(h.completedDates) ? h.completedDates.map(d => forceStr(d, 20, '')) : [],
-                            diff: forceStr(h.diff, 20, 'medium'),
-                            stat: forceStr(h.stat, 20, 'str'),
+                            diff: forceStr(h.diff, 20, 'medium').replace(/[^a-zA-Z0-9_-]/g, ''),
+                            stat: forceStr(h.stat, 20, 'str').replace(/[^a-zA-Z0-9_-]/g, ''),
                             type: forceStr(h.type, 20, 'repeating'),
                             streak: forceNum(h.streak, 0, 10000, 0),
                             date: forceStr(h.date, 20, null),
@@ -2301,7 +2301,7 @@
                             id: forceStr(q.id, 100, '').replace(/[^a-zA-Z0-9_-]/g, '') || String(Date.now()),
                             title: forceStr(q.title, 100, 'Untitled System Mission'),
                             description: forceStr(q.description, 200, 'System task evaluation.'),
-                            difficulty: forceStr(q.difficulty, 20, 'medium'),
+                            difficulty: forceStr(q.difficulty, 20, 'medium').replace(/[^a-zA-Z0-9_-]/g, ''),
                             status: forceStr(q.status, 20, 'pending'),
                             date: forceStr(q.date, 20, ''),
                             stat_targets: (q.stat_targets && typeof q.stat_targets === 'object') ? q.stat_targets : { STR: 1 }
@@ -3837,15 +3837,15 @@
                     hasQuestsToday = true;
                     const q_title = this.escapeHTML(q.title || 'Untitled System Mission');
                     const q_desc = this.escapeHTML(q.description || 'System task evaluation.');
-                    const q_diff = q.difficulty || 'medium';
+                    const q_diff = this.escapeHTML(q.difficulty || 'medium');
                     const q_status = q.status || 'pending';
                     const q_stat_raw = Object.keys(q.stat_targets || { STR: 1 })[0] || 'STR';
-                    let q_stat_label = q_stat_raw.toUpperCase();
-                    if (q_stat_label === 'INT') q_stat_label = 'INT | Mastery';
-                    else if (q_stat_label === 'STR') q_stat_label = 'STR | Discipline';
-                    else if (q_stat_label === 'AGI') q_stat_label = 'AGI | Execution';
-                    else if (q_stat_label === 'VIT') q_stat_label = 'VIT | Health';
-                    else if (q_stat_label === 'SNS' || q_stat_label === 'PER') q_stat_label = 'PER | Vision';
+                    let q_stat_label = this.escapeHTML(q_stat_raw.toUpperCase());
+                    if (q_stat_raw.toUpperCase() === 'INT') q_stat_label = 'INT | Mastery';
+                    else if (q_stat_raw.toUpperCase() === 'STR') q_stat_label = 'STR | Discipline';
+                    else if (q_stat_raw.toUpperCase() === 'AGI') q_stat_label = 'AGI | Execution';
+                    else if (q_stat_raw.toUpperCase() === 'VIT') q_stat_label = 'VIT | Health';
+                    else if (q_stat_raw.toUpperCase() === 'SNS' || q_stat_raw.toUpperCase() === 'PER') q_stat_label = 'PER | Vision';
                     const q_xp = q_diff === 'hard' ? 100 : q_diff === 'medium' ? 50 : 25;
                     const isDone = q_status === 'verified';
 
@@ -3896,14 +3896,14 @@
                 State.habits.forEach(h => {
                     const h_title = this.escapeHTML(h.title || 'Unknown Quest');
                     const h_comp = Array.isArray(h.completedDates) ? h.completedDates : [];
-                    const h_diff = h.diff || 'medium';
+                    const h_diff = this.escapeHTML(h.diff || 'medium');
                     const h_stat_raw = h.stat || 'str';
-                    let h_stat_label = h_stat_raw.toUpperCase();
-                    if (h_stat_label === 'INT') h_stat_label = 'INT | Mastery';
-                    else if (h_stat_label === 'STR') h_stat_label = 'STR | Discipline';
-                    else if (h_stat_label === 'AGI') h_stat_label = 'AGI | Execution';
-                    else if (h_stat_label === 'VIT') h_stat_label = 'VIT | Health';
-                    else if (h_stat_label === 'SNS' || h_stat_label === 'PER') h_stat_label = 'PER | Vision';
+                    let h_stat_label = this.escapeHTML(h_stat_raw.toUpperCase());
+                    if (h_stat_raw.toUpperCase() === 'INT') h_stat_label = 'INT | Mastery';
+                    else if (h_stat_raw.toUpperCase() === 'STR') h_stat_label = 'STR | Discipline';
+                    else if (h_stat_raw.toUpperCase() === 'AGI') h_stat_label = 'AGI | Execution';
+                    else if (h_stat_raw.toUpperCase() === 'VIT') h_stat_label = 'VIT | Health';
+                    else if (h_stat_raw.toUpperCase() === 'SNS' || h_stat_raw.toUpperCase() === 'PER') h_stat_label = 'PER | Vision';
                     const h_streak = typeof h.streak === 'number' ? h.streak : 0;
                     const h_type = h.type || 'repeating';
 
