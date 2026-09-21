@@ -3909,7 +3909,6 @@
 
                     const isTodayActive = this.isHabitActiveOnDate(h, todayStr);
                     const isDone = h_comp.includes(todayStr) || h.status === 'verified';
-                    const xpValue = this.getHabitXP(h);
                     
                     if (isDone) currentStreakTotal = Math.max(currentStreakTotal, h_streak);
                     
@@ -3933,6 +3932,9 @@
                     // Dashboard active habits
                     if (isTodayActive && listContainer) {
                         hasQuestsToday = true;
+
+                        // BOLT OPTIMIZATION: Defer getHabitXP calculation so it only runs when a habit is active on today's date
+                        const xpValue = this.getHabitXP(h);
 
                         const card = document.createElement('div');
                         card.className = `habit-card ${isDone ? 'completed' : ''}`;
