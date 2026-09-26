@@ -4202,11 +4202,18 @@
                 return Math.floor(base * Math.pow(level, 1.5));
             },
 
+            _totalXpCache: {}, // BOLT OPTIMIZATION: Memoization cache for cumulative XP per level
+
             getTotalXpForLevel(lvl) {
+                if (lvl <= 1) return 0;
+                if (!this._totalXpCache) this._totalXpCache = {};
+                if (this._totalXpCache[lvl] !== undefined) return this._totalXpCache[lvl];
+
                 let total = 0;
                 for (let i = 1; i < lvl; i++) {
                     total += this.getXpRequired(i);
                 }
+                this._totalXpCache[lvl] = total;
                 return total;
             },
 
