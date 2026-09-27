@@ -3259,9 +3259,9 @@
                 document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
 
                 if (id) {
-                    const habit = State.habits.find(h => h.id === id);
+                    const habit = State.habits.find(h => h.id === id || String(h.id) === String(id));
                     if (!habit) return;
-                    this.editingHabitId = id;
+                    this.editingHabitId = habit.id;
 
                     document.getElementById('habit-name').value = habit.title || '';
                     document.getElementById('habit-diff').value = habit.diff || 'medium';
@@ -3641,7 +3641,7 @@
 
             deleteHabit(id) {
                 if(confirm("Delete this quest?")) {
-                    State.habits = State.habits.filter(h => h.id !== id);
+                    State.habits = State.habits.filter(h => h.id !== id && String(h.id) !== String(id));
                     saveState();
                     this.renderHistory(); // Update history view
                     this.render(); // Instantly refresh active dashboard & sidebar list
@@ -3835,6 +3835,7 @@
                 // Render generated quests
                 todayQuests.forEach(q => {
                     hasQuestsToday = true;
+                    const q_id = String(q.id).replace(/[^a-zA-Z0-9_-]/g, '');
                     const q_title = this.escapeHTML(q.title || 'Untitled System Mission');
                     const q_desc = this.escapeHTML(q.description || 'System task evaluation.');
                     const q_diff = this.escapeHTML(q.difficulty || 'medium');
@@ -3872,19 +3873,19 @@
                             </div>
                         </div>
                         ${!isDone ? `
-                            <div class="swipe-container" id="swipe-container-quest-${q.id}" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
+                            <div class="swipe-container" id="swipe-container-quest-${q_id}" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
                                 <label class="honesty-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-system); font-size: 0.85rem; color: var(--text-dim); transition: color 0.3s ease;">
-                                    <input type="radio" name="honesty-quest-${q.id}" id="honesty-quest-${q.id}" class="honesty-radio" onclick="App.unlockSwipe('${q.id}', 'quest')">
+                                    <input type="radio" name="honesty-quest-${q_id}" id="honesty-quest-${q_id}" class="honesty-radio" onclick="App.unlockSwipe('${q_id}', 'quest')">
                                     <span>I swear, on my honor, that I completed this quest honestly.</span>
                                 </label>
                                 <div class="swipe-track-wrapper">
-                                    <div class="swipe-bg-text" id="swipe-text-quest-${q.id}">
+                                    <div class="swipe-bg-text" id="swipe-text-quest-${q_id}">
                                         Locked - Swear Oath First
                                     </div>
-                                    <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-quest-${q.id}" disabled
+                                    <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-quest-${q_id}" disabled
                                            aria-label="Swipe to complete quest" title="Swipe to complete quest"
-                                           oninput="App.handleSwipeInput(this, '${q.id}', 'quest')"
-                                           onchange="App.handleSwipeChange(this, '${q.id}', 'quest')">
+                                           oninput="App.handleSwipeInput(this, '${q_id}', 'quest')"
+                                           onchange="App.handleSwipeChange(this, '${q_id}', 'quest')">
                                 </div>
                             </div>
                         ` : ''}
@@ -3894,6 +3895,7 @@
 
                 // Render custom user-created habits/quests
                 State.habits.forEach(h => {
+                    const h_id = typeof h.id === 'number' ? h.id : String(h.id).replace(/[^a-zA-Z0-9_-]/g, '');
                     const h_title = this.escapeHTML(h.title || 'Unknown Quest');
                     const h_comp = Array.isArray(h.completedDates) ? h.completedDates : [];
                     const h_diff = this.escapeHTML(h.diff || 'medium');
@@ -3922,8 +3924,8 @@
                                 ${isTodayActive ? 'Active' : 'Inactive'}
                             </span>
                             <div style="display: flex; align-items: center;">
-                                <span class="sb-edit" onclick="App.openModal(${h.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" role="button" tabindex="0" aria-label="Edit quest" title="Edit quest">✎</span>
-                                <span class="sb-del" onclick="App.deleteHabit(${h.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" style="margin-left: 10px;" role="button" tabindex="0" aria-label="Delete quest" title="Delete quest">×</span>
+                                <span class="sb-edit" onclick="App.openModal('${h_id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" role="button" tabindex="0" aria-label="Edit quest" title="Edit quest">✎</span>
+                                <span class="sb-del" onclick="App.deleteHabit('${h_id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" style="margin-left: 10px;" role="button" tabindex="0" aria-label="Delete quest" title="Delete quest">×</span>
                             </div>
                         `;
                         sidebarFrag.appendChild(sbItem);
@@ -3956,28 +3958,28 @@
                                         ${isDone ? 'COMPLETED' : 'PENDING'}
                                     </span>
                                     ${isDone ? `
-                                        <button class="btn-primary" onclick="App.toggleHabit(event, ${h.id})" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;" aria-label="Undo quest completion" title="Undo quest completion">
+                                        <button class="btn-primary" onclick="App.toggleHabit(event, '${h_id}')" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; width: auto;" aria-label="Undo quest completion" title="Undo quest completion">
                                             Undo
                                         </button>
                                     ` : ''}
-                                    <button class="edit-btn" onclick="App.openModal(${h.id})" aria-label="Edit quest" title="Edit quest">✎</button>
-                                    <button class="delete-btn" onclick="App.deleteHabit(${h.id})" aria-label="Delete quest" title="Delete quest">×</button>
+                                    <button class="edit-btn" onclick="App.openModal('${h_id}')" aria-label="Edit quest" title="Edit quest">✎</button>
+                                    <button class="delete-btn" onclick="App.deleteHabit('${h_id}')" aria-label="Delete quest" title="Delete quest">×</button>
                                 </div>
                             </div>
                             ${!isDone ? `
-                                <div class="swipe-container" id="swipe-container-habit-${h.id}" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
+                                <div class="swipe-container" id="swipe-container-habit-${h_id}" style="width: 100%; border-top: 1px solid rgba(0, 245, 255, 0.1); padding-top: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
                                     <label class="honesty-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-system); font-size: 0.85rem; color: var(--text-dim); transition: color 0.3s ease;">
-                                        <input type="radio" name="honesty-habit-${h.id}" id="honesty-habit-${h.id}" class="honesty-radio" onclick="App.unlockSwipe('${h.id}', 'habit')">
+                                        <input type="radio" name="honesty-habit-${h_id}" id="honesty-habit-${h_id}" class="honesty-radio" onclick="App.unlockSwipe('${h_id}', 'habit')">
                                         <span>I swear, on my honor, that I completed this quest honestly.</span>
                                     </label>
                                     <div class="swipe-track-wrapper">
-                                        <div class="swipe-bg-text" id="swipe-text-habit-${h.id}">
+                                        <div class="swipe-bg-text" id="swipe-text-habit-${h_id}">
                                             Locked - Swear Oath First
                                         </div>
-                                        <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-habit-${h.id}" disabled
+                                        <input type="range" min="0" max="100" value="0" class="swipe-slider" id="swipe-slider-habit-${h_id}" disabled
                                                aria-label="Swipe to complete quest" title="Swipe to complete quest"
-                                               oninput="App.handleSwipeInput(this, '${h.id}', 'habit')"
-                                               onchange="App.handleSwipeChange(this, '${h.id}', 'habit')">
+                                               oninput="App.handleSwipeInput(this, '${h_id}', 'habit')"
+                                               onchange="App.handleSwipeChange(this, '${h_id}', 'habit')">
                                     </div>
                                 </div>
                             ` : ''}
