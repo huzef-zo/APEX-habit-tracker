@@ -1494,13 +1494,13 @@
             <div id="repeating-days-container">
                 <label style="font-size: 0.8rem; color: #666; margin-bottom: 10px; display: block;">Repeat On:</label>
                 <div class="day-selector" id="day-selector">
-                    <button class="day-btn" data-day="0" aria-label="Sunday">S</button>
-                    <button class="day-btn" data-day="1" aria-label="Monday">M</button>
-                    <button class="day-btn" data-day="2" aria-label="Tuesday">T</button>
-                    <button class="day-btn" data-day="3" aria-label="Wednesday">W</button>
-                    <button class="day-btn" data-day="4" aria-label="Thursday">T</button>
-                    <button class="day-btn" data-day="5" aria-label="Friday">F</button>
-                    <button class="day-btn" data-day="6" aria-label="Saturday">S</button>
+                    <button class="day-btn" data-day="0" aria-label="Sunday" aria-pressed="false">S</button>
+                    <button class="day-btn" data-day="1" aria-label="Monday" aria-pressed="false">M</button>
+                    <button class="day-btn" data-day="2" aria-label="Tuesday" aria-pressed="false">T</button>
+                    <button class="day-btn" data-day="3" aria-label="Wednesday" aria-pressed="false">W</button>
+                    <button class="day-btn" data-day="4" aria-label="Thursday" aria-pressed="false">T</button>
+                    <button class="day-btn" data-day="5" aria-label="Friday" aria-pressed="false">F</button>
+                    <button class="day-btn" data-day="6" aria-label="Saturday" aria-pressed="false">S</button>
                 </div>
 
                 <button style="font-size: 0.8rem; color: var(--primary); background: none; border: none; cursor: pointer; text-decoration: underline; margin-bottom: 1rem; display: block;" onclick="App.toggleEveryday()">Select Every Day</button>
@@ -3131,7 +3131,8 @@
                 // Set up day selector
                 document.querySelectorAll('.day-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        e.target.classList.toggle('selected');
+                        const isSel = e.target.classList.toggle('selected');
+                        e.target.setAttribute('aria-pressed', isSel ? 'true' : 'false');
                         const day = parseInt(e.target.dataset.day);
                         if(this.tempDays.includes(day)) {
                             this.tempDays = this.tempDays.filter(d => d !== day);
@@ -3256,7 +3257,10 @@
 
             openModal(id = null) {
                 this.tempDays = [];
-                document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('.day-btn').forEach(b => {
+                    b.classList.remove('selected');
+                    b.setAttribute('aria-pressed', 'false');
+                });
 
                 if (id) {
                     const habit = State.habits.find(h => h.id === id);
@@ -3274,8 +3278,10 @@
                     if (habit.type === 'repeating' && habit.days) {
                         this.tempDays = [...habit.days].map(Number);
                         document.querySelectorAll('.day-btn').forEach(btn => {
-                            if (this.tempDays.includes(parseInt(btn.dataset.day))) {
+                            const isSel = this.tempDays.includes(parseInt(btn.dataset.day));
+                            if (isSel) {
                                 btn.classList.add('selected');
+                                btn.setAttribute('aria-pressed', 'true');
                             }
                         });
                     }
@@ -3367,9 +3373,11 @@
                 document.querySelectorAll('.day-btn').forEach(btn => {
                     if (!allSelected) {
                         btn.classList.add('selected');
+                        btn.setAttribute('aria-pressed', 'true');
                         this.tempDays.push(parseInt(btn.dataset.day));
                     } else {
                         btn.classList.remove('selected');
+                        btn.setAttribute('aria-pressed', 'false');
                     }
                 });
             },
