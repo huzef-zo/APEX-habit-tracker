@@ -1427,8 +1427,12 @@
     <div class="scanlines"></div>
 
     <!-- System Notification -->
-    <div id="system-notification" class="system-notification">
-        <div class="system-notification-header" id="sys-notif-title">System Message</div>
+    <div id="system-notification" class="system-notification" role="status" aria-live="polite">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <div class="system-notification-header" id="sys-notif-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">System Message</div>
+            <button onclick="App.hideSystemMessage()" aria-label="Dismiss system notification" title="Dismiss notification" style="background: none; border: none; color: var(--text-dim); font-size: 1.2rem; line-height: 1; cursor: pointer; padding: 0 4px; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-dim)'">×</button>
+        </div>
+        <div style="border-bottom: 1px solid rgba(0, 245, 255, 0.3); margin: 6px 0 8px 0;"></div>
         <div class="system-notification-body" id="sys-notif-body">Message body text.</div>
     </div>
 
@@ -2935,19 +2939,39 @@
                 event.target.value = '';
             },
 
+            notifTimeout: null,
+
+            hideSystemMessage() {
+                const notif = document.getElementById('system-notification');
+                if (notif) {
+                    notif.classList.remove('active');
+                    if (this.notifTimeout) {
+                        clearTimeout(this.notifTimeout);
+                        this.notifTimeout = null;
+                    }
+                }
+            },
+
             showSystemMessage(title, message) {
                 const notif = document.getElementById('system-notification');
                 const titleEl = document.getElementById('sys-notif-title');
                 const bodyEl = document.getElementById('sys-notif-body');
 
+                if (!notif || !titleEl || !bodyEl) return;
+
+                if (this.notifTimeout) clearTimeout(this.notifTimeout);
+
+                notif.setAttribute('role', 'status');
+                notif.setAttribute('aria-live', 'polite');
+
                 titleEl.innerText = title;
                 bodyEl.innerText = message;
 
                 notif.classList.add('active');
-                AudioSys.play('complete');
+                if (window.AudioSys) AudioSys.play('complete');
 
-                setTimeout(() => {
-                    notif.classList.remove('active');
+                this.notifTimeout = setTimeout(() => {
+                    this.hideSystemMessage();
                 }, 5000);
             },
 
@@ -2957,6 +2981,11 @@
                 const bodyEl = document.getElementById('sys-notif-body');
 
                 if (!notif || !titleEl || !bodyEl) return;
+
+                if (this.notifTimeout) clearTimeout(this.notifTimeout);
+
+                notif.setAttribute('role', 'alert');
+                notif.setAttribute('aria-live', 'assertive');
 
                 titleEl.innerText = "🚨 SYSTEM CONNECTION FAILED";
                 bodyEl.innerText = message;
@@ -2969,8 +2998,8 @@
                 notif.classList.add('active');
                 if (window.AudioSys) window.AudioSys.play('click'); // Play error click
 
-                setTimeout(() => {
-                    notif.classList.remove('active');
+                this.notifTimeout = setTimeout(() => {
+                    this.hideSystemMessage();
                     // Reset styling after transition
                     setTimeout(() => {
                         notif.style.borderColor = "";

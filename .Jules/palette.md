@@ -21,3 +21,7 @@
 ## 2025-09-12 - Actionable Empty States in Focused Gaming Dashboards
 **Learning:** Displaying standalone status strings like `[ NO MISSIONS SCHEDULED ]` without next steps leaves users stranded, forcing them to search for floating action elements (like FABs). Integrating an explicit description and an inline CTA button directly inside the empty state component creates a frictionless, contextual flow for new and daily active users.
 **Action:** Always include actionable CTA buttons alongside empty state notices to guide the user to the next logical step without requiring interface navigation.
+
+## 2025-10-03 - Accessible & Dismissible Notification Toasts
+**Learning:** Auto-dismissing system toasts without manual close controls can obstruct mobile viewports and frustrate users needing to interact with blocked UI elements. Additionally, static toast containers without dynamic ARIA live region attributes (`role="status"`/`aria-live="polite"` for standard messages vs `role="alert"`/`aria-live="assertive"` for errors) fail to trigger assistive technology speech synthesizers. Dynamically updating ARIA live region attributes based on message severity alongside a clear dismiss button ensures both screen reader accessibility and full user control.
+**Action:** Always provide explicit close buttons with descriptive `aria-label` attributes on toast overlays, and dynamically set `role` and `aria-live` attributes based on message severity.
