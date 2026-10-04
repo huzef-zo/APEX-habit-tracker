@@ -2276,16 +2276,23 @@
                     }
                 }
                 if (appState.habits && Array.isArray(appState.habits)) {
+                    const VALID_DIFFS = ['easy', 'medium', 'hard'];
+                    const VALID_STATS = ['str', 'int', 'agi', 'vit', 'sns'];
+                    const VALID_TYPES = ['repeating', 'one-time', 'date-range'];
+
                     appState.habits = appState.habits.map(h => {
                         if (!h || typeof h !== 'object') return null;
+                        const cleanDiff = forceStr(h.diff, 20, 'medium').replace(/[^a-zA-Z0-9_-]/g, '');
+                        const cleanStat = forceStr(h.stat, 20, 'str').replace(/[^a-zA-Z0-9_-]/g, '');
+                        const cleanType = forceStr(h.type, 20, 'repeating');
                         return {
                             id: forceNum(h.id, 0, Number.MAX_SAFE_INTEGER, Date.now()),
                             title: forceStr(h.title, 100, 'Unknown Quest'),
                             desc: forceStr(h.desc || h.description, 200, ''),
                             completedDates: Array.isArray(h.completedDates) ? h.completedDates.map(d => forceStr(d, 20, '')) : [],
-                            diff: forceStr(h.diff, 20, 'medium').replace(/[^a-zA-Z0-9_-]/g, ''),
-                            stat: forceStr(h.stat, 20, 'str').replace(/[^a-zA-Z0-9_-]/g, ''),
-                            type: forceStr(h.type, 20, 'repeating'),
+                            diff: VALID_DIFFS.includes(cleanDiff) ? cleanDiff : 'medium',
+                            stat: VALID_STATS.includes(cleanStat) ? cleanStat : 'str',
+                            type: VALID_TYPES.includes(cleanType) ? cleanType : 'repeating',
                             streak: forceNum(h.streak, 0, 10000, 0),
                             date: forceStr(h.date, 20, null),
                             startDate: forceStr(h.startDate, 20, null),
@@ -2294,14 +2301,17 @@
                     }).filter(Boolean);
                 }
                 if (appState.quests && Array.isArray(appState.quests)) {
+                    const VALID_DIFFS = ['easy', 'medium', 'hard'];
+
                     appState.quests = appState.quests.map(q => {
                         if (!q || typeof q !== 'object') return null;
+                        const cleanDiff = forceStr(q.difficulty, 20, 'medium').replace(/[^a-zA-Z0-9_-]/g, '');
                         return {
                             // Security: Sanitize quest id to alphanumeric/dash/underscore to prevent inline XSS injection; fallback to Date.now if empty
                             id: forceStr(q.id, 100, '').replace(/[^a-zA-Z0-9_-]/g, '') || String(Date.now()),
                             title: forceStr(q.title, 100, 'Untitled System Mission'),
                             description: forceStr(q.description, 200, 'System task evaluation.'),
-                            difficulty: forceStr(q.difficulty, 20, 'medium').replace(/[^a-zA-Z0-9_-]/g, ''),
+                            difficulty: VALID_DIFFS.includes(cleanDiff) ? cleanDiff : 'medium',
                             status: forceStr(q.status, 20, 'pending'),
                             date: forceStr(q.date, 20, ''),
                             stat_targets: (q.stat_targets && typeof q.stat_targets === 'object') ? q.stat_targets : { STR: 1 }
@@ -2991,6 +3001,9 @@
             },
 
             allocateStat(stat) {
+                const VALID_STATS = ['str', 'int', 'agi', 'vit', 'sns'];
+                if (!VALID_STATS.includes(stat)) return;
+
                 if (State.user.stats.points > 0) {
                     State.user.stats[stat]++;
                     State.user.stats.points--;
@@ -3187,14 +3200,17 @@
 
                 // Apply stat bonuses if it's a habit object
                 if (typeof habit === 'object' && habit.stat) {
-                    const statVal = State.user.stats[habit.stat] || 10;
+                    const VALID_STATS = ['str', 'int', 'agi', 'vit', 'sns'];
+                    const statKey = VALID_STATS.includes(habit.stat) ? habit.stat : null;
+                    const statVal = (statKey && State.user && State.user.stats) ? (State.user.stats[statKey] || 10) : 10;
                     // 2% bonus per point above 10
                     const multiplier = 1 + (statVal - 10) * 0.02;
                     xp = Math.floor(xp * multiplier);
 
                     // AGI bonus for streaks
                     if (habit.streak > 1) {
-                        const agiBonus = (State.user.stats.agi - 10) * 0.01;
+                        const agiVal = (State.user && State.user.stats) ? (State.user.stats.agi || 10) : 10;
+                        const agiBonus = (agiVal - 10) * 0.01;
                         xp = Math.floor(xp * (1 + agiBonus));
                     }
                 }
@@ -3385,10 +3401,19 @@
             saveHabit() {
                 const name = document.getElementById('habit-name').value.trim().substring(0, 100);
                 const diffSelect = document.getElementById('habit-diff');
-                const diff = diffSelect.options[diffSelect.selectedIndex].value;
+                const rawDiff = diffSelect.options[diffSelect.selectedIndex].value;
                 const statSelect = document.getElementById('habit-stat-cat');
-                const stat = statSelect.options[statSelect.selectedIndex].value;
-                const type = document.getElementById('habit-type').value;
+                const rawStat = statSelect.options[statSelect.selectedIndex].value;
+                const rawType = document.getElementById('habit-type').value;
+
+                // Security: Validate inputs against strict allowlists
+                const VALID_DIFFS = ['easy', 'medium', 'hard'];
+                const VALID_STATS = ['str', 'int', 'agi', 'vit', 'sns'];
+                const VALID_TYPES = ['repeating', 'one-time', 'date-range'];
+
+                const diff = VALID_DIFFS.includes(rawDiff) ? rawDiff : 'medium';
+                const stat = VALID_STATS.includes(rawStat) ? rawStat : 'str';
+                const type = VALID_TYPES.includes(rawType) ? rawType : 'repeating';
                 const targetDate = document.getElementById('habit-target-date').value;
                 const startDate = document.getElementById('habit-start-date').value;
                 const endDate = document.getElementById('habit-end-date').value;
@@ -4336,7 +4361,9 @@
             },
 
             allocateAttribute(stat) {
-                const key = stat.toUpperCase();
+                const VALID_ATTRS = ['STR', 'INT', 'AGI', 'VIT', 'SNS', 'PER'];
+                const key = typeof stat === 'string' ? stat.toUpperCase() : '';
+                if (!VALID_ATTRS.includes(key)) return;
                 if (this.playerState.availablePoints <= 0) return;
 
                 if (this.playerState.attributes[key] >= 999) {
