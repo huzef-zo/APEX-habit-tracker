@@ -2420,7 +2420,12 @@
         }
 
         // --- HISTORY FUNCTIONS (from index.html) ---
-        function drawHistoryChart() {
+        // BOLT OPTIMIZATION: Helper to pre-map completedDates to Sets for fast O(1) lookups
+        function getHabitCompletionSets() {
+            return new Map((State.habits || []).map(h => [h.id, new Set(h.completedDates || [])]));
+        }
+
+        function drawHistoryChart(completedSets = getHabitCompletionSets()) {
             const canvas = document.getElementById('historyChart');
             if (!canvas) return;
             
@@ -2437,22 +2442,27 @@
             // 30x expensive redundant Date creations and complex calendar calculation overhead.
             const d = new Date();
             d.setDate(d.getDate() - 29);
-            // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
-            const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
+            const habits = State.habits || [];
+
             for (let i = 29; i >= 0; i--) {
                 const dateStr = getLocalDateString(d);
                 labels.push(d.getDate());
 
-                const habitsScheduled = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
-                const scheduled = habitsScheduled.length;
+                // BOLT OPTIMIZATION: Iterate State.habits in a single pass without intermediate array allocations
+                let scheduled = 0;
+                let completed = 0;
+                for (let j = 0; j < habits.length; j++) {
+                    const h = habits[j];
+                    if (App.isHabitActiveOnDate(h, dateStr)) {
+                        scheduled++;
+                        const compSet = completedSets.get(h.id);
+                        if (compSet && compSet.has(dateStr)) completed++;
+                    }
+                }
+
                 if (scheduled === 0) {
                     dataPoints.push(0);
                 } else {
-                    let completed = 0;
-                    habitsScheduled.forEach(h => {
-                        const compSet = completedSets.get(h.id);
-                        if (compSet && compSet.has(dateStr)) completed++;
-                    });
                     dataPoints.push((completed / scheduled) * 100);
                 }
 
@@ -2527,7 +2537,7 @@
             }
         }
 
-        function drawOverallRing() {
+        function drawOverallRing(completedSets = getHabitCompletionSets()) {
             let totalPossible = 0;
             let totalDone = 0;
             const now = new Date();
@@ -2539,19 +2549,20 @@
             // by using string interpolation to construct the date string.
             const yearStr = String(year);
             const monthStr = String(month + 1).padStart(2, '0');
-
-            // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
-            const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
+            const habits = State.habits || [];
 
             for (let i = 1; i <= today; i++) {
                 const dayStr = String(i).padStart(2, '0');
                 const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
-                const habits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
-                totalPossible += habits.length;
-                habits.forEach(h => {
-                    const compSet = completedSets.get(h.id);
-                    if (compSet && compSet.has(dateStr)) totalDone++;
-                });
+                // BOLT OPTIMIZATION: Direct single-pass scan over habits to calculate totals without array filter allocations
+                for (let j = 0; j < habits.length; j++) {
+                    const h = habits[j];
+                    if (App.isHabitActiveOnDate(h, dateStr)) {
+                        totalPossible++;
+                        const compSet = completedSets.get(h.id);
+                        if (compSet && compSet.has(dateStr)) totalDone++;
+                    }
+                }
             }
             const pct = totalPossible === 0 ? 0 : Math.round((totalDone / totalPossible) * 100);
             const circle = document.getElementById('history-ring');
@@ -2564,7 +2575,7 @@
             if (percentEl) percentEl.textContent = `${pct}%`;
         }
 
-        function renderCalendar() {
+        function renderCalendar(completedSets = getHabitCompletionSets()) {
             const grid = document.getElementById('calendar-grid');
             if (!grid) return;
             
@@ -2581,9 +2592,7 @@
             const yearStr = String(year);
             const monthStr = String(month + 1).padStart(2, '0');
             const currentDay = now.getDate();
-
-            // BOLT OPTIMIZATION: Pre-map completedDates to Sets to avoid O(N) array includes search in loops
-            const completedSets = new Map(State.habits.map(h => [h.id, new Set(h.completedDates || [])]));
+            const habits = State.habits || [];
 
             // BOLT OPTIMIZATION: Batch DOM insertions using a DocumentFragment to minimize browser layout reflows and recalculations.
             const gridFrag = document.createDocumentFragment();
@@ -2594,15 +2603,20 @@
                 const dayNum = i;
                 const isToday = dateStr === todayStr;
 
-                const scheduledHabits = State.habits.filter(h => App.isHabitActiveOnDate(h, dateStr));
+                // BOLT OPTIMIZATION: Calculate scheduled and completed counts in a single pass without array filter allocations
+                let scheduledCount = 0;
                 let completedCount = 0;
-                scheduledHabits.forEach(h => { 
-                    const compSet = completedSets.get(h.id);
-                    if (compSet && compSet.has(dateStr)) completedCount++;
-                });
+                for (let j = 0; j < habits.length; j++) {
+                    const h = habits[j];
+                    if (App.isHabitActiveOnDate(h, dateStr)) {
+                        scheduledCount++;
+                        const compSet = completedSets.get(h.id);
+                        if (compSet && compSet.has(dateStr)) completedCount++;
+                    }
+                }
                 
                 const isPast = i < currentDay && !isToday;
-                const isMissed = isPast && scheduledHabits.length > 0 && completedCount === 0;
+                const isMissed = isPast && scheduledCount > 0 && completedCount === 0;
 
                 // Calculate heat level based on completed tasks
                 let heatLevel = 0;
@@ -3210,9 +3224,11 @@
 
 
             renderHistory() {
-                drawHistoryChart();
-                drawOverallRing();
-                renderCalendar();
+                // BOLT OPTIMIZATION: Construct habit completion Sets once and pass across history renders to avoid repeated Map/Set allocations
+                const completedSets = getHabitCompletionSets();
+                drawHistoryChart(completedSets);
+                drawOverallRing(completedSets);
+                renderCalendar(completedSets);
                 this.renderWeeklyReport();
             },
 
